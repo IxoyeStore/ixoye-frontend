@@ -8,8 +8,8 @@ const BannerDiscount = () => {
         <div className="p-5 sm:p-20 text-center">
             <h2 className="uppercase font-black text-2xl text-primary">Encuentra descuentos en toda la tienda</h2>
             <div className="max-w-md mx-auto sm:flex justify-center gap-8 mt-5">
-                <Link href="#" className={buttonVariants()}>Comprar</Link>
-                <Link href="#" className={buttonVariants({variant: "outline"})}>Más información</Link>
+                <Link href="/category" className={buttonVariants()}>Comprar</Link>
+                <Link href="/info" className={buttonVariants({variant: "outline"})}>Más información</Link>
             </div>
         </div>
       );

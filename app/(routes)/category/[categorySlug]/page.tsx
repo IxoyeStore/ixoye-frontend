@@ -1,4 +1,5 @@
 "use client"
+
 import { Separator } from "@/components/ui/separator"
 import { useParams } from "next/navigation"
 import { useGetCategoryProduct } from "@/api/getCategoryProduct"
@@ -7,13 +8,11 @@ import SkeletonSchema from "@/components/skeletonSchema"
 import ProductCard from "@/app/(routes)/category/[categorySlug]/components/product-card"
 import { ProductType } from "@/types/product"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 
 export default function Page() {
   const { categorySlug } = useParams<{ categorySlug: string }>()
   const { result, loading, error } = useGetCategoryProduct(categorySlug)
   const [filterOrigin, setFilterOrigin] = useState('')
-  const router = useRouter()
 
   const filteredProducts = result !== null && !loading && (
     filterOrigin == '' 
@@ -37,7 +36,7 @@ export default function Page() {
       <Separator />
 
       <div className="sm:flex sm:justify-between">
-        <FiltersControlCategory setFilterOrigin={setFilterOrigin}/>
+        <FiltersControlCategory setFilterOrigin={setFilterOrigin} filterOrigin={filterOrigin}/>
 
         <div className="grid w-full gap-5 mt-8 sm:grid-cols-2 md:grid-cols-3 md:gap-10">
           {loading && <SkeletonSchema grid={3} />}

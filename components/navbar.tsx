@@ -39,7 +39,7 @@ export default function Header() {
         {/* MENU DESKTOP */}
         <nav className="hidden md:flex gap-6 items-center">
 
-          <Link href="/tienda" aria-label="Tienda" className={iconClass}>
+          <Link href="/category" aria-label="Tienda" className={iconClass}>
             <Store className="w-5 h-5" />
           </Link>
 
@@ -69,9 +69,9 @@ export default function Header() {
           </Link>
 
           {/* PERFIL */}
-          <Link href="/perfil" aria-label="Perfil" className={iconClass}>
+          {/* <Link href="/profile" aria-label="Perfil" className={iconClass}>
             <User className="w-5 h-5" />
-          </Link>
+          </Link> */}
         </nav>
 
         {/* BOTÓN MENU MOBILE */}
@@ -89,7 +89,7 @@ export default function Header() {
         <nav className="md:hidden bg-white/95 backdrop-blur-md shadow-lg flex justify-around py-4">
 
           <Link
-            href="/tienda"
+            href="/category"
             onClick={() => setOpen(false)}
             aria-label="Tienda"
             className={iconClass}
@@ -123,14 +123,14 @@ export default function Header() {
           </Link>
 
           {/* PERFIL */}
-          <Link
-            href="/perfil"
+          {/* <Link
+            href="/profile"
             onClick={() => setOpen(false)}
             aria-label="Perfil"
             className={iconClass}
           >
             <User className="w-6 h-6" />
-          </Link>
+          </Link> */}
         </nav>
       )}
     </header>

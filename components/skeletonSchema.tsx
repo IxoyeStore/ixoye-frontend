@@ -1,25 +1,27 @@
-import {Skeleton} from "./ui/skeleton";
+import { Skeleton } from "./ui/skeleton"
 
-type SkeletonSchemaProps ={
-    grid: number
+type SkeletonSchemaProps = {
+  grid: number
 }
 
-const SkeletonSchema = (props: SkeletonSchemaProps) => {
-    const {grid} = props;
-    
-    return (  
-        Array.from({length: grid}).map((_,index) =>
+const SkeletonSchema = ({ grid }: SkeletonSchemaProps) => {
+  return (
+    <>
+      {Array.from({ length: grid }).map((_, index) => (
+        <div
+          key={index}
+          className="flex flex-col gap-4 p-4 border rounded-xl bg-background"
+        >
+          {/* Imagen */}
+          <Skeleton className="w-full aspect-square rounded-lg" />
 
-            <div key={index} className="flex flex-col gap-8 mx-auto spaye-y-3">
-                <Skeleton className="h-[125px] w[250px] rounded-xl"/>
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-[250px]" />
-                    <Skeleton className="h-4 w-[250px]" />
-                </div>
-            </div>
-
-        )
-    );
+          {/* Texto */}
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+        </div>
+      ))}
+    </>
+  )
 }
- 
-export default SkeletonSchema;
+
+export default SkeletonSchema
