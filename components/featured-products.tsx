@@ -1,27 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
-"use client"
+"use client";
 
-import { useGetFeaturedProducts } from "@/api/useGetFeturedProducts"
-import { ResponeType } from "@/types/response"
+import { useGetFeaturedProducts } from "@/api/useGetFeturedProducts";
+import { ResponeType } from "@/types/response";
 import {
   Carousel,
   CarouselContent,
   CarouselNext,
   CarouselPrevious,
   CarouselItem,
-} from "./ui/carousel"
-import FeaturedSkeleton from "./featuredSkeleton"
-import { ProductType } from "@/types/product"
-import { Card, CardContent } from "@/components/ui/card"
-import { Expand, ShoppingCart } from "lucide-react"
-import IconButton from "./ui/icon-button"
-import { useRouter } from "next/navigation"
-import { useCart } from "@/hooks/use-cart"
+} from "./ui/carousel";
+import FeaturedSkeleton from "./featuredSkeleton";
+import { ProductType } from "@/types/product";
+import { Card, CardContent } from "@/components/ui/card";
+import { Expand, ShoppingCart } from "lucide-react";
+import IconButton from "./ui/icon-button";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/hooks/use-cart";
 
 const FeaturedProducts = () => {
-  const { result, loading }: ResponeType = useGetFeaturedProducts()
-  const router = useRouter()
-  const { addItem } = useCart()
+  const { result, loading }: ResponeType = useGetFeaturedProducts();
+  const router = useRouter();
+  const { addItem } = useCart();
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
@@ -33,9 +33,9 @@ const FeaturedProducts = () => {
 
           {!loading &&
             result?.map((product: ProductType) => {
-              if (!product) return null
+              if (!product) return null;
 
-              const { id, slug, images, productName, price } = product
+              const { id, slug, images, productName, price } = product;
 
               return (
                 <CarouselItem
@@ -65,7 +65,9 @@ const FeaturedProducts = () => {
                           <div className="flex justify-center gap-x-6">
                             <IconButton
                               onClick={() => router.push(`product/${slug}`)}
-                              icon={<Expand size={20} className="text-gray-600" />}
+                              icon={
+                                <Expand size={20} className="text-gray-600" />
+                              }
                             />
                             <IconButton
                               onClick={() => addItem(product)}
@@ -84,14 +86,14 @@ const FeaturedProducts = () => {
                         <h3 className="text-lg font-bold line-clamp-2 min-h-[3rem]">
                           {productName}
                         </h3>
-                        <div className="flex items-center">
+                        <div className="flex items-center text-green-700">
                           <p>${price}</p>
                         </div>
                       </div>
                     </Card>
                   </div>
                 </CarouselItem>
-              )
+              );
             })}
         </CarouselContent>
 
@@ -99,7 +101,7 @@ const FeaturedProducts = () => {
         <CarouselNext className="hidden sm:flex" />
       </Carousel>
     </div>
-  )
-}
+  );
+};
 
-export default FeaturedProducts
+export default FeaturedProducts;

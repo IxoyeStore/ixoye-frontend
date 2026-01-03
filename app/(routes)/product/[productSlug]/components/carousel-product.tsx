@@ -1,26 +1,33 @@
 /* eslint-disable @next/next/no-img-element */
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 type ImageProps = {
-  id: number
-  url: string
-  alternativeText?: string | null
-}
+  id: number;
+  url: string;
+  alternativeText?: string | null;
+};
 
 interface CarouselProductProps {
-  images: ImageProps[]
+  images: ImageProps[];
 }
 
 const CarouselProduct = ({ images }: CarouselProductProps) => {
   if (!images || images.length === 0) {
-    return <p>No hay imagenes para mostrar</p>
+    return <p>No hay imagenes para mostrar</p>;
   }
 
-  const showArrows = images.length > 1
+  const showArrows = images.length > 1;
 
   return (
     <div className="sm:px-16">
-      <Carousel opts={{
+      <Carousel
+        opts={{
           loop: images.length > 1,
         }}
       >
@@ -41,10 +48,9 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
             <CarouselNext />
           </>
         )}
-
       </Carousel>
     </div>
-  )
-}
+  );
+};
 
-export default CarouselProduct
+export default CarouselProduct;

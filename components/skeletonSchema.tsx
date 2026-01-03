@@ -1,8 +1,8 @@
-import { Skeleton } from "./ui/skeleton"
+import { Skeleton } from "./ui/skeleton";
 
 type SkeletonSchemaProps = {
-  grid: number
-}
+  grid: number;
+};
 
 const SkeletonSchema = ({ grid }: SkeletonSchemaProps) => {
   return (
@@ -21,7 +21,7 @@ const SkeletonSchema = ({ grid }: SkeletonSchemaProps) => {
         </div>
       ))}
     </>
-  )
-}
+  );
+};
 
-export default SkeletonSchema
+export default SkeletonSchema;

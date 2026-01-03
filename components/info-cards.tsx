@@ -1,12 +1,11 @@
-"use client"
+"use client";
 
-import { Truck, BadgePercent, Store } from "lucide-react"
+import { Truck, BadgePercent, Store } from "lucide-react";
 
 const InfoCards = () => {
   return (
     <section className="max-w-6xl mx-auto px-6 py-12">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-
         {/* Envíos */}
         <div className="flex items-center gap-4 p-6 border border-gray-200 rounded-lg">
           <Truck className="w-10 h-10 text-gray-700 shrink-0" />
@@ -39,10 +38,9 @@ const InfoCards = () => {
             </p>
           </div>
         </div>
-
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default InfoCards
+export default InfoCards;

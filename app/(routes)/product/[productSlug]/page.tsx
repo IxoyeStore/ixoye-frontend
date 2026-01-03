@@ -1,25 +1,25 @@
-"use client"
-import { useGetProductBySlug } from "@/api/getProductBySlug"
-import { useParams } from "next/navigation"
-import SkeletonProduct from "./components/skeleton-product"
-import CarouselProduct from "./components/carousel-product"
-import InfoProduct from "@/app/(routes)/product/[productSlug]/components/info-product"
+"use client";
+import { useGetProductBySlug } from "@/api/getProductBySlug";
+import { useParams } from "next/navigation";
+import SkeletonProduct from "./components/skeleton-product";
+import CarouselProduct from "./components/carousel-product";
+import InfoProduct from "@/app/(routes)/product/[productSlug]/components/info-product";
 
 export default function Page() {
-  const params = useParams()
+  const params = useParams();
 
   const productSlug = Array.isArray(params.productSlug)
     ? params.productSlug[0]
-    : params.productSlug
+    : params.productSlug;
 
-  const { product, loading, error } = useGetProductBySlug(productSlug)
+  const { product, loading, error } = useGetProductBySlug(productSlug);
 
   if (loading) {
-    return <SkeletonProduct />
+    return <SkeletonProduct />;
   }
 
   if (error || !product) {
-    return <p>No se encontró el producto</p>
+    return <p>No se encontró el producto</p>;
   }
 
   return (
@@ -30,9 +30,9 @@ export default function Page() {
         </div>
 
         <div className="sm:px-12">
-          <InfoProduct product={product}/>
+          <InfoProduct product={product} />
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -11,32 +11,43 @@ const ChooseCategory = () => {
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
-      <h3 className="px-6 pb-4 text-3xl sm:pb-8">Categorías</h3>
+      <h3 className="px-6 pb-4 text-3xl sm:pb-8">Categorías destacadas</h3>
 
-      <div className="grid gap-5 sm:grid-cols-3">
-        {!loading && result !== undefined &&(
-            result.map((category: CategoryType)=>(
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {!loading &&
+          result?.map((category: CategoryType) => (
             <Link
-                key={category.id}
-                href={`/category/${category.slug}`}
-                className="relative max-w-xd mx-auto overflow-hidden bg-no-repeat bg-cover rounded-lg"
+              key={category.id}
+              href={`/category/${category.slug}`}
+              className="
+              relative
+              w-full
+              aspect-[4/5]
+              overflow-hidden
+              rounded-xl
+              shadow-md"
             >
-                <img
-                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${category.mainImage?.data?.url}`}
-                  alt={category.categoryName}
-                  className="max-w-[270px] transition duration-300 ease-in-out rounded-lg hover:scale-110"
-                />
+              <img
+                src={
+                  category.mainImage?.url
+                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${category.mainImage.url}`
+                    : "/placeholder-category.jpg"
+                }
+                alt={category.categoryName}
+                loading="lazy"
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+              />
 
-                <p className="absolute w-full py-2 text-lg font-bold text-center text-white bottom-5 backdrop-blur-lg">
-                  {category.categoryName}
-                </p>
-              </Link>
-            ))
-        )}
-
+              <p
+                className="absolute bottom-0 w-full py-2 text-lg font-semibold text-center text-white
+              bg-sky-700 backdrop-blur-md"
+              >
+                {category.categoryName}
+              </p>
+            </Link>
+          ))}
       </div>
-
-      </div>
+    </div>
   );
 };
 

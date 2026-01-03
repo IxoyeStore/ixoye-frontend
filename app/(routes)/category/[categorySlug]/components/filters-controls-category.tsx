@@ -1,9 +1,9 @@
-import FilterOrigin from "./filter-origin"
+import FilterOrigin from "./filter-origin";
 
 type FiltersControlsCategoryProps = {
-  filterOrigin: string
-  setFilterOrigin: (origin: string) => void
-}
+  filterOrigin: string;
+  setFilterOrigin: (origin: string) => void;
+};
 
 const FiltersControlCategory = ({
   filterOrigin,
@@ -16,7 +16,7 @@ const FiltersControlCategory = ({
         setFilterOrigin={setFilterOrigin}
       />
     </div>
-  )
-}
+  );
+};
 
-export default FiltersControlCategory
+export default FiltersControlCategory;

@@ -1,26 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 interface ProductImageMiniatureProps {
-    slug: string,
-    url: string,
+  slug: string;
+  url: string;
 }
 
-const ProductImageMiniature = (props : ProductImageMiniatureProps) => {
-    const {slug, url} = props
-    const router = useRouter()
+const ProductImageMiniature = (props: ProductImageMiniatureProps) => {
+  const { slug, url } = props;
+  const router = useRouter();
 
-    return ( 
+  return (
+    <div
+      className="cursor-pointer"
+      onClick={() => router.push(`/product/${slug}`)}
+    >
+      <img
+        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${url}`}
+        alt="Producto"
+        className="w-24 h-24 overflow-hidden rounded-md sm:w-auto sm:h-32"
+      />
+    </div>
+  );
+};
 
-        <div className="cursor-pointer" onClick={() => router.push(`/product/${slug}`)}>
-            <img
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${url}`}
-            alt="Producto"
-            className="w-24 h-24 overflow-hidden rounded-md sm:w-auto sm:h-32"
-            />
-        </div>
-
-     );
-}
- 
 export default ProductImageMiniature;

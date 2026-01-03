@@ -1,45 +1,43 @@
-"use client"
+"use client";
 
-import { Separator } from "@/components/ui/separator"
-import SkeletonSchema from "@/components/skeletonSchema"
-import { ProductType } from "@/types/product"
-import { useEffect, useState } from "react"
-import ProductCard from "./[categorySlug]/components/product-card"
-import FiltersControlCategory from "./[categorySlug]/components/filters-controls-category"
-import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator";
+import SkeletonSchema from "@/components/skeletonSchema";
+import { ProductType } from "@/types/product";
+import { useEffect, useState } from "react";
+import ProductCard from "./[categorySlug]/components/product-card";
+import FiltersControlCategory from "./[categorySlug]/components/filters-controls-category";
+import { Button } from "@/components/ui/button";
 
 export default function Page() {
-  const [result, setResult] = useState<ProductType[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [filterOrigin, setFilterOrigin] = useState("")
+  const [result, setResult] = useState<ProductType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [filterOrigin, setFilterOrigin] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?populate=*`
-        )
-        const json = await res.json()
-        setResult(json.data ?? [])
+        );
+        const json = await res.json();
+        setResult(json.data ?? []);
       } catch {
-        setError("Error al cargar los productos")
+        setError("Error al cargar los productos");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchProducts()
-  }, [])
+    fetchProducts();
+  }, []);
 
   const filteredProducts =
     filterOrigin === ""
       ? result
-      : result.filter(
-          (product) => product.origin === filterOrigin
-        )
+      : result.filter((product) => product.origin === filterOrigin);
 
-  if (error) return <p>{error}</p>
+  if (error) return <p>{error}</p>;
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
@@ -48,9 +46,12 @@ export default function Page() {
       <Separator />
 
       <div className="sm:flex sm:justify-between">
-        {/* Filtros */}
+        {/* Filtros
         <div>
-          <FiltersControlCategory setFilterOrigin={setFilterOrigin} filterOrigin={filterOrigin} />
+          <FiltersControlCategory
+            setFilterOrigin={setFilterOrigin}
+            filterOrigin={filterOrigin}
+          />
 
           {filterOrigin !== "" && (
             <Button
@@ -62,8 +63,7 @@ export default function Page() {
               Quitar filtro
             </Button>
           )}
-        </div>
-
+        </div> */}
         {/* Grid */}
         <div className="grid w-full gap-5 mt-8 sm:grid-cols-2 md:grid-cols-3 md:gap-10">
           {loading && <SkeletonSchema grid={6} />}
@@ -81,5 +81,5 @@ export default function Page() {
         </div>
       </div>
     </div>
-  )
+  );
 }
