@@ -49,7 +49,7 @@ export default function RegisterPage() {
 
       if (userId && jwt) {
         const updateRes = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/profile/me`,
           {
             method: "PUT",
             headers: {
