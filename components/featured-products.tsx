@@ -13,15 +13,18 @@ import {
 import FeaturedSkeleton from "./featuredSkeleton";
 import { ProductType } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
-import { Expand, ShoppingCart } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import IconButton from "./ui/icon-button";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/use-cart";
+import { useLovedProducts } from "@/hooks/use-loved-products";
 
 const FeaturedProducts = () => {
   const { result, loading }: ResponeType = useGetFeaturedProducts();
   const router = useRouter();
   const { addItem } = useCart();
+
+  const { lovedItems, addLovedItem, removeLovedItem } = useLovedProducts();
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
@@ -37,6 +40,8 @@ const FeaturedProducts = () => {
 
               const { id, slug, images, productName, price } = product;
 
+              const isLoved = lovedItems.some((item) => item.id === product.id);
+
               return (
                 <CarouselItem
                   key={id}
@@ -45,7 +50,10 @@ const FeaturedProducts = () => {
                   <div className="p-1">
                     <Card className="group flex h-full flex-col py-4 border border-gray-200 shadow-none">
                       <CardContent className="relative flex items-center justify-center px-6 py-2">
-                        <div className="relative w-full max-w-[220px] aspect-square overflow-hidden">
+                        <div
+                          onClick={() => router.push(`/product/${slug}`)}
+                          className="relative w-full max-w-[220px] aspect-square overflow-hidden cursor-pointer"
+                        >
                           {images && images.length > 0 ? (
                             <img
                               src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${images[0].url}`}
@@ -64,17 +72,32 @@ const FeaturedProducts = () => {
                         <div className="absolute w-full px-6 transition duration-200 opacity-0 group-hover:opacity-100">
                           <div className="flex justify-center gap-x-6">
                             <IconButton
-                              onClick={() => router.push(`product/${slug}`)}
-                              icon={
-                                <Expand size={20} className="text-gray-600" />
-                              }
-                            />
-                            <IconButton
-                              onClick={() => addItem(product)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addItem(product);
+                              }}
                               icon={
                                 <ShoppingCart
                                   size={20}
                                   className="text-gray-600"
+                                />
+                              }
+                            />
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                isLoved
+                                  ? removeLovedItem(product.id)
+                                  : addLovedItem(product);
+                              }}
+                              icon={
+                                <Heart
+                                  size={20}
+                                  className={
+                                    isLoved
+                                      ? "text-red-500 fill-red-500"
+                                      : "text-gray-600"
+                                  }
                                 />
                               }
                             />

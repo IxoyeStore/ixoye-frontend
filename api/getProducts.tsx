@@ -11,12 +11,8 @@ export function useGetCategories() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      console.log("URL:", url);
-
       const res = await fetch(url);
       const json = await res.json();
-
-      console.log("Respuesta Strapi:", json);
 
       setResult(json.data ?? []);
       setLoading(false);

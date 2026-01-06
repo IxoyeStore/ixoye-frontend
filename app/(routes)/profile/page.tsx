@@ -1,22 +1,57 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const PageProfile = () => {
+export default function ProfilePage() {
+  const router = useRouter();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isAuthenticated, router]);
+
+  if (!isAuthenticated) {
+    return <p className="text-center mt-10">Redirigiendo...</p>;
+  }
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-6">Mi perfil</h1>
+    <div className="flex justify-center items-center min-h-screen">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">
+            Perfil de usuario
+          </CardTitle>
+        </CardHeader>
 
-      <div className="bg-white rounded-lg shadow p-6 space-y-4">
-        <p>
-          <strong>Nombre:</strong> Usuario demo
-        </p>
-        <p>
-          <strong>Email:</strong> usuario@email.com
-        </p>
+        <CardContent className="space-y-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Usuario</p>
+            <p className="font-medium">{user?.username}</p>
+          </div>
 
-        <Button variant="outline">Cerrar sesión</Button>
-      </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Correo</p>
+            <p className="font-medium">{user?.email}</p>
+          </div>
+
+          <Button
+            variant="destructive"
+            className="w-full"
+            onClick={() => {
+              logout();
+              router.push("/login");
+            }}
+          >
+            Cerrar sesión
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default PageProfile;
+}

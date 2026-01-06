@@ -1,18 +1,31 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@/schemas/login-schema";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
+
+const loginSchema = z.object({
+  email: z.string().email("Correo inválido"),
+  password: z.string().min(8, "Contraseña mínimo 8 caracteres"),
+});
 
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+
+  useEffect(() => setMounted(true), []);
+
   const {
     register,
     handleSubmit,
@@ -21,7 +34,11 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
+  if (!mounted) return <div>Cargando...</div>;
+
   const onSubmit = async (data: LoginForm) => {
+    setLoginError(null);
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
@@ -35,15 +52,23 @@ export default function LoginPage() {
         }
       );
 
+      const result = await res.json();
+
       if (!res.ok) {
-        throw new Error("Credenciales inválidas");
+        const message =
+          result.error?.message || "Invalid identifier or password";
+        setLoginError(message);
+        return;
       }
 
-      const result = await res.json();
-      console.log("LOGIN OK", result);
-    } catch (error) {
-      console.error(error);
+      login(result.jwt, result.user);
+
+      router.push("/profile");
+    } catch (error: any) {
+      console.error("Error onSubmit:", error.message);
     }
+
+    if (isSubmitting) return;
   };
 
   return (
@@ -57,49 +82,34 @@ export default function LoginPage() {
 
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Email */}
           <div className="space-y-1">
-            <label className="text-sm font-medium">
-              Correo electrónico
-              <span className="ml-1 text-red-500">*</span>
-            </label>
+            <label className="text-sm font-medium">Correo electrónico</label>
             <Input
               type="email"
-              placeholder="correo@ejemplo.com"
               {...register("email")}
+              placeholder="correo@ejemplo.com"
             />
             {errors.email && (
               <p className="text-sm text-red-500">{errors.email.message}</p>
             )}
           </div>
 
-          {/* Password */}
           <div className="space-y-1">
-            <label className="text-sm font-medium">
-              Contraseña
-              <span className="ml-1 text-red-500">*</span>
-            </label>
+            <label className="text-sm font-medium">Contraseña</label>
             <Input
               type="password"
-              placeholder="••••••••"
               {...register("password")}
+              placeholder="•••••••••••"
             />
             {errors.password && (
               <p className="text-sm text-red-500">{errors.password.message}</p>
             )}
           </div>
 
-          {/* Forgot password */}
-          <div className="flex justify-end">
-            <Link
-              href="/forgot-password"
-              className="text-sm text-muted-foreground hover:underline"
-            >
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </div>
+          {loginError && (
+            <p className="text-sm text-red-500 text-center">{loginError}</p>
+          )}
 
-          {/* Login button */}
           <Button className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
           </Button>
@@ -107,15 +117,14 @@ export default function LoginPage() {
 
         <Separator />
 
-        {/* Register */}
         <p className="text-center text-sm text-muted-foreground">
           ¿No tienes una cuenta?{" "}
-          <Link
+          <a
             href="/register"
             className="font-medium text-primary hover:underline"
           >
             Crear cuenta
-          </Link>
+          </a>
         </p>
       </CardContent>
     </Card>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@/schemas/register-schema";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const [registerError, setRegisterError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -23,14 +28,16 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (data: RegisterForm) => {
+    setRegisterError(null);
+
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/custom-register`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            username: data.email,
+            username: data.username,
             email: data.email,
             password: data.password,
           }),
@@ -40,111 +47,40 @@ export default function RegisterPage() {
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.error?.message || "Error al registrarse");
-      }
-
-      console.log("REGISTER OK:", result);
-      const userId = result.user?.id;
-      const jwt = result.jwt;
-
-      if (userId && jwt) {
-        const updateRes = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/profile/me`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
-            },
-            body: JSON.stringify({
-              firstName: data.firstName,
-              lastName: data.lastName,
-              motherLastName: data.motherLastName,
-              phone: data.phone,
-              birthDate: data.birthDate,
-            }),
-          }
+        setRegisterError(
+          result.error?.message || "El usuario o correo ya existe"
         );
-
-        const updatedUser = await updateRes.json();
-
-        if (!updateRes.ok) {
-          throw new Error(
-            updatedUser.error?.message || "Error al actualizar perfil"
-          );
-        }
-
-        console.log("PROFILE UPDATED:", updatedUser);
+        return;
       }
+
+      router.push("/login");
     } catch (error) {
-      console.error("REGISTER ERROR:", error);
+      console.error(error);
+      setRegisterError("Ocurrió un error al registrar");
     }
   };
 
   return (
-    <Card className="w-full max-w-lg shadow-lg m-20">
-      <CardHeader className="space-y-1 text-center">
+    <Card className="w-full max-w-md shadow-lg m-20">
+      <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">Crear cuenta</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Nombre y Apellidos */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-1">
-              <RequiredLabel>Nombre(s)</RequiredLabel>
-              <Input placeholder="Juan" {...register("firstName")} />
-              {errors.firstName && (
-                <p className="text-sm text-red-500">
-                  {errors.firstName.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-1">
-              <RequiredLabel>Apellido paterno</RequiredLabel>
-              <Input placeholder="Pérez" {...register("lastName")} />
-              {errors.lastName && (
-                <p className="text-sm text-red-500">
-                  {errors.lastName.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-1 sm:col-span-2">
-              <label className="text-sm font-medium">Apellido materno</label>
-              <Input placeholder="Gómez" {...register("motherLastName")} />
-            </div>
-          </div>
-
-          {/* Fecha de nacimiento */}
-          <div className="space-y-1">
-            <RequiredLabel>Fecha de nacimiento</RequiredLabel>
-            <Input type="date" {...register("birthDate")} />
-            {errors.birthDate && (
-              <p className="text-sm text-red-500">{errors.birthDate.message}</p>
+          <div>
+            <RequiredLabel>Usuario</RequiredLabel>
+            <Input placeholder="ej: juan_perez" {...register("username")} />
+            {errors.username && (
+              <p className="text-sm text-red-500">{errors.username.message}</p>
             )}
           </div>
 
-          {/* Teléfono */}
-          <div className="space-y-1">
-            <RequiredLabel>Número de teléfono</RequiredLabel>
-            <Input
-              type="tel"
-              placeholder="55 1234 5678"
-              {...register("phone")}
-            />
-            {errors.phone && (
-              <p className="text-sm text-red-500">{errors.phone.message}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div className="space-y-1">
+          <div>
             <RequiredLabel>Correo electrónico</RequiredLabel>
             <Input
               type="email"
-              placeholder="correo@ejemplo.com"
+              placeholder="ej: correo@ejemplo.com"
               {...register("email")}
             />
             {errors.email && (
@@ -152,19 +88,25 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Password */}
-          <div className="space-y-1">
+          <div>
             <RequiredLabel>Contraseña</RequiredLabel>
-            <Input type="password" {...register("password")} />
+            <Input
+              type="password"
+              placeholder="Mínimo 8 caracteres"
+              {...register("password")}
+            />
             {errors.password && (
               <p className="text-sm text-red-500">{errors.password.message}</p>
             )}
           </div>
 
-          {/* Confirm Password */}
-          <div className="space-y-1">
+          <div>
             <RequiredLabel>Confirmar contraseña</RequiredLabel>
-            <Input type="password" {...register("confirmPassword")} />
+            <Input
+              type="password"
+              placeholder="Repite tu contraseña"
+              {...register("confirmPassword")}
+            />
             {errors.confirmPassword && (
               <p className="text-sm text-red-500">
                 {errors.confirmPassword.message}
@@ -172,7 +114,10 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Register button */}
+          {registerError && (
+            <p className="text-sm text-red-500 text-center">{registerError}</p>
+          )}
+
           <Button className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Creando cuenta..." : "Crear cuenta"}
           </Button>
@@ -180,13 +125,9 @@ export default function RegisterPage() {
 
         <Separator />
 
-        {/* Login link */}
         <p className="text-center text-sm text-muted-foreground">
           ¿Ya tienes una cuenta?{" "}
-          <Link
-            href="/login"
-            className="font-medium text-primary hover:underline"
-          >
+          <Link href="/login" className="font-medium text-primary">
             Iniciar sesión
           </Link>
         </p>

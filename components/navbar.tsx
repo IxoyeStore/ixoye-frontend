@@ -37,21 +37,21 @@ export default function Header() {
       className={`sticky top-0 w-full z-50 transition-all duration-300
       ${scrolled ? "bg-gray-100 backdrop-blur-md shadow" : "bg-transparent"}`}
     >
-      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-[82px]">
         {/* SECCIÓN IZQUIERDA: LOGO */}
         <div className="flex items-center pr-4 ml-15">
           <Link href="/" className="flex items-center">
             <img src="/logo-ixoye.png" className="h-15" alt="logo" />
-            <p className="font-bold text-sky-700 text-lg text-center mt-7">
+            <p className="font-extrabold text-sky-700 text-xl text-center mt-6">
               REFACCIONES DIESEL Y AGRICOLA IXOYE
             </p>
           </Link>
         </div>
 
-        <div className="hidden md:block h-12 border-l border-gray-400/80 mt-5" />
+        <div className="hidden md:block h-12 border-l border-gray-400/80" />
 
         {/* MENU DESKTOP */}
-        <nav className="hidden md:flex gap-6 items-center pl-4 mt-5">
+        <nav className="hidden md:flex gap-6 items-center pl-4 text-sky-700 mt-2">
           <Link href="/category" aria-label="Tienda" className={iconClass}>
             <Store className="w-10 h-10" />
           </Link>
@@ -84,7 +84,7 @@ export default function Header() {
             className={iconClass}
           >
             <Heart
-              className={`cursor-pointer 
+              className={`w-10 h-10 cursor-pointer 
               ${
                 lovedItems.length > 0 && "fill-black dark:fill-white w-10 h-10"
               }`}
@@ -98,7 +98,7 @@ export default function Header() {
           className="md:hidden p-2 rounded-md hover:bg-gray-100 transition transform hover:scale-110"
           aria-label="Abrir menú"
         >
-          {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {open ? <X className="w-6 h-6" /> : <Menu className="w-8 h-8" />}
         </button>
       </div>
 

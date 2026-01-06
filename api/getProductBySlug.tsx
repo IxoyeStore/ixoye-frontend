@@ -1,36 +1,31 @@
-import { useEffect, useState } from "react"
-import { ProductType } from "@/types/product"
+import { useEffect, useState } from "react";
+import { ProductType } from "@/types/product";
 
 export function useGetProductBySlug(slug?: string) {
-  const [product, setProduct] = useState<ProductType | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [product, setProduct] = useState<ProductType | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!slug) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
 
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[slug][$eq]=${slug}&populate=images`
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[slug][$eq]=${slug}&populate=images`;
 
-    console.log("url:", url)
-
-    ;(async () => {
+    (async () => {
       try {
-        const res = await fetch(url)
-        const json = await res.json()
-
-        console.log("data:", json.data)
-
-        setProduct(json.data[0] ?? null)
+        const res = await fetch(url);
+        const json = await res.json();
+        setProduct(json.data[0] ?? null);
       } catch (error) {
-        setError("Error al obtener el producto")
+        setError("Error al obtener el producto");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    })()
-  }, [slug])
+    })();
+  }, [slug]);
 
-  return { product, loading, error }
+  return { product, loading, error };
 }

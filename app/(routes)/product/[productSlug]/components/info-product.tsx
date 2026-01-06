@@ -6,7 +6,7 @@ import { formatPrice } from "@/lib/formatPrice";
 import { Button } from "../../../../../components/ui/button";
 import { Heart } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
-import { useLovedProducts } from "@/hooks/use-loved-products"; // <-- cambio aquí
+import { useLovedProducts } from "@/hooks/use-loved-products";
 
 export type InfoProductProps = {
   product: ProductType;
