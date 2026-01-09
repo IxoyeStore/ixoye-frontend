@@ -71,7 +71,7 @@ export default function Header() {
               <ShoppingCart className="w-10 h-10" />
             ) : (
               <div className="flex gap-1 items-center">
-                <BaggageClaim strokeWidth={1} />
+                <BaggageClaim strokeWidth={1} className="w-10 h-10" />
                 <span className="text-xs font-medium">{cart.items.length}</span>
               </div>
             )}
@@ -86,7 +86,8 @@ export default function Header() {
             <Heart
               className={`w-10 h-10 cursor-pointer 
               ${
-                lovedItems.length > 0 && "fill-black dark:fill-white w-10 h-10"
+                lovedItems.length > 0 &&
+                "fill-sky-700 dark:fill-white w-10 h-10"
               }`}
             />
           </Link>

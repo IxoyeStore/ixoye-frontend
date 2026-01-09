@@ -1,70 +1,81 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type AuthContextType = {
   user: any | null;
-  jwt: string | null;
-  isAuthenticated: boolean;
-  login: (jwt: string, user: any) => void;
-  logout: () => void;
+  loading: boolean;
+  refreshUser: () => Promise<void>;
+  logout: () => Promise<void>;
+  setUser: (user: any | null) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any | null>(null);
-  const [jwt, setJwt] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  // 🔄 Restaurar sesión
-  useEffect(() => {
-    const storedJwt = localStorage.getItem("jwt");
-    const storedUser = localStorage.getItem("user");
+  const refreshUser = async () => {
+    try {
+      const res = await fetch("/api/me", {
+        credentials: "include",
+        cache: "no-store",
+      });
 
-    if (storedJwt && storedUser) {
-      setJwt(storedJwt);
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
+      if (!res.ok) {
+        setUser(null);
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.user) {
+        setUser({
+          ...data.user,
+          jwt: data.jwt,
+          users_permissions_user: data.user.users_permissions_user || null,
+        });
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("Error al refrescar usuario:", err);
+      setUser(null);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    setLoading(false);
+  useEffect(() => {
+    refreshUser();
   }, []);
 
-  const login = (jwt: string, user: any) => {
-    localStorage.setItem("jwt", jwt);
-    localStorage.setItem("user", JSON.stringify(user));
-
-    setJwt(jwt);
-    setUser(user);
-    setIsAuthenticated(true);
+  const logout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+    } finally {
+      setUser(null);
+      router.replace("/login");
+      router.refresh();
+    }
   };
-
-  const logout = () => {
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("user");
-
-    setJwt(null);
-    setUser(null);
-    setIsAuthenticated(false);
-  };
-
-  if (loading) {
-    return null; // o loader
-  }
 
   return (
-    <AuthContext.Provider value={{ user, jwt, isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, refreshUser, logout, setUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
+    throw new Error("useAuth must be used dentro de AuthProvider");
   }
   return context;
-};
+}

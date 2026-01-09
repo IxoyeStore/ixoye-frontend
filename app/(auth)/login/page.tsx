@@ -20,7 +20,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { setUser, refreshUser } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -40,35 +40,35 @@ export default function LoginPage() {
     setLoginError(null);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            identifier: data.email,
-            password: data.password,
-          }),
-        }
-      );
-
-      const result = await res.json();
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          identifier: data.email,
+          password: data.password,
+        }),
+      });
 
       if (!res.ok) {
-        const message =
-          result.error?.message || "Invalid identifier or password";
-        setLoginError(message);
+        const text = await res.text();
+        const result = text ? JSON.parse(text) : null;
+        setLoginError(result?.error || "Correo o contraseña incorrectos");
         return;
       }
 
-      login(result.jwt, result.user);
+      const result = await res.json();
+
+      if (result.user) {
+        setUser(result.user);
+      } else {
+        await refreshUser();
+      }
 
       router.push("/profile");
-    } catch (error: any) {
-      console.error("Error onSubmit:", error.message);
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoginError("Error al iniciar sesión");
     }
-
-    if (isSubmitting) return;
   };
 
   return (
@@ -82,7 +82,7 @@ export default function LoginPage() {
 
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1">
+          <div>
             <label className="text-sm font-medium">Correo electrónico</label>
             <Input
               type="email"
@@ -94,12 +94,12 @@ export default function LoginPage() {
             )}
           </div>
 
-          <div className="space-y-1">
+          <div>
             <label className="text-sm font-medium">Contraseña</label>
             <Input
               type="password"
               {...register("password")}
-              placeholder="•••••••••••"
+              placeholder="••••••••"
             />
             {errors.password && (
               <p className="text-sm text-red-500">{errors.password.message}</p>
@@ -119,10 +119,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           ¿No tienes una cuenta?{" "}
-          <a
-            href="/register"
-            className="font-medium text-primary hover:underline"
-          >
+          <a href="/register" className="font-medium text-primary">
             Crear cuenta
           </a>
         </p>

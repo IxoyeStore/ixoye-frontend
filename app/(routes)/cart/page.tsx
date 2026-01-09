@@ -7,9 +7,11 @@ import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/lib/formatPrice";
 import CartItem from "./components/cart-item";
 import { makePaymentReques } from "@/api/payment";
+import { useAuth } from "@/context/auth-context";
 
 export default function Page() {
   const { items } = useCart();
+  const { user } = useAuth();
 
   const validItems = items.filter(Boolean);
   const hasItems = validItems.length > 0;
@@ -19,12 +21,25 @@ export default function Page() {
   const buyStripe = async () => {
     if (!hasItems) return;
 
+    if (!user?.users_permissions_user?.phone) {
+      alert(
+        "Por favor, completa tu información de perfil (teléfono) antes de comprar."
+      );
+      window.location.href = "/profile/edit";
+      return;
+    }
+
     try {
       const res = await makePaymentReques.post("/api/orders", {
         data: {
           products: validItems.map((item) => ({
             id: item.id,
           })),
+          userId: user.id,
+          email: user.email,
+          username: user.username,
+          phone: user.users_permissions_user.phone || "",
+          fullName: `${user.users_permissions_user.firstName} ${user.users_permissions_user.lastName}`,
         },
       });
 
@@ -50,7 +65,7 @@ export default function Page() {
               </p>
               <Button
                 variant="outline"
-                onClick={() => (window.location.href = "/")}
+                onClick={() => (window.location.href = "/category")}
                 className="w-max"
               >
                 Explorar productos
@@ -66,7 +81,6 @@ export default function Page() {
         </div>
 
         {hasItems ? (
-          /* Resumen pedido */
           <div className="max-w-xl">
             <div className="p-6 rounded-lg bg-slate-100">
               <p className="mb-3 text-lg font-semibold">Resumen de pedido</p>
@@ -77,13 +91,21 @@ export default function Page() {
                 <p>{formatPrice(totalPrice)}</p>
               </div>
 
-              <Button className="w-full" onClick={buyStripe}>
-                Comprar
-              </Button>
+              {!user ? (
+                <Button
+                  className="w-full"
+                  onClick={() => (window.location.href = "/login")}
+                >
+                  Inicia sesión para comprar
+                </Button>
+              ) : (
+                <Button className="w-full" onClick={buyStripe}>
+                  Comprar
+                </Button>
+              )}
             </div>
           </div>
         ) : (
-          /* Imagen con carrito vacio */
           <div className="flex items-center justify-center">
             <img
               src="/success-v2.png"

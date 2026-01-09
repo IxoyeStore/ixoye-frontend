@@ -53,7 +53,10 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/terminos" className="hover:text-white transition">
+                <Link
+                  href="/terms-and-conditions"
+                  className="hover:text-white transition"
+                >
                   Términos y condiciones
                 </Link>
               </li>
