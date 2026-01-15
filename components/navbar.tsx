@@ -82,7 +82,7 @@ export default function Header() {
             className={`relative ${iconClass}`}
           >
             {cart.items.length === 0 ? (
-              <ShoppingCart className="w-6 h-6 lg:w-9 lg:h-9" />
+              <ShoppingCart className="w-8 h-8 lg:w-9 lg:h-9" />
             ) : (
               <div className="flex gap-1 items-center">
                 <BaggageClaim

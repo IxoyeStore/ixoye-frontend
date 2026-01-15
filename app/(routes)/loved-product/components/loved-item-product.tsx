@@ -9,15 +9,12 @@ import { formatPrice } from "@/lib/formatPrice";
 import { cn } from "@/lib/utils";
 import { ProductType } from "@/types/product";
 import { X, ShoppingCart } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface LovedItemProductProps {
   product: ProductType;
 }
 
-const LovedItemProduct = (props: LovedItemProductProps) => {
-  const { product } = props;
-  const router = useRouter();
+const LovedItemProduct = ({ product }: LovedItemProductProps) => {
   const { removeLovedItem } = useLovedProducts();
   const { addItem } = useCart();
 
@@ -27,46 +24,40 @@ const LovedItemProduct = (props: LovedItemProductProps) => {
   };
 
   return (
-    <li className="flex py-6 border-b">
-      {/* Usamos el mismo componente de imagen que en CartItem */}
-      <ProductImageMiniature slug={product.slug} url={product.images[0].url} />
-
-      <div className="flex justify-between flex-1 px-6">
-        <div className="flex flex-col justify-between">
-          <div>
-            {/* Texto en negro como pediste */}
-            <h2 className="text-lg font-bold text-black">
-              {product.productName}
-            </h2>
-            {/* Precio en verde siguiendo la referencia de CartItem */}
-            <p className="font-bold text-green-700">
-              ${formatPrice(product.price)}
-            </p>
-          </div>
-
-          {/* Botón de acción principal al estilo Ixoye */}
-          <Button
-            className="mt-3 rounded-lg bg-[#0055a4] hover:bg-[#003d7a] text-white transition-all w-fit flex gap-2 h-9 px-4 shadow-sm"
-            onClick={addToCheckout}
-          >
-            <ShoppingCart size={16} />
-            <span className="text-sm">Mover al carrito</span>
-          </Button>
-        </div>
-
-        <div className="flex flex-col justify-start items-end">
-          {/* Botón X idéntico al de CartItem */}
-          <button
-            onClick={() => removeLovedItem(product.id)}
-            className={cn(
-              "rounded-full flex items-center justify-center bg-white border shadow-md p-1.5 hover:scale-110 transition text-rose-700"
-            )}
-          >
-            <X size={20} />
-          </button>
-        </div>
+    <div className="flex p-4 border border-slate-200 rounded-xl items-center hover:shadow-md transition-all bg-white relative group">
+      
+      <div className="shrink-0">
+        <ProductImageMiniature slug={product.slug} url={product.images[0].url} />
       </div>
-    </li>
+
+      <div className="flex flex-col justify-between flex-1 px-4 min-h-[110px]">
+        <div>
+          <h2 className="text-sm font-bold text-black line-clamp-2 leading-snug">
+            {product.productName}
+          </h2>
+          <p className="font-bold text-green-700 mt-1 text-base">
+            {formatPrice(product.price)}
+          </p>
+        </div>
+
+        <Button
+          className="mt-2 rounded-lg bg-[#0055a4] hover:bg-[#003d7a] text-white transition-all w-full md:w-fit flex gap-2 h-8 px-3 shadow-sm"
+          onClick={addToCheckout}
+        >
+          <ShoppingCart size={14} />
+          <span className="text-[11px] font-bold uppercase">Agregar al carrito</span>
+        </Button>
+      </div>
+
+      <button
+        onClick={() => removeLovedItem(product.id)}
+        className={cn(
+          "absolute top-2 right-2 rounded-full flex items-center justify-center bg-white border border-slate-100 shadow-sm p-1 hover:scale-110 transition text-rose-700 hover:bg-rose-50"
+        )}
+      >
+        <X size={14} />
+      </button>
+    </div>
   );
 };
 

@@ -18,7 +18,7 @@ const ChooseCategory = () => {
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
-      <h3 className="px-6 text-3xl font-bold text-sky-900 sm:pb-8">
+      <h3 className="px-6 text-3xl font-bold text-[#003366] sm:pb-8">
         Categorías destacadas
       </h3>
 
@@ -67,7 +67,7 @@ const ChooseCategory = () => {
 
                     <p
                       className="absolute bottom-0 w-full py-2 text-lg font-semibold text-center text-white
-                    bg-sky-700/90 backdrop-blur-md"
+                    bg-[#003366] backdrop-blur-md"
                     >
                       {category.categoryName}
                     </p>
