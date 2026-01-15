@@ -11,7 +11,6 @@ const PageSuccess = () => {
   const { removeAll } = useCart();
 
   useEffect(() => {
-    // Seguridad extra: si alguien entra directo aquí
     removeAll();
   }, [removeAll]);
 
@@ -24,27 +23,29 @@ const PageSuccess = () => {
             alt="Success"
             width={250}
             height={500}
-            className="rounded-lg"
+            className="rounded-lg opacity-90"
           />
         </div>
 
         <div className="flex flex-col">
-          <h1 className="text-3xl font-semibold">¡Gracias por tu compra!</h1>
+          <h1 className="text-3xl font-bold text-sky-900">
+            ¡Gracias por tu compra!
+          </h1>
 
-          <p className="my-3">
+          <p className="my-3 text-sky-700">
             En breve, nuestro equipo se pondrá manos a la obra para preparar tu
             envío.
           </p>
 
-          <p className="my-3">
+          <p className="my-3 text-sky-700">
             Te enviaremos una notificación cuando tu pedido esté listo y en
             camino.
           </p>
 
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center sm:justify-start mt-6">
             <Button
               onClick={() => router.push("/")}
-              className="px-8 py-6 text-lg"
+              className="px-8 py-6 text-lg bg-sky-700 hover:bg-sky-800 text-white transition-colors"
             >
               Volver a la tienda
             </Button>

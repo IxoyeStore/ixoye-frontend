@@ -54,7 +54,6 @@ export default function ProfilePage() {
       </div>
 
       <Card className="shadow-2xl shadow-sky-100/50 border-none overflow-hidden">
-        {/* Header con degradado suave en tonos sky */}
         <CardHeader className="bg-gradient-to-r from-sky-50 to-white border-b border-sky-100 pb-8 pt-8">
           <div className="flex flex-col items-center text-center gap-3">
             <div className="bg-white p-2 rounded-full shadow-md border border-sky-100">

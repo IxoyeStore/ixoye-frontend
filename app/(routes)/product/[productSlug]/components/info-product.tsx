@@ -17,11 +17,10 @@ const InfoProduct = (props: InfoProductProps) => {
   const { product } = props;
   const { items, addItem } = useCart();
   const { addLovedItem } = useLovedProducts();
-
-  const stock = product.stock ?? 0;
-
+  const stock = Number(product.stock) ?? 0;
   const itemInCart = items.find((item) => item.id === product.id);
-  const quantityInCart = itemInCart ? 1 : 0;
+
+  const quantityInCart = itemInCart ? itemInCart.quantity || 1 : 0;
 
   const onAddToCart = () => {
     if (quantityInCart >= stock) {
@@ -77,7 +76,7 @@ const InfoProduct = (props: InfoProductProps) => {
         {product.description}
       </p>
       <Separator className="my-4" />
-      <p className="my-4 text-2xl font-semibold text-sky-700">
+      <p className="my-4 text-2xl font-semibold text-green-700">
         {formatPrice(product.price)}
       </p>
 
@@ -94,7 +93,7 @@ const InfoProduct = (props: InfoProductProps) => {
           {stock <= 0
             ? "Agotado"
             : quantityInCart >= stock
-            ? "Límite alcanzado"
+            ? "Agotado"
             : "Comprar"}
         </Button>
 

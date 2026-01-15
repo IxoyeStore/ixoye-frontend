@@ -49,7 +49,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </Carousel>
       <p className="text-2xl text-center text-sky-900">{product.productName}</p>
       <p className="font-bold text-center text-emerald-600">
-        ${formatPrice(product.price)}
+        {formatPrice(product.price)}
       </p>
     </Link>
   );

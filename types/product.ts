@@ -14,6 +14,7 @@ export type ProductType = {
   id: number;
   documentId?: string;
   productName: string;
+  stock: number;
   slug: string;
   description: string;
   price: number;
@@ -21,8 +22,6 @@ export type ProductType = {
   quantity?: number;
   origin: string;
   isFeatured: boolean;
-
   images: StrapiImage[];
-
   category?: CategoryType | null;
 };

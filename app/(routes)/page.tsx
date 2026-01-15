@@ -4,6 +4,7 @@ import BannerDiscount from "@/components/banner-discount";
 import ChooseCategory from "@/components/choose-category";
 import InfoCards from "@/components/info-cards";
 import BannerProduct from "@/components/banner-product";
+import ShipmentSection from "@/components/shipment";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <CarouselTextBanner />
       <FeaturedProducts />
       <InfoCards />
+      <ShipmentSection />
       <ChooseCategory />
       <BannerDiscount />
       {/* <BannerProduct /> */}

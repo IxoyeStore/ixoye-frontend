@@ -93,15 +93,19 @@ export default function Page() {
 
               <div className="flex justify-between my-4">
                 <p className="text-sky-800">Total del pedido</p>
-                <p className="text-emerald-600">${formatPrice(totalPrice)}</p>
+                <p className="text-emerald-600">{formatPrice(totalPrice)}</p>
               </div>
 
               {!user ? (
                 <Button
                   className="w-full bg-sky-700 hover:bg-sky-800 text-white"
-                  onClick={() => (window.location.href = "/login")}
+                  onClick={() => {
+                    window.location.href = `/login?callbackUrl=${encodeURIComponent(
+                      window.location.pathname
+                    )}`;
+                  }}
                 >
-                  Inicia sesión para comprar
+                  Comprar
                 </Button>
               ) : (
                 <Button

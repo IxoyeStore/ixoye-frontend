@@ -2,9 +2,7 @@ export type CategoryType = {
   id: number;
   categoryName: string;
   mainImage: {
-    data:{
-        url:string;
-    } | null;
+    url: string;
   };
   slug: string;
   createdAt: string;

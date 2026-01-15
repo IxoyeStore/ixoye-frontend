@@ -5,8 +5,6 @@ import SkeletonSchema from "@/components/skeletonSchema";
 import { ProductType } from "@/types/product";
 import { useEffect, useState } from "react";
 import ProductCard from "./[categorySlug]/components/product-card";
-import FiltersControlCategory from "./[categorySlug]/components/filters-controls-category";
-import { Button } from "@/components/ui/button";
 
 export default function Page() {
   const [result, setResult] = useState<ProductType[]>([]);

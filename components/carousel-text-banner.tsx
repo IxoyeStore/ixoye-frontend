@@ -9,7 +9,9 @@ import {
 } from "@/components/ui/carousel";
 
 const images = [
+  "/carousel-banner/banner-dizzel-logo.jpeg",
   "/carousel-banner/banner-emmark.jpeg",
+  "/carousel-banner/banner-dizzel-emmark.jpeg",
   "/carousel-banner/banner-filtracion-aditivos-mangueras-herramientas.jpeg",
   "/carousel-banner/banner-hidraulico-sensores-suspension-bombas.jpeg",
   "/carousel-banner/banner-soporte-bandas-transmision-rodamientos.jpeg",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 
 const loginSchema = z.object({
@@ -18,11 +18,14 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginFormContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setUser, refreshUser } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+
+  const callbackUrl = searchParams.get("callbackUrl");
 
   useEffect(() => setMounted(true), []);
 
@@ -34,7 +37,12 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  if (!mounted) return <div>Cargando...</div>;
+  if (!mounted)
+    return (
+      <div className="flex justify-center p-10 font-medium text-gray-500">
+        Cargando...
+      </div>
+    );
 
   const onSubmit = async (data: LoginForm) => {
     setLoginError(null);
@@ -49,22 +57,19 @@ export default function LoginPage() {
         }),
       });
 
+      const result = await res.json();
+
       if (!res.ok) {
-        const text = await res.text();
-        const result = text ? JSON.parse(text) : null;
-        setLoginError(result?.error || "Correo o contraseña incorrectos");
+        setLoginError(result.error || "Credenciales inválidas");
         return;
       }
 
-      const result = await res.json();
-
       if (result.user) {
         setUser(result.user);
-      } else {
-        await refreshUser();
       }
 
-      router.push("/profile");
+      await refreshUser();
+      window.location.href = callbackUrl || "/profile";
     } catch (error) {
       console.error("Login error:", error);
       setLoginError("Error al iniciar sesión");
@@ -72,58 +77,100 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-lg">
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold">Iniciar sesión</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Ingresa tus datos para acceder a tu cuenta
+    <Card className="w-full max-w-md shadow-lg border-none">
+      <CardHeader className="space-y-1 text-center pt-8">
+        <CardTitle className="text-3xl font-bold text-gray-900">
+          Iniciar sesión
+        </CardTitle>
+        <p className="text-sm text-gray-500">
+          Usa tu cuenta Refacciones Diésel y Agrícola Ixoye
         </p>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 px-8 pb-10">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">Correo electrónico</label>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700">
+              Correo electrónico
+            </label>
             <Input
               type="email"
               {...register("email")}
               placeholder="correo@ejemplo.com"
+              className="border-gray-300 focus-visible:ring-[#0071b1] h-11"
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+              <p className="text-xs text-red-500 font-medium">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
-          <div>
-            <label className="text-sm font-medium">Contraseña</label>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700">
+              Contraseña
+            </label>
             <Input
               type="password"
               {...register("password")}
-              placeholder="••••••••"
+              placeholder="•••••••••••"
+              className="border-gray-300 focus-visible:ring-[#0071b1] h-11"
             />
             {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
+              <p className="text-xs text-red-500 font-medium">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
           {loginError && (
-            <p className="text-sm text-red-500 text-center">{loginError}</p>
+            <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-100 text-center font-medium">
+              {loginError}
+            </p>
           )}
 
-          <Button className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
+          <Button
+            type="submit"
+            className="w-full bg-[#0071b1] hover:bg-[#005a8e] text-white transition-all h-12 text-base font-semibold mt-2"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Accediendo..." : "Iniciar sesión"}
           </Button>
         </form>
 
-        <Separator />
+        <div className="relative py-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-gray-200" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white px-2 text-gray-400 font-medium">
+              O también
+            </span>
+          </div>
+        </div>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm text-gray-600">
           ¿No tienes una cuenta?{" "}
-          <a href="/register" className="font-medium text-primary">
-            Crear cuenta
+          <a
+            href="/register"
+            className="font-bold text-[#0071b1] hover:underline"
+          >
+            Registrate aquí
           </a>
         </p>
       </CardContent>
     </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <div className="flex items-center justify-center p-4 py-12">
+      <Suspense
+        fallback={<div className="text-[#0071b1] font-bold">Cargando...</div>}
+      >
+        <LoginFormContent />
+      </Suspense>
+    </div>
   );
 }

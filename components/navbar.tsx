@@ -30,45 +30,50 @@ export default function Header() {
   }, []);
 
   const iconClass =
-    "p-2 rounded-md transition transform hover:scale-110 hover:bg-gray-100";
+    "p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-blue-50 hover:text-blue-600";
 
   return (
     <header
-      className={`sticky top-0 w-full z-50 transition-all duration-300
+      className={`sticky top-0 w-full z-50 transition-all duration-500
       ${
-        scrolled ? "bg-gray-100/90 backdrop-blur-md shadow" : "bg-transparent"
+        scrolled
+          ? "bg-white/90 backdrop-blur-lg shadow-sm border-b border-blue-100/50 py-1"
+          : "bg-transparent py-2"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-16 md:h-[82px]">
-        {/* SECCIÓN IZQUIERDA: LOGO */}
-        <div className="flex items-center">
-          <Link href="/" className="flex items-center gap-2">
+        {/* SECCIÓN IZQUIERDA: LOGO Y NOMBRE */}
+        <div className="flex items-center shrink-0">
+          <Link href="/" className="flex items-center gap-3 group">
             <img
               src="/logo-ixoye.png"
-              className="h-10 md:h-15 w-auto object-contain"
+              className="h-10 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               alt="logo"
             />
 
-            <p className="hidden md:block font-extrabold text-sky-700 text-xl mt-2 leading-tight xl:mt-7">
-              REFACCIONES DIESEL Y <br className="lg:hidden" /> AGRICOLA IXOYE
-            </p>
-            <p className="md:hidden font-black text-sky-700 text-lg mt-4">
-              REFACCIONES IXOYE
-            </p>
+            <div className="flex flex-col justify-center mt-1">
+              <h1 className="hidden md:block text-[#0055a4] font-black mt-5 md:text-lg tracking-tighter leading-none whitespace-nowrap">
+                REFACCIONES DIESEL Y AGRICOLA IXOYE
+              </h1>
+
+              {/* NOMBRE CORTO MOBILE*/}
+              <h1 className="md:hidden text-[#0055a4] font-black text-base tracking-tight leading-none">
+                REFACCIONES IXOYE
+              </h1>
+            </div>
           </Link>
         </div>
 
-        {/* LÍNEA DIVISORIA PC */}
-        <div className="hidden md:block h-12 border-l border-gray-400/80 mx-4" />
-
         {/* MENU DESKTOP */}
-        <nav className="hidden md:flex gap-4 lg:gap-6 items-center text-sky-700">
+        <nav className="hidden md:flex gap-2 lg:gap-4 items-center text-[#0055a4] ml-4">
+          <div className="h-6 border-l border-blue-300 mx-2" />
+
           <Link href="/category" aria-label="Tienda" className={iconClass}>
-            <Store className="w-8 h-8 lg:w-10 lg:h-10" />
+            <Store className="w-8 h-8 lg:w-9 lg:h-9" />
           </Link>
 
           <Link href="/profile" aria-label="Perfil" className={iconClass}>
-            <UserRound className="w-8 h-8 lg:w-10 lg:h-10" />
+            <UserRound className="w-8 h-8 lg:w-9 lg:h-9" />
           </Link>
 
           <Link
@@ -77,14 +82,16 @@ export default function Header() {
             className={`relative ${iconClass}`}
           >
             {cart.items.length === 0 ? (
-              <ShoppingCart className="w-8 h-8 lg:w-10 lg:h-10" />
+              <ShoppingCart className="w-6 h-6 lg:w-9 lg:h-9" />
             ) : (
               <div className="flex gap-1 items-center">
                 <BaggageClaim
-                  strokeWidth={1}
-                  className="w-8 h-8 lg:w-10 lg:h-10"
+                  strokeWidth={2}
+                  className="w-8 h-8 lg:w-9 lg:h-9 text-blue-600"
                 />
-                <span className="text-xs font-bold">{cart.items.length}</span>
+                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full shadow-md">
+                  {cart.items.length}
+                </span>
               </div>
             )}
           </Link>
@@ -95,8 +102,8 @@ export default function Header() {
             className={iconClass}
           >
             <Heart
-              className={`w-8 h-8 lg:w-10 lg:h-10 cursor-pointer 
-              ${lovedItems.length > 0 && "fill-sky-700"}`}
+              className={`w-8 h-8 lg:w-9 lg:h-9 cursor-pointer transition-colors
+              ${lovedItems.length > 0 ? "fill-blue-600 text-blue-600" : ""}`}
             />
           </Link>
         </nav>
@@ -104,44 +111,49 @@ export default function Header() {
         {/* BOTÓN MENU MOBILE */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden p-2 rounded-md hover:bg-gray-200/50 transition"
+          className="md:hidden p-2 rounded-lg text-[#0055a4] hover:bg-blue-50 transition"
           aria-label="Abrir menú"
         >
-          {open ? (
-            <X className="w-7 h-7 text-sky-700" />
-          ) : (
-            <Menu className="w-7 h-7 text-sky-700" />
-          )}
+          {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
       {/* MENU MOBILE DESPLEGABLE */}
       {open && (
-        <nav className="md:hidden bg-white/95 backdrop-blur-md border-t shadow-xl flex justify-around py-4 animate-in slide-in-from-top duration-300">
+        <nav className="md:hidden bg-white border-t border-blue-50 shadow-2xl flex justify-around py-6 animate-in fade-in slide-in-from-top-4 duration-300">
           <Link
             href="/profile"
             onClick={() => setOpen(false)}
-            className={iconClass}
+            className="flex flex-col items-center gap-1 text-[#0055a4]"
           >
-            <UserRound className="w-6 h-6 text-sky-700" />
+            <UserRound className="w-6 h-6" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">
+              Perfil
+            </span>
           </Link>
 
           <Link
             href="/category"
             onClick={() => setOpen(false)}
-            className={iconClass}
+            className="flex flex-col items-center gap-1 text-[#0055a4]"
           >
-            <Store className="w-6 h-6 text-sky-700" />
+            <Store className="w-6 h-6" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">
+              Tienda
+            </span>
           </Link>
 
           <Link
             href="/cart"
             onClick={() => setOpen(false)}
-            className={`relative ${iconClass}`}
+            className="relative flex flex-col items-center gap-1 text-[#0055a4]"
           >
-            <ShoppingCart className="w-6 h-6 text-sky-700" />
+            <ShoppingCart className="w-6 h-6" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">
+              Carrito
+            </span>
             {cart.items.length > 0 && (
-              <span className="absolute top-1 right-1 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+              <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-[10px] h-4 w-4 flex items-center justify-center rounded-full">
                 {cart.items.length}
               </span>
             )}
@@ -150,13 +162,16 @@ export default function Header() {
           <Link
             href="/loved-product"
             onClick={() => setOpen(false)}
-            className={iconClass}
+            className="flex flex-col items-center gap-1 text-[#0055a4]"
           >
             <Heart
-              className={`w-6 h-6 text-sky-700 ${
-                lovedItems.length > 0 && "fill-sky-700"
+              className={`w-6 h-6 ${
+                lovedItems.length > 0 ? "fill-blue-600 text-blue-600" : ""
               }`}
             />
+            <span className="text-[10px] font-bold uppercase tracking-widest">
+              Favoritos
+            </span>
           </Link>
         </nav>
       )}
