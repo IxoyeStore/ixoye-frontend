@@ -19,7 +19,8 @@ export const useCart = create(
       addItem: (data) => {
         const currentItems = get().items;
         const existingItem = currentItems.find((item) => item.id === data.id);
-        const stockAvailable = data.stock ?? 0;
+
+        const stockAvailable = Number(data.stock) ?? 0;
 
         if (existingItem) {
           const nextQuantity = (existingItem.quantity || 1) + 1;
@@ -54,11 +55,16 @@ export const useCart = create(
       updateQuantity: (id: number, quantity: number) => {
         const currentItems = get().items;
         const item = currentItems.find((i) => i.id === id);
-        const stockAvailable = item?.stock ?? 0;
+        if (!item) return;
 
-        toast.error("Límite de compra alcanzado", {
-          description: `No es posible añadir más unidades al carrito.`,
-        });
+        const stockAvailable = Number(item.stock) ?? 0;
+
+        if (quantity > stockAvailable) {
+          toast.error("Límite de compra alcanzado", {
+            description: `Solo hay ${stockAvailable} disponibles.`,
+          });
+          return;
+        }
 
         const updatedItems = currentItems.map((item) =>
           item.id === id ? { ...item, quantity: quantity } : item

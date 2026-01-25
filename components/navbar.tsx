@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ShoppingCart,
   Store,
@@ -11,169 +12,316 @@ import {
   BaggageClaim,
   Heart,
   UserRound,
+  Search,
+  Tractor,
+  Settings,
+  Package,
+  ShieldCheck,
+  ChevronDown,
 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
+import SupportMenu from "./support-menu";
+import TechnicalFilterModal from "./technical-filter-modal";
+
+const STATIC_BRANDS = [
+  "EMMARK",
+  "DAI",
+  "FERSA",
+  "EDTPART",
+  "KANADIAN",
+  "BW",
+  "PFI",
+  "RYCO",
+  "KOMAN",
+  "GABRIEL",
+  "BEZARES",
+  "SAKURA",
+  "WEGA",
+];
+
+const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
+  return (
+    <div className="relative group">
+      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-slate-200 text-sky-950 hover:border-sky-500 hover:text-sky-600 transition-all shadow-sm active:scale-95">
+        <Icon size={14} className={color} />
+        <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">
+          {label}
+        </span>
+        <ChevronDown
+          size={12}
+          className="opacity-50 group-hover:rotate-180 transition-transform"
+        />
+      </button>
+
+      <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+        <div className="p-2 max-h-[400px] overflow-y-auto">
+          {items.length === 0 ? (
+            <div className="p-4 text-[10px] font-bold text-slate-400 uppercase italic">
+              Cargando...
+            </div>
+          ) : (
+            items.map((item: string) => (
+              <button
+                key={item}
+                onClick={() => onSelect(item)}
+                className="w-full text-left px-4 py-2.5 text-[10px] font-bold text-slate-600 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors uppercase italic"
+              >
+                {item}
+              </button>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dynamicProductTypes, setDynamicProductTypes] = useState<string[]>([]);
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    type: "tractor" | "motor" | null;
+  }>({ isOpen: false, type: null });
+
+  const router = useRouter();
   const cart = useCart();
   const { lovedItems } = useLovedProducts();
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 10);
+    const fetchProductTypes = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?fields[0]=productType&pagination[pageSize]=100`,
+        );
+        const json = await res.json();
+        if (json.data) {
+          const types = json.data.map(
+            (item: any) => (item.attributes || item).productType,
+          );
+          const uniqueTypes = Array.from(
+            new Set(types.filter(Boolean)),
+          ) as string[];
+          setDynamicProductTypes(uniqueTypes.sort());
+        }
+      } catch (error) {
+        console.error("Error cargando tipos de producto:", error);
+      }
     };
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    fetchProductTypes();
   }, []);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?query=${encodeURIComponent(searchQuery)}`);
+      setOpen(false);
+    }
+  };
+
+  const openFilter = (type: "tractor" | "motor") => {
+    setModalConfig({ isOpen: true, type });
+  };
+
+  const handleStaticSelect = (val: string, param: string) => {
+    router.push(`/category?${param}=${encodeURIComponent(val.toLowerCase())}`);
+    setOpen(false);
+  };
+
   const iconClass =
-    "p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-blue-50 hover:text-blue-600";
+    "flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-slate-50 text-sky-950 min-w-[70px]";
+  const navTextClass =
+    "text-[9px] font-black uppercase italic tracking-wider text-center";
+  const filterBtnClass =
+    "flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-slate-200 text-sky-950 hover:border-sky-500 hover:text-sky-600 transition-all shadow-sm active:scale-95";
+  const filterTextClass =
+    "text-[10px] font-black uppercase tracking-[0.15em] italic";
 
   return (
-    <header
-      className={`sticky top-0 w-full z-50 transition-all duration-500
-      ${
-        scrolled
-          ? "bg-white/90 backdrop-blur-lg shadow-sm border-b border-blue-100/50 py-1"
-          : "bg-transparent py-2"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-16 md:h-[82px]">
-        {/* SECCIÓN IZQUIERDA: LOGO Y NOMBRE */}
+    <header className="w-full bg-white border-b border-slate-100 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 md:h-[110px] gap-8">
+        {/* LOGO */}
         <div className="flex items-center shrink-0">
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-4 group">
             <img
               src="/logo-ixoye.png"
-              className="h-10 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-10 md:h-16 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-2deg]"
               alt="logo"
             />
-
-            <div className="flex flex-col justify-center mt-1">
-              <h1 className="hidden md:block text-[#0055a4] font-black mt-5 md:text-lg tracking-tighter leading-none whitespace-nowrap">
-                REFACCIONES DIESEL Y AGRICOLA IXOYE
+            <div className="hidden lg:flex flex-col justify-center">
+              <h1 className="text-sky-950 font-black text-xl tracking-tighter leading-none uppercase italic">
+                Refacciones
               </h1>
-
-              {/* NOMBRE CORTO MOBILE*/}
-              <h1 className="md:hidden text-[#0055a4] font-black text-base tracking-tight leading-none">
-                REFACCIONES IXOYE
-              </h1>
+              <span className="text-sky-500 font-bold text-[10px] uppercase tracking-[0.3em] leading-tight">
+                Diesel y Agrícola
+              </span>
             </div>
           </Link>
         </div>
 
-        {/* MENU DESKTOP */}
-        <nav className="hidden md:flex gap-2 lg:gap-4 items-center text-[#0055a4] ml-4">
-          <div className="h-6 border-l border-blue-300 mx-2" />
-
-          <Link href="/category" aria-label="Tienda" className={iconClass}>
-            <Store className="w-8 h-8 lg:w-9 lg:h-9" />
-          </Link>
-
-          <Link href="/profile" aria-label="Perfil" className={iconClass}>
-            <UserRound className="w-8 h-8 lg:w-9 lg:h-9" />
-          </Link>
-
-          <Link
-            href="/cart"
-            aria-label="Carrito"
-            className={`relative ${iconClass}`}
-          >
-            {cart.items.length === 0 ? (
-              <ShoppingCart className="w-8 h-8 lg:w-9 lg:h-9" />
-            ) : (
-              <div className="flex gap-1 items-center">
-                <BaggageClaim
-                  strokeWidth={2}
-                  className="w-8 h-8 lg:w-9 lg:h-9 text-blue-600"
-                />
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full shadow-md">
-                  {cart.items.length}
-                </span>
-              </div>
-            )}
-          </Link>
-
-          <Link
-            href="/loved-product"
-            aria-label="Favoritos"
-            className={iconClass}
-          >
-            <Heart
-              className={`w-8 h-8 lg:w-9 lg:h-9 cursor-pointer transition-colors
-              ${lovedItems.length > 0 ? "fill-blue-600 text-blue-600" : ""}`}
-            />
-          </Link>
-        </nav>
-
-        {/* BOTÓN MENU MOBILE */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden p-2 rounded-lg text-[#0055a4] hover:bg-blue-50 transition"
-          aria-label="Abrir menú"
+        {/* BÚSQUEDA */}
+        <form
+          onSubmit={handleSearch}
+          className="hidden md:flex flex-1 max-w-lg relative group"
         >
-          {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
-
-      {/* MENU MOBILE DESPLEGABLE */}
-      {open && (
-        <nav className="md:hidden bg-white border-t border-blue-50 shadow-2xl flex justify-around py-6 animate-in fade-in slide-in-from-top-4 duration-300">
-          <Link
-            href="/profile"
-            onClick={() => setOpen(false)}
-            className="flex flex-col items-center gap-1 text-[#0055a4]"
+          <input
+            type="text"
+            placeholder="Nombre, OEM, Serie o Marca..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-6 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition-all text-sky-950 font-medium placeholder:text-slate-400"
+          />
+          <button
+            type="submit"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-sky-900 text-white rounded-xl hover:bg-sky-950 transition-colors shadow-md"
           >
-            <UserRound className="w-6 h-6" />
-            <span className="text-[10px] font-bold uppercase tracking-widest">
-              Perfil
-            </span>
+            <Search size={20} />
+          </button>
+        </form>
+
+        {/* NAVEGACIÓN */}
+        <nav className="hidden md:flex gap-1 items-center">
+          <Link href="/category" className={iconClass}>
+            <Store className="w-7 h-7" />
+            <span className={navTextClass}>Tienda</span>
           </Link>
-
-          <Link
-            href="/category"
-            onClick={() => setOpen(false)}
-            className="flex flex-col items-center gap-1 text-[#0055a4]"
-          >
-            <Store className="w-6 h-6" />
-            <span className="text-[10px] font-bold uppercase tracking-widest">
-              Tienda
-            </span>
+          <Link href="/profile" className={iconClass}>
+            <UserRound className="w-7 h-7" />
+            <span className={navTextClass}>Perfil</span>
           </Link>
-
-          <Link
-            href="/cart"
-            onClick={() => setOpen(false)}
-            className="relative flex flex-col items-center gap-1 text-[#0055a4]"
-          >
-            <ShoppingCart className="w-6 h-6" />
-            <span className="text-[10px] font-bold uppercase tracking-widest">
-              Carrito
-            </span>
+          <Link href="/loved-product" className={iconClass}>
+            <Heart
+              className={`w-7 h-7 transition-colors ${lovedItems.length > 0 ? "fill-sky-950 text-sky-950" : ""}`}
+            />
+            <span className={navTextClass}>Favoritos</span>
+          </Link>
+          <Link href="/cart" className={`relative ${iconClass}`}>
+            {cart.items.length === 0 ? (
+              <ShoppingCart className="w-7 h-7" />
+            ) : (
+              <BaggageClaim
+                strokeWidth={2.5}
+                className="w-7 h-7 text-sky-950"
+              />
+            )}
+            <span className={navTextClass}>Carrito</span>
             {cart.items.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-[10px] h-4 w-4 flex items-center justify-center rounded-full">
+              <span className="absolute top-1 right-2 bg-sky-600 text-white text-[10px] font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
                 {cart.items.length}
               </span>
             )}
           </Link>
-
-          <Link
-            href="/loved-product"
-            onClick={() => setOpen(false)}
-            className="flex flex-col items-center gap-1 text-[#0055a4]"
-          >
-            <Heart
-              className={`w-6 h-6 ${
-                lovedItems.length > 0 ? "fill-blue-600 text-blue-600" : ""
-              }`}
-            />
-            <span className="text-[10px] font-bold uppercase tracking-widest">
-              Favoritos
-            </span>
-          </Link>
+          <div className={iconClass}>
+            <SupportMenu />
+            <span className={navTextClass}>Soporte</span>
+          </div>
         </nav>
+
+        <button
+          onClick={() => setOpen(!open)}
+          className="md:hidden p-2 rounded-xl text-sky-950 hover:bg-slate-50 transition"
+        >
+          {open ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
+        </button>
+      </div>
+
+      {/* FILTROS (Desktop) */}
+      <div className="hidden md:flex justify-center items-center gap-3 pb-5 pt-1">
+        <button
+          onClick={() => openFilter("tractor")}
+          className={filterBtnClass}
+        >
+          <Tractor size={14} className="text-orange-500" />
+          <span className={filterTextClass}>Tractor</span>
+        </button>
+        <button onClick={() => openFilter("motor")} className={filterBtnClass}>
+          <Settings size={14} className="text-sky-500" />
+          <span className={filterTextClass}>Motor</span>
+        </button>
+
+        <NavDropdown
+          label="Producto"
+          items={dynamicProductTypes}
+          icon={Package}
+          color="text-emerald-500"
+          onSelect={(val: string) => handleStaticSelect(val, "category")}
+        />
+
+        <NavDropdown
+          label="Marcas"
+          items={STATIC_BRANDS}
+          icon={ShieldCheck}
+          color="text-rose-500"
+          onSelect={(val: string) => handleStaticSelect(val, "brand")}
+        />
+      </div>
+
+      <TechnicalFilterModal
+        isOpen={modalConfig.isOpen}
+        type={modalConfig.type}
+        onClose={() => setModalConfig({ isOpen: false, type: null })}
+      />
+
+      {/* MENU MOBILE */}
+      {open && (
+        <div className="md:hidden bg-white border-t border-slate-50 shadow-2xl animate-in slide-in-from-top-2 duration-300 overflow-y-auto max-h-[calc(100vh-80px)]">
+          <div className="px-6 py-8 space-y-8">
+            <form onSubmit={handleSearch} className="relative">
+              <input
+                type="text"
+                placeholder="¿Qué refacción necesitas?"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 px-5 text-sm font-medium focus:outline-none"
+              />
+              <Search
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                size={20}
+              />
+            </form>
+
+            <div className="space-y-4">
+              <p className="text-[10px] font-black text-sky-950 uppercase tracking-[0.2em] italic pl-1">
+                Búsqueda técnica
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => {
+                    openFilter("tractor");
+                    setOpen(false);
+                  }}
+                  className="flex items-center justify-center gap-2 p-4 rounded-2xl font-black uppercase text-[10px] tracking-wider italic bg-orange-50 text-orange-700"
+                >
+                  <Tractor size={16} /> Tractor
+                </button>
+                <button
+                  onClick={() => {
+                    openFilter("motor");
+                    setOpen(false);
+                  }}
+                  className="flex items-center justify-center gap-2 p-4 rounded-2xl font-black uppercase text-[10px] tracking-wider italic bg-sky-50 text-sky-700"
+                >
+                  <Settings size={16} /> Motor
+                </button>
+              </div>
+
+              <div className="space-y-2 text-center">
+                <p className="text-[10px] font-black text-sky-950 uppercase tracking-[0.2em] italic pl-1">
+                  Explorar Catálogo
+                </p>
+                <Link
+                  href="/category"
+                  onClick={() => setOpen(false)}
+                  className="block w-full py-4 bg-slate-100 rounded-2xl text-[10px] font-bold text-slate-600 uppercase italic"
+                >
+                  Ver todos los productos
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </header>
   );

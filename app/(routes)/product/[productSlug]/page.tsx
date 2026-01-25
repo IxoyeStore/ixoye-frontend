@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import SkeletonProduct from "./components/skeleton-product";
 import CarouselProduct from "./components/carousel-product";
 import InfoProduct from "@/app/(routes)/product/[productSlug]/components/info-product";
+import { ProductImage } from "@/components/product-image";
 
 export default function Page() {
   const params = useParams();
@@ -19,14 +20,23 @@ export default function Page() {
   }
 
   if (error || !product) {
-    return <p>No se encontró el producto</p>;
+    return <p className="text-center py-20">No se encontró el producto</p>;
   }
+
+  const hasImages = product.images && product.images.length > 0;
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-32 sm:px-24">
-      <div className="grid sm:grid-cols-2">
+      <div className="grid sm:grid-cols-2 gap-8">
         <div>
-          <CarouselProduct images={product.images ?? []} />
+          {hasImages ? (
+            <CarouselProduct images={product.images} />
+          ) : (
+            <ProductImage
+              url={undefined}
+              className="w-full aspect-square shadow-sm border border-slate-100"
+            />
+          )}
         </div>
 
         <div className="sm:px-12">

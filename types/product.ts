@@ -14,14 +14,28 @@ export type ProductType = {
   id: number;
   documentId?: string;
   productName: string;
-  stock: number;
   slug: string;
   description: string;
-  price: number;
-  active: boolean;
-  quantity?: number;
-  origin: string;
-  isFeatured: boolean;
-  images: StrapiImage[];
+  code: string;
+
+  // Clasificación del Catálogo
+  department: string;
+  subDepartment: string;
+  productType: string;
   category?: CategoryType | null;
+
+  // Especificaciones
+  brand: string;
+  series: string;
+  oemCode?: string;
+
+  // Valores y Estados
+  price: number;
+  wholesalePrice?: number;
+  stock: number;
+  active: boolean;
+  isFeatured: boolean;
+
+  quantity?: number;
+  images: StrapiImage[];
 };

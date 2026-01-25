@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
@@ -8,122 +9,153 @@ import { formatPrice } from "@/lib/formatPrice";
 import CartItem from "./components/cart-item";
 import { makePaymentReques } from "@/api/payment";
 import { useAuth } from "@/context/auth-context";
+import { toast } from "sonner";
 
 export default function Page() {
-  const { items } = useCart();
+  const { items, removeAll } = useCart();
   const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const validItems = items.filter(Boolean);
   const hasItems = validItems.length > 0;
+  const isB2B = user?.profile?.type === "b2b";
 
   const totalPrice = validItems.reduce((total, item) => {
+    const priceToPay =
+      isB2B && item.wholesalePrice ? item.wholesalePrice : item.price;
+    return total + priceToPay * (item.quantity || 1);
+  }, 0);
+
+  const totalOriginalPrice = validItems.reduce((total, item) => {
     return total + item.price * (item.quantity || 1);
   }, 0);
 
-  const buyStripe = async () => {
-    if (!hasItems) return;
+  const totalSavings = totalOriginalPrice - totalPrice;
 
-    if (!user?.users_permissions_user?.phone) {
-      alert(
-        "Por favor, completa tu información de perfil (teléfono) antes de comprar."
-      );
-      window.location.href = "/profile/edit";
+  // --- NUEVA LÓGICA DE PAGO (REDIRECCIÓN) ---
+  const handleCheckoutClick = async () => {
+    if (!user || !user.jwt) {
+      window.location.href = `/login?callbackUrl=${encodeURIComponent(
+        window.location.pathname
+      )}`;
       return;
     }
 
+    setLoading(true);
+
     try {
-      const res = await makePaymentReques.post("/api/orders", {
+      const payload = {
         data: {
+          email: user.email,
+          phone: user.profile?.phone || "0000000000",
           products: validItems.map((item) => ({
             id: item.id,
             quantity: item.quantity || 1,
           })),
-          userId: user.id,
-          email: user.email,
-          username: user.username,
-          phone: user.users_permissions_user.phone || "",
-          fullName: `${user.users_permissions_user.firstName} ${user.users_permissions_user.lastName}`,
+        },
+      };
+
+      // 1. Llamamos a tu API de Strapi (la que configuramos con openpay.checkouts.create)
+      const res = await makePaymentReques.post("/api/orders", payload, {
+        headers: {
+          Authorization: `Bearer ${user.jwt.trim()}`,
         },
       });
 
-      window.location.href = res.data.stripeSession.url;
-    } catch (error) {
-      console.error("Stripe error:", error);
+      // 2. Si el backend nos da la URL de Openpay, redirigimos al usuario
+      if (res.data?.data?.url) {
+        toast.success("Redirigiendo al procesador de pago...");
+        // Guardamos en localStorage o similar si necesitamos limpiar el carrito después
+        // Aunque lo ideal es limpiarlo en la página de /success
+        window.location.href = res.data.data.url;
+      } else {
+        throw new Error("No se recibió la URL de pago.");
+      }
+    } catch (error: any) {
+      console.error("Error en el checkout:", error);
+      toast.error(
+        error.response?.data?.error?.message ||
+          "Error al iniciar el proceso de pago"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="max-w-6xl px-4 py-16 mx-auto">
-      <h1 className="mb-5 text-3xl font-bold text-sky-900">
+      <h1 className="mb-8 text-4xl font-black text-sky-950 uppercase italic tracking-tighter">
         Carrito de compras
       </h1>
 
-      <div className="grid sm:grid-cols-2 gap-5">
+      <div className="grid md:grid-cols-2 gap-10">
         <div className="flex flex-col gap-4">
           {!hasItems && (
-            <>
-              <p className="text-sky-600/90 text-lg">
-                No hay productos en el carrito. Agrega productos al carrito para
-                visualizarlos aqui.
+            <div className="space-y-4">
+              <p className="text-sky-700 font-bold italic">
+                No hay productos en el carrito.
               </p>
               <Button
                 variant="outline"
                 onClick={() => (window.location.href = "/category")}
-                className="w-max border-sky-200 text-sky-700 hover:bg-sky-50 hover:text-sky-700/90 text-lg"
+                className="rounded-full border-sky-200 text-sky-800 font-black uppercase text-[10px] px-6 py-6"
               >
                 Explorar productos
               </Button>
-            </>
+            </div>
           )}
 
-          <ul>
+          <ul className="divide-y divide-slate-100">
             {validItems.map((item) => (
               <CartItem key={item.id} product={item} />
             ))}
           </ul>
         </div>
 
-        {hasItems ? (
+        {hasItems && (
           <div className="max-w-xl">
-            <div className="p-6 rounded-lg bg-sky-50/50 border border-sky-100">
-              <p className="mb-3 text-xl font-semibold text-sky-900">
+            <div className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-xl shadow-sky-100/30">
+              <p className="mb-4 text-xs font-black text-sky-950 uppercase tracking-widest">
                 Resumen de pedido
               </p>
-              <Separator className="bg-sky-100" />
+              <Separator className="bg-slate-100" />
 
-              <div className="flex justify-between my-4">
-                <p className="text-sky-800">Total del pedido</p>
-                <p className="text-emerald-600">{formatPrice(totalPrice)}</p>
+              <div className="space-y-4 my-6">
+                {isB2B && totalSavings > 0 && (
+                  <div className="flex justify-between items-center">
+                    <p className="text-slate-400 font-bold uppercase text-[10px]">
+                      Precio original
+                    </p>
+                    <p className="text-base font-bold text-slate-400 line-through decoration-red-400/40">
+                      {formatPrice(totalOriginalPrice)}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center">
+                  <p className="text-slate-500 font-bold uppercase text-[10px]">
+                    Total del pedido
+                  </p>
+                  <div className="text-right">
+                    <p className="text-2xl font-black text-green-600 tracking-tighter italic">
+                      {formatPrice(totalPrice)}
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              {!user ? (
-                <Button
-                  className="w-full bg-sky-700 hover:bg-sky-800 text-white"
-                  onClick={() => {
-                    window.location.href = `/login?callbackUrl=${encodeURIComponent(
-                      window.location.pathname
-                    )}`;
-                  }}
-                >
-                  Comprar
-                </Button>
-              ) : (
-                <Button
-                  className="w-full bg-sky-700 hover:bg-sky-800/90 text-white"
-                  onClick={buyStripe}
-                >
-                  Comprar
-                </Button>
-              )}
+              <Button
+                disabled={loading}
+                className="w-full rounded-full bg-sky-800 hover:bg-sky-900 text-white font-black uppercase text-[11px] tracking-[0.2em] py-7 shadow-lg transition-transform active:scale-95"
+                onClick={handleCheckoutClick}
+              >
+                {loading ? "Preparando pago..." : "Ir a pagar"}
+              </Button>
+
+              <p className="mt-4 text-center text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                🔒 Pago seguro con Openpay
+              </p>
             </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center">
-            <img
-              src="/success-v2.png"
-              alt="Carrito vacío"
-              className="w-60 opacity-90"
-            />
           </div>
         )}
       </div>
