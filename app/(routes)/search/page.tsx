@@ -1,13 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ProductType } from "@/types/product";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProductCard from "../category/[categorySlug]/components/product-card";
-import { Search, FilterX, Target, ChevronRight } from "lucide-react";
+import { Search, Target, ChevronRight } from "lucide-react";
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const query = searchParams.get("query") || "";
@@ -31,6 +32,7 @@ export default function SearchPage() {
 
       try {
         const keywords = query.trim().split(/\s+/);
+
         const searchFields = [
           "productName",
           "code",
@@ -39,9 +41,10 @@ export default function SearchPage() {
           "productType",
           "department",
         ];
-        const params = new URLSearchParams();
-        let globalIndex = 0;
 
+        const params = new URLSearchParams();
+
+        let globalIndex = 0;
         keywords.forEach((word) => {
           searchFields.forEach((field) => {
             params.append(
@@ -53,6 +56,7 @@ export default function SearchPage() {
         });
 
         params.append("populate", "*");
+
         const url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products?${params.toString()}`;
         const response = await fetch(url);
         const json = await response.json();
@@ -91,7 +95,6 @@ export default function SearchPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 min-h-[70vh] bg-white">
       <div className="flex flex-col md:flex-row gap-12">
-        {/* PANEL DE FILTRADO TÉCNICO */}
         {!isQueryTooShort && query.length >= 2 && (
           <aside className="w-full md:w-64 shrink-0">
             <div className="sticky top-32">
@@ -154,7 +157,7 @@ export default function SearchPage() {
         <main className="flex-1">
           {isQueryTooShort ? (
             <div className="flex flex-col items-center justify-center py-24 border border-slate-100 rounded-xl bg-slate-50/30">
-              <Search size={32} className="text-slate-900 mb-6 stroke-[1.5]" />
+              <Target size={32} className="text-slate-900 mb-6 stroke-[1.5]" />
               <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tight mb-2">
                 Criterio de búsqueda insuficiente
               </h2>
@@ -201,7 +204,7 @@ export default function SearchPage() {
                       {filteredProducts.length}
                     </span>
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-                      Items identificados
+                      Productos encontrados
                     </span>
                   </div>
                 )}
@@ -226,7 +229,7 @@ export default function SearchPage() {
                         className="mx-auto text-slate-200 mb-6 stroke-[1]"
                       />
                       <p className="text-slate-900 font-bold uppercase tracking-tight text-lg">
-                        No se hallaron coincidencias
+                        No se encontraron coincidencias
                       </p>
                       <p className="text-slate-400 text-xs mt-2 uppercase tracking-widest font-medium">
                         Verifique el código OEM o la descripción técnica
@@ -240,5 +243,24 @@ export default function SearchPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <Skeleton className="h-10 w-48 mb-8" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Skeleton className="h-96" />
+            <Skeleton className="h-96" />
+            <Skeleton className="h-96" />
+          </div>
+        </div>
+      }
+    >
+      <SearchContent />
+    </Suspense>
   );
 }

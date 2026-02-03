@@ -43,7 +43,7 @@ const InfoProduct = (props: InfoProductProps) => {
       <div className="mb-3">
         <div className="flex flex-wrap items-center gap-2 mb-2">
           <span className="text-[11px] font-bold bg-blue-50 text-[#0055a4] px-2 py-0.5 rounded border border-blue-100 uppercase tracking-wider">
-            REF: {product.code}
+            {product.code}
           </span>
           {product.productType && (
             <span className="text-[11px] font-bold bg-slate-50 text-slate-600 px-2 py-0.5 rounded border border-slate-200 uppercase tracking-wider">
@@ -87,7 +87,7 @@ const InfoProduct = (props: InfoProductProps) => {
         )}
       </div>
 
-      {/* Cuadrícula de Información Técnica - ACTUALIZADA */}
+      {/* Información Técnica */}
       <div className="grid grid-cols-2 gap-4 p-5 bg-slate-50/50 rounded-2xl border border-slate-200 my-6 shadow-sm overflow-hidden">
         <div className="space-y-2 min-w-0">
           <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0055a4]/10 text-[#0055a4]">
@@ -118,7 +118,7 @@ const InfoProduct = (props: InfoProductProps) => {
           <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-200/50 text-slate-500">
             <Layers size={12} strokeWidth={3} />
             <span className="text-[10px] font-black uppercase tracking-[0.15em]">
-              Ubicación
+              Series
             </span>
           </div>
           <p className="text-xs font-bold text-slate-500 px-1 uppercase tracking-tight">
@@ -147,7 +147,7 @@ const InfoProduct = (props: InfoProductProps) => {
               ))
             ) : (
               <span className="text-slate-400 font-bold italic text-sm">
-                CONSULTAR
+                Sin referencias...
               </span>
             )}
           </div>
@@ -199,7 +199,7 @@ const InfoProduct = (props: InfoProductProps) => {
         </div>
       </div>
 
-      {/* Botones de acción */}
+      {/* Botones */}
       <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
         <Button
           className={`w-full sm:flex-[3] py-8 text-lg font-black uppercase tracking-widest shadow-[0_10px_20px_-10px_rgba(0,85,164,0.5)] transition-all active:scale-[0.95] ${

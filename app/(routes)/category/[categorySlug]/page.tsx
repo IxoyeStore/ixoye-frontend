@@ -24,7 +24,7 @@ export default function Page() {
     (filterOrigin === ""
       ? result
       : result.filter(
-          (product: ProductType) => product.origin === filterOrigin
+          (product: ProductType) => product.brand === filterOrigin,
         ));
 
   if (error)

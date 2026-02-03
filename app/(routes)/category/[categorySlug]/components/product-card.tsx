@@ -26,7 +26,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <div className="relative p-2 transition-all duration-200 rounded-lg hover:shadow-md group border border-transparent hover:border-slate-100 flex flex-col h-full">
-      {/* Contenedor de Imagen + Botones */}
       <div className="relative rounded-xl overflow-hidden">
         {product.brand && (
           <div className="absolute top-2 right-2 z-20 pointer-events-none">
@@ -56,7 +55,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
           )}
         </Link>
 
-        {/* Botones de acción flotantes (Ahora relativos a la imagen) */}
         <div className="absolute w-full px-4 transition duration-300 opacity-0 group-hover:opacity-100 bottom-4 left-0 z-10">
           <div className="flex justify-center gap-x-4">
             <IconButton
@@ -81,7 +79,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
       </div>
 
-      {/* Información del Producto */}
       <div className="mt-3 flex flex-col flex-grow text-center">
         <Link href={`/product/${product.slug}`}>
           <p className="text-sm font-bold text-sky-900 line-clamp-2 min-h-[40px] flex items-center justify-center">

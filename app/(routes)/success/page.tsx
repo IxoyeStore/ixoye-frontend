@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { Package, ShoppingBag, CheckCircle2 } from "lucide-react";
 
-const PageSuccess = () => {
+const SuccessContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { removeAll } = useCart();
@@ -82,4 +82,10 @@ const PageSuccess = () => {
   );
 };
 
-export default PageSuccess;
+export default function PageSuccess() {
+  return (
+    <Suspense fallback={null}>
+      <SuccessContent />
+    </Suspense>
+  );
+}

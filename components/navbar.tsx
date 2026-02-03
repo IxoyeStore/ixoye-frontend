@@ -227,9 +227,9 @@ export default function Header() {
         </button>
       </div>
 
-      {/* FILTROS (Desktop) */}
+      {/* FILTROS */}
       <div className="hidden md:flex justify-center items-center gap-3 pb-5 pt-1">
-        <button
+        {/* <button
           onClick={() => openFilter("tractor")}
           className={filterBtnClass}
         >
@@ -239,7 +239,7 @@ export default function Header() {
         <button onClick={() => openFilter("motor")} className={filterBtnClass}>
           <Settings size={14} className="text-sky-500" />
           <span className={filterTextClass}>Motor</span>
-        </button>
+        </button> */}
 
         <NavDropdown
           label="Producto"

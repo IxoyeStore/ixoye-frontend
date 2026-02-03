@@ -26,6 +26,7 @@ import {
 import Link from "next/link";
 import { useCart } from "@/hooks/use-cart";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { ProductType } from "@/types/product";
 
 export default function ProfilePage() {
   const { user, loading, logout } = useAuth();
@@ -55,7 +56,7 @@ export default function ProfilePage() {
           headers: {
             Authorization: `Bearer ${user.jwt}`,
           },
-        }
+        },
       );
       const { data } = await response.json();
       setAddresses(data || []);
@@ -78,7 +79,7 @@ export default function ProfilePage() {
             headers: {
               Authorization: `Bearer ${user.jwt}`,
             },
-          }
+          },
         );
         const { data } = await response.json();
         setOrders(data || []);
@@ -105,12 +106,12 @@ export default function ProfilePage() {
           headers: {
             Authorization: `Bearer ${user.jwt}`,
           },
-        }
+        },
       );
 
       if (res.ok) {
         setAddresses((prev) =>
-          prev.filter((addr) => (addr.documentId || addr.id) !== id)
+          prev.filter((addr) => (addr.documentId || addr.id) !== id),
         );
       }
     } catch (error) {
@@ -126,7 +127,6 @@ export default function ProfilePage() {
     );
   if (!user) return null;
 
-  // CORRECCIÓN: Acceso directo a la relación 'profile' definida en Strapi
   const profileData = user.profile;
   const isProfileComplete = !!profileData?.firstName;
 
@@ -417,7 +417,7 @@ function OrderCard({ order }: { order: any }) {
   const totalItems =
     data.products?.reduce(
       (acc: number, p: any) => acc + (p.quantity || 1),
-      0
+      0,
     ) || 0;
 
   const handleReorder = async () => {
@@ -428,11 +428,25 @@ function OrderCard({ order }: { order: any }) {
       cart.removeAll();
 
       data.products.forEach((p: any) => {
-        cart.addItem({
+        const productToCart: ProductType = {
           id: p.id,
-          productName: p.productName || p.name,
-          price: p.price,
-        });
+          productName: p.productName || p.name || "Producto",
+          price: Number(p.price || 0),
+          slug: p.slug || "",
+          code: p.code || "N/A",
+          description: p.description || "",
+          department: p.department || "",
+          brand: p.brand || "N/A",
+          images: p.images || { data: [] },
+          productType: p.productType || "",
+          series: p.series || "",
+          subDepartment: p.subDepartment || "",
+          stock: p.stock ?? 0,
+          active: p.active ?? true,
+          isFeatured: p.isFeatured ?? false,
+        };
+
+        cart.addItem(productToCart);
       });
 
       router.push("/cart");

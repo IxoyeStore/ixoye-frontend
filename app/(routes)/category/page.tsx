@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
+import { Suspense } from "react";
 import { Separator } from "@/components/ui/separator";
 import SkeletonSchema from "@/components/skeletonSchema";
 import { ProductType } from "@/types/product";
@@ -10,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import ProductSort from "@/components/product-sort";
 import { useSearchParams } from "next/navigation";
 
-export default function Page() {
+function CategoryContent() {
   const [result, setResult] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -139,5 +140,19 @@ export default function Page() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-6xl py-4 mx-auto sm:py-16 px-4 sm:px-24">
+          <SkeletonSchema grid={6} />
+        </div>
+      }
+    >
+      <CategoryContent />
+    </Suspense>
   );
 }
