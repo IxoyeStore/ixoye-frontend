@@ -1,4 +1,3 @@
-import { profile } from "console";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -9,15 +8,18 @@ export async function GET() {
   if (!jwt) return NextResponse.json({ user: null }, { status: 401 });
 
   try {
-    const userRes = await fetch(`${process.env.STRAPI_URL}/api/users/me`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    });
+    const userRes = await fetch(
+      `https://ixoye-backend-production.up.railway.app/api/users/me`,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+        cache: "no-store",
+      },
+    );
 
     if (!userRes.ok) return NextResponse.json({ user: null }, { status: 401 });
     const userData = await userRes.json();
 
-    const profileUrl = `${process.env.STRAPI_URL}/api/profiles?filters[users_permissions_user][id][$eq]=${userData.id}`;
+    const profileUrl = `https://ixoye-backend-production.up.railway.app/api/profiles?filters[users_permissions_user][id][$eq]=${userData.id}`;
 
     const profileRes = await fetch(profileUrl, {
       headers: { Authorization: `Bearer ${jwt}` },

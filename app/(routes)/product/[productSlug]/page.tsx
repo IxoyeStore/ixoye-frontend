@@ -33,7 +33,7 @@ export default function Page() {
             <CarouselProduct images={product.images} />
           ) : (
             <ProductImage
-              url={undefined}
+              url={product.images?.[0]?.url || ""}
               className="w-full aspect-square shadow-sm border border-slate-100"
             />
           )}

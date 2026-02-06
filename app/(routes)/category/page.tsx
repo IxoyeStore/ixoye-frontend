@@ -46,7 +46,7 @@ function CategoryContent() {
         filterQuery += `&filters[productName][$containsi]=${productName}`;
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?populate=*&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}&sort[0]=${currentSort}${filterQuery}`,
+        `https://ixoye-backend-production.up.railway.app/api/products?populate=*&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}&sort[0]=${currentSort}${filterQuery}`,
       );
 
       const json = await res.json();

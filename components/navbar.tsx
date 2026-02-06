@@ -97,7 +97,7 @@ export default function Header() {
     const fetchProductTypes = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?fields[0]=productType&pagination[pageSize]=100`,
+          `https://ixoye-backend-production.up.railway.app/api/products?fields[0]=productType&pagination[pageSize]=100`,
         );
         const json = await res.json();
         if (json.data) {

@@ -58,7 +58,7 @@ export default function ProfilePage() {
     setLoadingAddresses(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${user.id}`,
+        `https://ixoye-backend-production.up.railway.app/api/addresses?filters[users_permissions_user][id][$eq]=${user.id}`,
         { headers: { Authorization: `Bearer ${user.jwt}` } },
       );
       const { data } = await response.json();
@@ -76,7 +76,7 @@ export default function ProfilePage() {
       setLoadingOrders(true);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/orders?sort[0]=createdAt:desc`,
+          `https://ixoye-backend-production.up.railway.app/api/orders?sort[0]=createdAt:desc`,
           { headers: { Authorization: `Bearer ${user.jwt}` } },
         );
         const { data } = await response.json();
@@ -95,7 +95,7 @@ export default function ProfilePage() {
     if (!user || !confirm("¿Estás seguro de eliminar esta dirección?")) return;
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses/${id}`,
+        `https://ixoye-backend-production.up.railway.app/api/addresses/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${user.jwt}` },

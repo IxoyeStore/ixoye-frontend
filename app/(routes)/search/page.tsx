@@ -57,7 +57,7 @@ function SearchContent() {
 
         params.append("populate", "*");
 
-        const url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products?${params.toString()}`;
+        const url = `https://ixoye-backend-production.up.railway.app/api/products?${params.toString()}`;
         const response = await fetch(url);
         const json = await response.json();
 

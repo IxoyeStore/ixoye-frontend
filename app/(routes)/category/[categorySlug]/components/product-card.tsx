@@ -56,7 +56,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
               </CarouselContent>
             </Carousel>
           ) : (
-            <ProductImage url={undefined} className="aspect-square w-full" />
+            <ProductImage
+              url={product.images?.[0]?.url}
+              className="aspect-square w-full"
+            />
           )}
         </Link>
 

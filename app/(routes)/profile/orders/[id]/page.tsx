@@ -42,13 +42,13 @@ export default function OrderDetailPage() {
       if (!user || !user.jwt || !id) return;
       setLoading(true);
       try {
-        let url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/orders/${id}?populate=*`;
+        let url = `https://ixoye-backend-production.up.railway.app/api/orders/${id}?populate=*`;
         let response = await fetch(url, {
           headers: { Authorization: `Bearer ${user.jwt}` },
         });
 
         if (response.status === 404) {
-          url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/orders?filters[id][$eq]=${id}&populate=*`;
+          url = `https://ixoye-backend-production.up.railway.app/api/orders?filters[id][$eq]=${id}&populate=*`;
           response = await fetch(url, {
             headers: { Authorization: `Bearer ${user.jwt}` },
           });
@@ -218,7 +218,7 @@ export default function OrderDetailPage() {
             <div className="flex items-center gap-4">
               <img
                 src={`https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(
-                  qrUrl
+                  qrUrl,
                 )}&chs=120x120&chld=L|0`}
                 className="w-16 h-16 grayscale"
                 alt="QR"

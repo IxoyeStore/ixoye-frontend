@@ -9,18 +9,21 @@ export async function POST(request: Request) {
     let finalUser = user;
 
     if (!finalJwt) {
-      const res = await fetch(`${process.env.STRAPI_URL}/api/auth/local`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
-      });
+      const res = await fetch(
+        `https://ixoye-backend-production.up.railway.app/api/auth/local`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier, password }),
+        },
+      );
 
       const data = await res.json();
 
       if (!res.ok) {
         return NextResponse.json(
           { error: data.error?.message || "Credenciales inválidas" },
-          { status: 401 }
+          { status: 401 },
         );
       }
 
@@ -46,7 +49,7 @@ export async function POST(request: Request) {
     console.error("Error en API LOGIN:", error);
     return NextResponse.json(
       { error: "Error en el servidor" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

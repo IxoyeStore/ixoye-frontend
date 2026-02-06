@@ -12,8 +12,7 @@ export function useGetProductBySlug(slug?: string) {
       return;
     }
 
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[slug][$eq]=${slug}&populate=images`;
-
+    const url = `https://ixoye-backend-production.up.railway.app/api/products?filters[slug][$eq]=${slug}&populate=images`;
     (async () => {
       try {
         const res = await fetch(url);

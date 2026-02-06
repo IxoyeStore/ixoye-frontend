@@ -26,7 +26,7 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
       try {
         const field = FIELD_MAP[type];
 
-        const url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products?filters[${field}][$notNull]=true&fields[0]=${field}&pagination[pageSize]=100`;
+        const url = `https://ixoye-backend-production.up.railway.app/api/products?filters[${field}][$notNull]=true&fields[0]=${field}&pagination[pageSize]=100`;
 
         const response = await fetch(url);
         const json = await response.json();
@@ -57,7 +57,7 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
       setLoadingStep2(true);
       try {
         const field = FIELD_MAP[type];
-        const url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products?filters[${field}][$eq]=${encodeURIComponent(selections.step1)}&fields[0]=productType&pagination[pageSize]=100`;
+        const url = `https://ixoye-backend-production.up.railway.app/api/products?filters[${field}][$eq]=${encodeURIComponent(selections.step1)}&fields[0]=productType&pagination[pageSize]=100`;
 
         const response = await fetch(url);
         const json = await response.json();

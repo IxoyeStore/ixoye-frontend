@@ -8,7 +8,7 @@ export function useGetCategoryWithFilters(slug?: string) {
     if (!slug) return;
 
     const url =
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories` +
+      `https://ixoye-backend-production.up.railway.app/api/categories` +
       `?filters[slug][$eq]=${slug}` +
       `&populate[filters]=*`;
 

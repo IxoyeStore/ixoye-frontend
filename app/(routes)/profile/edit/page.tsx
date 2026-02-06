@@ -147,7 +147,7 @@ export default function EditProfilePage() {
 
           if (addressId) {
             const res = await fetch(
-              `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses/${addressId}`,
+              `https://ixoye-backend-production.up.railway.app/api/addresses/${addressId}`,
               { headers: { Authorization: `Bearer ${user.jwt}` } },
             );
             const json = await res.json();
@@ -155,7 +155,7 @@ export default function EditProfilePage() {
           } else {
             const userId = user.id;
             const res = await fetch(
-              `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
+              `https://ixoye-backend-production.up.railway.app/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
               { headers: { Authorization: `Bearer ${user.jwt}` } },
             );
             const json = await res.json();
@@ -240,7 +240,7 @@ export default function EditProfilePage() {
 
       if (addressForm.isDefault) {
         const addrRes = await fetch(
-          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
+          `https://ixoye-backend-production.up.railway.app/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
           { headers: { Authorization: `Bearer ${jwt}` } },
         );
         const { data: defaultAddresses } = await addrRes.json();
@@ -250,7 +250,7 @@ export default function EditProfilePage() {
             const docId = addr.documentId;
             if (docId && docId !== addressId) {
               await fetch(
-                `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses/${docId}`,
+                `https://ixoye-backend-production.up.railway.app/api/addresses/${docId}`,
                 {
                   method: "PUT",
                   headers: {
@@ -281,7 +281,7 @@ export default function EditProfilePage() {
 
       if (profileDocId) {
         await fetch(
-          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/profiles/${profileDocId}`,
+          `https://ixoye-backend-production.up.railway.app/api/profiles/${profileDocId}`,
           {
             method: "PUT",
             headers: {
@@ -295,8 +295,8 @@ export default function EditProfilePage() {
 
       const isUpdatingAddress = addressId && !isNewAddress;
       const addrUrl = isUpdatingAddress
-        ? `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses/${addressId}`
-        : `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses`;
+        ? `https://ixoye-backend-production.up.railway.app/api/addresses/${addressId}`
+        : `https://ixoye-backend-production.up.railway.app/api/addresses`;
 
       const addrRes = await fetch(addrUrl, {
         method: isUpdatingAddress ? "PUT" : "POST",
