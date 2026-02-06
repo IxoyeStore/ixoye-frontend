@@ -60,7 +60,9 @@ export default function RegisterPage() {
     );
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${type}`);
+      const res = await fetch(
+        `https://ixoye-backend-production.up.railway.app/api/${type}`,
+      );
       if (!res.ok) throw new Error("No encontrado");
       const result = await res.json();
       const rawData = result.data?.attributes?.content || result.data?.content;
@@ -93,7 +95,7 @@ export default function RegisterPage() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local/register`,
+        `https://ixoye-backend-production.up.railway.app/api/auth/local/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -30,7 +30,7 @@ export default function Footer() {
   const [isLoadingLegal, setIsLoadingLegal] = useState(false);
 
   const openLegalModal = async (
-    type: "terms-and-condition" | "privacy-policy"
+    type: "terms-and-condition" | "privacy-policy",
   ) => {
     setIsModalOpen(true);
     setIsLoadingLegal(true);
@@ -39,11 +39,13 @@ export default function Footer() {
     setModalTitle(
       type === "terms-and-condition"
         ? "Términos y Condiciones"
-        : "Aviso de Privacidad"
+        : "Aviso de Privacidad",
     );
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${type}`);
+      const res = await fetch(
+        `https://ixoye-backend-production.up.railway.app/api/${type}`,
+      );
       if (!res.ok) throw new Error(`Error ${res.status}`);
 
       const result = await res.json();
@@ -52,7 +54,7 @@ export default function Footer() {
       if (Array.isArray(rawData)) {
         const parsedText = rawData
           .map((block: any) =>
-            block.children?.map((child: any) => child.text).join("")
+            block.children?.map((child: any) => child.text).join(""),
           )
           .join("\n\n");
         setModalContent(parsedText);

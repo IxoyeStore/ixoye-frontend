@@ -37,12 +37,12 @@ export default function ForgotPasswordPage() {
     setError(null);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/forgot-password`,
+        `https://ixoye-backend-production.up.railway.app/api/auth/forgot-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: data.email }),
-        }
+        },
       );
 
       if (!res.ok) {

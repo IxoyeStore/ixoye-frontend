@@ -56,7 +56,7 @@ function ResetPasswordContent() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset-password`,
+        `https://ixoye-backend-production.up.railway.app/api/auth/reset-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -65,14 +65,14 @@ function ResetPasswordContent() {
             password: data.password,
             passwordConfirmation: data.confirmPassword,
           }),
-        }
+        },
       );
 
       const result = await res.json();
 
       if (!res.ok) {
         throw new Error(
-          result.error?.message || "Error al restablecer la contraseña"
+          result.error?.message || "Error al restablecer la contraseña",
         );
       }
 
