@@ -32,16 +32,8 @@ export async function GET() {
         : null;
 
     const profileContent = userProfile?.attributes
-      ? { id: userProfile.id, ...userProfile.attributes } // Para Strapi v4
-      : userProfile; // Para Strapi v5 (ya viene plano)
-
-    console.log("> Datos reales del perfil:", profileContent);
-
-    console.log(
-      `> Perfil cargado para: ${userData.username} | ¿Existe?: ${
-        userProfile ? "SÍ" : "NO"
-      }`
-    );
+      ? { id: userProfile.id, ...userProfile.attributes }
+      : userProfile;
 
     return NextResponse.json({
       user: {

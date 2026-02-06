@@ -20,7 +20,6 @@ const SupportMenu = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Corregido: Color sky-950 para coincidir con Tienda, Perfil, Favs y Carrito
   const iconClass = `p-2 rounded-xl transition-all duration-300 transform hover:scale-110 
     text-sky-950 ${isOpen ? "bg-slate-100 scale-110" : "hover:bg-slate-50"}`;
 
@@ -31,7 +30,6 @@ const SupportMenu = () => {
         className={iconClass}
         aria-label="Soporte"
       >
-        {/* Tamaño ajustado para uniformidad con los otros iconos del header */}
         <Headset className="w-7 h-7" />
       </button>
 

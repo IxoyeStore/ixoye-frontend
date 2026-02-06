@@ -35,6 +35,7 @@ export type ProductType = {
   stock: number;
   active: boolean;
   isFeatured: boolean;
+  freeShipping: boolean;
 
   quantity?: number;
   images: StrapiImage[];

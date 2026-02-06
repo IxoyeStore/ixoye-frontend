@@ -19,7 +19,6 @@ const SuccessContent = () => {
     if (openpayId) {
       setIsAuthorized(true);
       removeAll();
-      console.log("🛒 Carrito limpiado con éxito");
     } else {
       router.replace("/");
     }

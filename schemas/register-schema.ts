@@ -17,8 +17,8 @@ export const registerSchema = z
       .string()
       .min(8, "La contraseña debe tener mínimo 8 caracteres")
       .regex(
-        /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-        "La contraseña debe contener letras y números, sin espacios"
+        /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/,
+        "La contraseña debe tener letras y números, sin espacios",
       ),
     confirmPassword: z.string(),
   })

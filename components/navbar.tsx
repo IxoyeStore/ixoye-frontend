@@ -18,6 +18,9 @@ import {
   Package,
   ShieldCheck,
   ChevronDown,
+  Headset,
+  Mail,
+  MessageCircle,
 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
@@ -121,10 +124,6 @@ export default function Header() {
     }
   };
 
-  const openFilter = (type: "tractor" | "motor") => {
-    setModalConfig({ isOpen: true, type });
-  };
-
   const handleStaticSelect = (val: string, param: string) => {
     router.push(`/category?${param}=${encodeURIComponent(val.toLowerCase())}`);
     setOpen(false);
@@ -134,10 +133,6 @@ export default function Header() {
     "flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-slate-50 text-sky-950 min-w-[70px]";
   const navTextClass =
     "text-[9px] font-black uppercase italic tracking-wider text-center";
-  const filterBtnClass =
-    "flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-slate-200 text-sky-950 hover:border-sky-500 hover:text-sky-600 transition-all shadow-sm active:scale-95";
-  const filterTextClass =
-    "text-[10px] font-black uppercase tracking-[0.15em] italic";
 
   return (
     <header className="w-full bg-white border-b border-slate-100 sticky top-0 z-50">
@@ -161,7 +156,7 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* BÚSQUEDA */}
+        {/* BÚSQUEDA DESKTOP */}
         <form
           onSubmit={handleSearch}
           className="hidden md:flex flex-1 max-w-lg relative group"
@@ -181,7 +176,7 @@ export default function Header() {
           </button>
         </form>
 
-        {/* NAVEGACIÓN */}
+        {/* NAVEGACIÓN DESKTOP */}
         <nav className="hidden md:flex gap-1 items-center">
           <Link href="/category" className={iconClass}>
             <Store className="w-7 h-7" />
@@ -227,20 +222,8 @@ export default function Header() {
         </button>
       </div>
 
-      {/* FILTROS */}
+      {/* FILTROS DESKTOP */}
       <div className="hidden md:flex justify-center items-center gap-3 pb-5 pt-1">
-        {/* <button
-          onClick={() => openFilter("tractor")}
-          className={filterBtnClass}
-        >
-          <Tractor size={14} className="text-orange-500" />
-          <span className={filterTextClass}>Tractor</span>
-        </button>
-        <button onClick={() => openFilter("motor")} className={filterBtnClass}>
-          <Settings size={14} className="text-sky-500" />
-          <span className={filterTextClass}>Motor</span>
-        </button> */}
-
         <NavDropdown
           label="Producto"
           items={dynamicProductTypes}
@@ -248,7 +231,6 @@ export default function Header() {
           color="text-emerald-500"
           onSelect={(val: string) => handleStaticSelect(val, "category")}
         />
-
         <NavDropdown
           label="Marcas"
           items={STATIC_BRANDS}
@@ -266,59 +248,178 @@ export default function Header() {
 
       {/* MENU MOBILE */}
       {open && (
-        <div className="md:hidden bg-white border-t border-slate-50 shadow-2xl animate-in slide-in-from-top-2 duration-300 overflow-y-auto max-h-[calc(100vh-80px)]">
-          <div className="px-6 py-8 space-y-8">
+        <div className="md:hidden fixed inset-0 top-20 bg-white z-[100] overflow-y-auto animate-in slide-in-from-right duration-300">
+          <div className="p-6 space-y-8 pb-24">
+            {/* BUSQUEDA MOBILE */}
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
                 placeholder="¿Qué refacción necesitas?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 px-5 text-sm font-medium focus:outline-none"
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
               />
               <Search
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-sky-900"
                 size={20}
               />
             </form>
 
-            <div className="space-y-4">
-              <p className="text-[10px] font-black text-sky-950 uppercase tracking-[0.2em] italic pl-1">
-                Búsqueda técnica
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => {
-                    openFilter("tractor");
-                    setOpen(false);
-                  }}
-                  className="flex items-center justify-center gap-2 p-4 rounded-2xl font-black uppercase text-[10px] tracking-wider italic bg-orange-50 text-orange-700"
-                >
-                  <Tractor size={16} /> Tractor
-                </button>
-                <button
-                  onClick={() => {
-                    openFilter("motor");
-                    setOpen(false);
-                  }}
-                  className="flex items-center justify-center gap-2 p-4 rounded-2xl font-black uppercase text-[10px] tracking-wider italic bg-sky-50 text-sky-700"
-                >
-                  <Settings size={16} /> Motor
-                </button>
-              </div>
+            {/* NAVEGACIÓN PRINCIPAL MOBILE */}
+            <div className="grid grid-cols-2 gap-4">
+              <Link
+                href="/category"
+                onClick={() => setOpen(false)}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 border border-slate-100"
+              >
+                <Store className="w-6 h-6 text-sky-950" />
+                <span className="text-[10px] font-black uppercase italic">
+                  Tienda
+                </span>
+              </Link>
+              <Link
+                href="/profile"
+                onClick={() => setOpen(false)}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 border border-slate-100"
+              >
+                <UserRound className="w-6 h-6 text-sky-950" />
+                <span className="text-[10px] font-black uppercase italic">
+                  Mi Perfil
+                </span>
+              </Link>
+              <Link
+                href="/loved-product"
+                onClick={() => setOpen(false)}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 border border-slate-100 relative"
+              >
+                <Heart
+                  className={`w-6 h-6 ${lovedItems.length > 0 ? "fill-sky-950 text-sky-950" : "text-sky-950"}`}
+                />
+                <span className="text-[10px] font-black uppercase italic">
+                  Favoritos
+                </span>
+                {lovedItems.length > 0 && (
+                  <span className="absolute top-3 right-8 w-2 h-2 bg-sky-500 rounded-full" />
+                )}
+              </Link>
+              <Link
+                href="/cart"
+                onClick={() => setOpen(false)}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 border border-slate-100 relative"
+              >
+                <ShoppingCart className="w-6 h-6 text-sky-950" />
+                <span className="text-[10px] font-black uppercase italic">
+                  Carrito
+                </span>
+                {cart.items.length > 0 && (
+                  <span className="absolute top-3 right-8 bg-sky-600 text-white text-[9px] font-black h-4 w-4 flex items-center justify-center rounded-full">
+                    {cart.items.length}
+                  </span>
+                )}
+              </Link>
+            </div>
 
-              <div className="space-y-2 text-center">
-                <p className="text-[10px] font-black text-sky-950 uppercase tracking-[0.2em] italic pl-1">
-                  Explorar Catálogo
-                </p>
-                <Link
-                  href="/category"
-                  onClick={() => setOpen(false)}
-                  className="block w-full py-4 bg-slate-100 rounded-2xl text-[10px] font-bold text-slate-600 uppercase italic"
-                >
-                  Ver todos los productos
-                </Link>
+            {/* FILTROS DINÁMICOS MOBILE */}
+            <div className="space-y-4 pt-4 border-t border-slate-100">
+              <p className="text-[10px] font-black text-sky-950 uppercase tracking-[0.2em] italic">
+                Explorar por
+              </p>
+
+              <div className="space-y-3">
+                <details className="group">
+                  <summary className="flex items-center justify-between p-4 rounded-2xl bg-emerald-50 text-emerald-700 list-none cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <Package size={18} />
+                      <span className="text-[11px] font-black uppercase italic">
+                        Tipos de Producto
+                      </span>
+                    </div>
+                    <ChevronDown
+                      size={16}
+                      className="group-open:rotate-180 transition-transform"
+                    />
+                  </summary>
+                  <div className="grid grid-cols-1 gap-1 mt-2 pl-4 border-l-2 border-emerald-100">
+                    {dynamicProductTypes.map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => handleStaticSelect(type, "category")}
+                        className="text-left py-3.5 text-[10px] font-bold text-slate-600 uppercase italic border-b border-slate-50 last:border-0"
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </details>
+
+                <details className="group">
+                  <summary className="flex items-center justify-between p-4 rounded-2xl bg-rose-50 text-rose-700 list-none cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <ShieldCheck size={18} />
+                      <span className="text-[11px] font-black uppercase italic">
+                        Nuestras Marcas
+                      </span>
+                    </div>
+                    <ChevronDown
+                      size={16}
+                      className="group-open:rotate-180 transition-transform"
+                    />
+                  </summary>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2 pl-4 border-l-2 border-rose-100">
+                    {STATIC_BRANDS.map((brand) => (
+                      <button
+                        key={brand}
+                        onClick={() => handleStaticSelect(brand, "brand")}
+                        className="text-left py-3.5 text-[10px] font-bold text-slate-600 uppercase italic border-b border-slate-50"
+                      >
+                        {brand}
+                      </button>
+                    ))}
+                  </div>
+                </details>
               </div>
+            </div>
+
+            {/* SOPORTE MOBILE */}
+            <div className="pt-6 border-t border-slate-100">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Headset size={16} className="text-sky-600" />
+                <p className="text-[10px] font-black text-sky-950 uppercase tracking-[0.2em] italic">
+                  Atención al Cliente
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-3">
+                <a
+                  href="https://wa.me/3111234567"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-between px-6 py-5 rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-100 active:scale-95 transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageCircle size={20} />
+                    <span className="text-[11px] font-black uppercase tracking-widest italic">
+                      WhatsApp
+                    </span>
+                  </div>
+                  <ChevronDown size={16} className="-rotate-90 opacity-50" />
+                </a>
+
+                <a
+                  href="soporte@refaccionesixoye.mx"
+                  className="w-full flex items-center justify-between px-6 py-5 rounded-2xl bg-sky-950 text-white shadow-lg shadow-sky-100 active:scale-95 transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <Mail size={20} />
+                    <span className="text-[11px] font-black uppercase tracking-widest italic">
+                      Enviar Correo
+                    </span>
+                  </div>
+                  <ChevronDown size={16} className="-rotate-90 opacity-50" />
+                </a>
+              </div>
+              <p className="text-[9px] text-center text-slate-400 font-bold uppercase italic mt-6 italic">
+                Horario de Atención: Lun - Vie / 9:00 - 18:00, Sab / 9:00 - 2:00
+              </p>
             </div>
           </div>
         </div>

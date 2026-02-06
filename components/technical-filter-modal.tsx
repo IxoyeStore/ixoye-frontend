@@ -18,7 +18,6 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
     step2: [],
   });
 
-  // PASO 1 corregido en TechnicalFilterModal
   useEffect(() => {
     if (!isOpen || !type) return;
 
@@ -33,10 +32,8 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
         const json = await response.json();
 
         if (json.data) {
-          // En Strapi 5 los datos son planos
           const values = json.data.map((item: any) => item[field]);
 
-          // Limpiamos duplicados y valores vacíos
           const unique = Array.from(
             new Set(values.filter(Boolean)),
           ) as string[];
@@ -53,7 +50,6 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
     setSelections({ step1: "", step2: "" });
   }, [isOpen, type]);
 
-  // PASO 2: Cargar SISTEMAS/TIPOS (Ej: FRENOS, TRANSMISIÓN, MOTOR) para esa serie
   useEffect(() => {
     if (!selections.step1 || !type) return;
 
@@ -61,7 +57,6 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
       setLoadingStep2(true);
       try {
         const field = FIELD_MAP[type];
-        // Buscamos qué 'productType' existen para la serie elegida
         const url = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/products?filters[${field}][$eq]=${encodeURIComponent(selections.step1)}&fields[0]=productType&pagination[pageSize]=100`;
 
         const response = await fetch(url);
@@ -102,7 +97,7 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
       <div className="bg-white w-full max-w-md rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
-        {/* Encabezado Profesional */}
+        {/* Encabezado  */}
         <div className="p-7 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-slate-900 rounded-2xl text-white shadow-lg shadow-slate-200">

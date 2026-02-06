@@ -26,17 +26,20 @@ export default function Page() {
     return total + priceToPay * (item.quantity || 1);
   }, 0);
 
+  // Cálculos de desglose de IVA (IVA incluido)
+  const subtotal = totalPrice / 1.16;
+  const iva = totalPrice - subtotal;
+
   const totalOriginalPrice = validItems.reduce((total, item) => {
     return total + item.price * (item.quantity || 1);
   }, 0);
 
   const totalSavings = totalOriginalPrice - totalPrice;
 
-  // --- NUEVA LÓGICA DE PAGO (REDIRECCIÓN) ---
   const handleCheckoutClick = async () => {
     if (!user || !user.jwt) {
       window.location.href = `/login?callbackUrl=${encodeURIComponent(
-        window.location.pathname
+        window.location.pathname,
       )}`;
       return;
     }
@@ -55,18 +58,15 @@ export default function Page() {
         },
       };
 
-      // 1. Llamamos a tu API de Strapi (la que configuramos con openpay.checkouts.create)
       const res = await makePaymentReques.post("/api/orders", payload, {
         headers: {
           Authorization: `Bearer ${user.jwt.trim()}`,
         },
       });
 
-      // 2. Si el backend nos da la URL de Openpay, redirigimos al usuario
       if (res.data?.data?.url) {
         toast.success("Redirigiendo al procesador de pago...");
-        // Guardamos en localStorage o similar si necesitamos limpiar el carrito después
-        // Aunque lo ideal es limpiarlo en la página de /success
+
         window.location.href = res.data.data.url;
       } else {
         throw new Error("No se recibió la URL de pago.");
@@ -75,7 +75,7 @@ export default function Page() {
       console.error("Error en el checkout:", error);
       toast.error(
         error.response?.data?.error?.message ||
-          "Error al iniciar el proceso de pago"
+          "Error al iniciar el proceso de pago",
       );
     } finally {
       setLoading(false);
@@ -132,13 +132,37 @@ export default function Page() {
                   </div>
                 )}
 
+                {/* Desglose de IVA */}
                 <div className="flex justify-between items-center">
                   <p className="text-slate-500 font-bold uppercase text-[10px]">
+                    Subtotal
+                  </p>
+                  <p className="text-sm font-bold text-slate-600">
+                    {formatPrice(subtotal)}
+                  </p>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <p className="text-slate-500 font-bold uppercase text-[10px]">
+                    IVA (16%)
+                  </p>
+                  <p className="text-sm font-bold text-slate-600">
+                    {formatPrice(iva)}
+                  </p>
+                </div>
+
+                <Separator className="bg-slate-50" />
+
+                <div className="flex justify-between items-center">
+                  <p className="text-sky-950 font-black uppercase text-[10px]">
                     Total del pedido
                   </p>
                   <div className="text-right">
                     <p className="text-2xl font-black text-green-600 tracking-tighter italic">
                       {formatPrice(totalPrice)}
+                    </p>
+                    <p className="text-[8px] text-slate-400 font-bold uppercase">
+                      IVA Incluido
                     </p>
                   </div>
                 </div>
@@ -149,11 +173,11 @@ export default function Page() {
                 className="w-full rounded-full bg-sky-800 hover:bg-sky-900 text-white font-black uppercase text-[11px] tracking-[0.2em] py-7 shadow-lg transition-transform active:scale-95"
                 onClick={handleCheckoutClick}
               >
-                {loading ? "Preparando pago..." : "Ir a pagar"}
+                {loading ? "Preparando pago..." : "Realizar pedido y pagar"}
               </Button>
 
               <p className="mt-4 text-center text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                🔒 Pago seguro con Openpay
+                🔒 Pago seguro con Openpay by BBVA
               </p>
             </div>
           </div>

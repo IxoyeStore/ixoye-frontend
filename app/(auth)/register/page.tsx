@@ -47,14 +47,8 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
-  useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      console.log("Errores de validación que bloquean el envío:", errors);
-    }
-  }, [errors]);
-
   const openLegalModal = async (
-    type: "terms-and-condition" | "privacy-policy"
+    type: "terms-and-condition" | "privacy-policy",
   ) => {
     setIsModalOpen(true);
     setIsLoadingLegal(true);
@@ -62,7 +56,7 @@ export default function RegisterPage() {
     setModalTitle(
       type === "terms-and-condition"
         ? "Términos y Condiciones"
-        : "Aviso de Privacidad"
+        : "Aviso de Privacidad",
     );
 
     try {
@@ -78,7 +72,7 @@ export default function RegisterPage() {
         setModalContent(parsedText);
       } else {
         setModalContent(
-          typeof rawData === "string" ? rawData : "Contenido no disponible."
+          typeof rawData === "string" ? rawData : "Contenido no disponible.",
         );
       }
     } catch (error) {
@@ -91,7 +85,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     if (!acceptedTerms) {
       setRegisterError(
-        "Debes aceptar los términos y condiciones para continuar."
+        "Debes aceptar los términos y condiciones para continuar.",
       );
       return;
     }
@@ -108,14 +102,14 @@ export default function RegisterPage() {
             email: data.email,
             password: data.password,
           }),
-        }
+        },
       );
 
       const result = await res.json();
 
       if (!res.ok) {
         setRegisterError(
-          result.error?.message || "El usuario o correo ya existe"
+          result.error?.message || "El usuario o correo ya existe",
         );
         return;
       }

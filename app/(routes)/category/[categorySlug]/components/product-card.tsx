@@ -12,6 +12,7 @@ import { formatPrice } from "@/lib/formatPrice";
 import { ProductImage } from "@/components/product-image";
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
+import Image from "next/image";
 
 type ProductCardProps = {
   product: ProductType;
@@ -41,11 +42,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
               <CarouselContent>
                 {product.images.map((image) => (
                   <CarouselItem key={image.id}>
-                    <img
-                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${image.url}`}
-                      alt={product.productName}
-                      className="aspect-square object-cover w-full"
-                    />
+                    <div className="relative aspect-square">
+                      <Image
+                        src={image.url}
+                        alt={product.productName}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>

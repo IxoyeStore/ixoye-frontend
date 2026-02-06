@@ -1,5 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { getPrivacyPolicy } from "@/api/getPrivacyPolicy";
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export default async function PrivacyPolicyPage() {
   const policy = await getPrivacyPolicy();

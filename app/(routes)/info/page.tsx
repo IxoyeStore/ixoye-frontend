@@ -23,12 +23,12 @@ export default function InfoPage() {
     {
       icon: LockKeyhole,
       title: "Pagos seguros",
-      desc: "Todas las transacciones están protegidas mediante Stripe y encriptación de datos.",
+      desc: "Todas las transacciones están protegidas mediante Openpay y encriptación de datos.",
     },
     {
       icon: PackageCheck,
       title: "Envíos confiables",
-      desc: "Enviamos a todo el país con paqueterías confiables y seguimiento de tu pedido.",
+      desc: "Enviamos a todo el estado con paqueterías confiables y seguimiento de tu pedido.",
     },
     {
       icon: HandCoins,
@@ -38,7 +38,7 @@ export default function InfoPage() {
     {
       icon: MessageCircleMore,
       title: "Atención al cliente",
-      desc: "Si tienes dudas, estamos listos para ayudarte antes y después de tu compra.",
+      desc: "Si tienes dudas, estamos listos para ayudarte antes y después de tu compra en nuestro horario de atención.",
     },
   ];
 

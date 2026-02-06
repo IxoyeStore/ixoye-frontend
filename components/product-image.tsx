@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from "next/image";
 import { PackageSearch } from "lucide-react";
 
 interface ProductImageProps {
@@ -8,8 +8,6 @@ interface ProductImageProps {
 }
 
 export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
-  const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL;
-
   if (!url) {
     return (
       <div
@@ -28,10 +26,14 @@ export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
   }
 
   return (
-    <img
-      src={`${strapiUrl}${url}`}
-      alt={alt || "Producto Ixoye"}
-      className={`object-cover rounded-xl ${className}`}
-    />
+    <div className={`relative overflow-hidden rounded-xl ${className}`}>
+      <Image
+        src={url}
+        alt={alt || "Producto Ixoye"}
+        fill
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      />
+    </div>
   );
 }

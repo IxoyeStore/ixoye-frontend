@@ -19,7 +19,7 @@ export default function EditProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const addressId = searchParams.get("addressId");
-
+  const isNewAddress = searchParams.get("new") === "true";
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingCP, setLoadingCP] = useState(false);
@@ -58,8 +58,8 @@ export default function EditProfilePage() {
       JSON.stringify(form) !== JSON.stringify(originalData.form);
     const addressChanged =
       JSON.stringify(addressForm) !== JSON.stringify(originalData.address);
-    return formChanged || addressChanged;
-  }, [form, addressForm, originalData]);
+    return formChanged || addressChanged || isNewAddress;
+  }, [form, addressForm, originalData, isNewAddress]);
 
   useEffect(() => {
     const fetchCP = async () => {
@@ -68,7 +68,7 @@ export default function EditProfilePage() {
         setCpError(false);
         try {
           const res = await fetch(
-            `https://api.copomex.com/query/info_cp/${addressForm.postalCode}?token=${COPOMEX_TOKEN}`
+            `https://api.copomex.com/query/info_cp/${addressForm.postalCode}?token=${COPOMEX_TOKEN}`,
           );
 
           if (!res.ok) {
@@ -81,7 +81,7 @@ export default function EditProfilePage() {
 
           if (Array.isArray(data) && data.length > 0) {
             const listaColonias = data.map(
-              (item: any) => item.response.asentamiento
+              (item: any) => item.response.asentamiento,
             );
             setColoniasSugeridas(listaColonias);
             const info = data[0].response;
@@ -114,9 +114,7 @@ export default function EditProfilePage() {
     if (!user) return;
     const fetchData = async () => {
       const profile = user.profile || user.users_permissions_user?.profile;
-      const baseData =
-        user.users_permissions_user?.attributes || user.users_permissions_user;
-      const data = profile?.attributes || profile || baseData;
+      const data = profile;
 
       const initialForm = {
         firstName: data?.firstName || "",
@@ -141,27 +139,49 @@ export default function EditProfilePage() {
 
       setForm(initialForm);
 
-      if (addressId) {
+      if (isNewAddress) {
+        setAddressForm(initialAddress);
+      } else {
         try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses/${addressId}`,
-            { headers: { Authorization: `Bearer ${user.jwt}` } }
-          );
-          const json = await res.json();
-          const addrData = json.data;
+          let addrData = null;
+
+          if (addressId) {
+            const res = await fetch(
+              `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses/${addressId}`,
+              { headers: { Authorization: `Bearer ${user.jwt}` } },
+            );
+            const json = await res.json();
+            addrData = json.data;
+          } else {
+            const userId = user.id;
+            const res = await fetch(
+              `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
+              { headers: { Authorization: `Bearer ${user.jwt}` } },
+            );
+            const json = await res.json();
+            if (json.data && json.data.length > 0) {
+              addrData = json.data[0];
+            }
+          }
+
           if (addrData) {
-            const attrs = addrData.attributes || addrData;
             initialAddress = {
-              alias: attrs.alias || "",
-              street: attrs.street || "",
-              neighborhood: attrs.neighborhood || "",
-              city: attrs.city || "",
-              state: attrs.state || "",
-              postalCode: attrs.postalCode || "",
-              references: attrs.references || "",
-              isDefault: attrs.isDefault || false,
+              alias: addrData.alias || "",
+              street: addrData.street || "",
+              neighborhood: addrData.neighborhood || "",
+              city: addrData.city || "",
+              state: addrData.state || "",
+              postalCode: addrData.postalCode || "",
+              references: addrData.references || "",
+              isDefault: addrData.isDefault || false,
             };
             setAddressForm(initialAddress);
+
+            if (!addressId && addrData.documentId) {
+              router.replace(`/profile/edit?addressId=${addrData.documentId}`, {
+                scroll: false,
+              });
+            }
           }
         } catch (error) {
           console.error("Error cargando dirección:", error);
@@ -175,7 +195,7 @@ export default function EditProfilePage() {
       setLoading(false);
     };
     fetchData();
-  }, [user, addressId]);
+  }, [user, addressId, isNewAddress, router]);
 
   const handleChange = (field: string, value: string) => {
     if (["firstName", "lastName", "motherLastName"].includes(field)) {
@@ -196,7 +216,6 @@ export default function EditProfilePage() {
   };
 
   const handleSave = async () => {
-    // VALIDACIÓN PREVENTIVA (Frontend)
     if (
       addressForm.street.trim() === "" ||
       addressForm.postalCode.length < 5 ||
@@ -219,20 +238,19 @@ export default function EditProfilePage() {
       const jwt = user.jwt;
       const userId = user.id;
 
-      // Lógica de dirección default
       if (addressForm.isDefault) {
         const addrRes = await fetch(
-          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${userId}`,
-          { headers: { Authorization: `Bearer ${jwt}` } }
+          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
+          { headers: { Authorization: `Bearer ${jwt}` } },
         );
-        const { data: allAddresses } = await addrRes.json();
+        const { data: defaultAddresses } = await addrRes.json();
 
-        if (allAddresses && Array.isArray(allAddresses)) {
-          for (const addr of allAddresses) {
-            const id = addr.documentId || addr.id;
-            if (id.toString() !== addressId?.toString()) {
+        if (defaultAddresses && Array.isArray(defaultAddresses)) {
+          for (const addr of defaultAddresses) {
+            const docId = addr.documentId;
+            if (docId && docId !== addressId) {
               await fetch(
-                `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses/${id}`,
+                `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses/${docId}`,
                 {
                   method: "PUT",
                   headers: {
@@ -240,18 +258,16 @@ export default function EditProfilePage() {
                     Authorization: `Bearer ${jwt}`,
                   },
                   body: JSON.stringify({ data: { isDefault: false } }),
-                }
+                },
               );
             }
           }
         }
       }
 
-      let profileId =
+      const profileDocId =
         user.profile?.documentId ||
-        user.profile?.id ||
-        user.users_permissions_user?.profile?.documentId ||
-        user.users_permissions_user?.profile?.id;
+        user.users_permissions_user?.profile?.documentId;
 
       const profileData: any = {
         firstName: form.firstName,
@@ -263,31 +279,27 @@ export default function EditProfilePage() {
         companyName: form.type === "b2b" ? form.companyName : "",
       };
 
-      const isUpdate = !!profileId;
-      const profileUrl = isUpdate
-        ? `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/profiles/${profileId}`
-        : `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/profiles`;
+      if (profileDocId) {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/profiles/${profileDocId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+            body: JSON.stringify({ data: profileData }),
+          },
+        );
+      }
 
-      if (!isUpdate) profileData.users_permissions_user = userId;
-
-      const profileRes = await fetch(profileUrl, {
-        method: isUpdate ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({ data: profileData }),
-      });
-
-      if (!profileRes.ok) throw new Error("Error al procesar el perfil");
-
-      // GUARDADO DE DIRECCIÓN
-      const addrUrl = addressId
+      const isUpdatingAddress = addressId && !isNewAddress;
+      const addrUrl = isUpdatingAddress
         ? `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses/${addressId}`
         : `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/addresses`;
 
       const addrRes = await fetch(addrUrl, {
-        method: addressId ? "PUT" : "POST",
+        method: isUpdatingAddress ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${jwt}`,
@@ -297,11 +309,13 @@ export default function EditProfilePage() {
         }),
       });
 
-      if (!addrRes.ok)
-        throw new Error("Error al guardar la dirección. Verifica los campos.");
+      if (!addrRes.ok) throw new Error("Error al guardar la dirección.");
 
       await refreshUser?.();
-      router.push("/profile?tab=" + (addressId ? "addresses" : "info"));
+      router.push(
+        "/profile?tab=" +
+          (isUpdatingAddress || isNewAddress ? "addresses" : "info"),
+      );
     } catch (error: any) {
       setErrors({ general: error.message });
     } finally {
@@ -328,9 +342,13 @@ export default function EditProfilePage() {
         </Link>
 
         <Card className="shadow-xl border-none ring-1 ring-gray-100">
-          <CardHeader className="text-center pt-8 border-b border-gray-50">
+          <CardHeader className="text-center pt-8 border-b border-gray-100">
             <CardTitle className="text-3xl font-extrabold text-[#012849]">
-              {addressId ? "Editar Dirección" : "Editar Perfil"}
+              {isNewAddress
+                ? "Agregar Nueva Dirección"
+                : addressId
+                  ? "Editar Dirección"
+                  : "Editar Perfil"}
             </CardTitle>
           </CardHeader>
 
@@ -418,6 +436,19 @@ export default function EditProfilePage() {
                 />
               </div>
 
+              <div className="space-y-1.5">
+                <Label className="text-sm font-bold text-[#012849] flex items-center">
+                  Fecha de Nacimiento
+                  <Info size={14} className="ml-1.5 text-slate-400" />
+                </Label>
+                <Input
+                  type="date"
+                  value={form.birthDate}
+                  onChange={(e) => handleChange("birthDate", e.target.value)}
+                  className="block w-full"
+                />
+              </div>
+
               {/* DIRECCIÓN */}
               <div className="md:col-span-2 pt-6 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <h3 className="md:col-span-2 font-bold text-[#012849]">
@@ -449,7 +480,7 @@ export default function EditProfilePage() {
                     onChange={(e) =>
                       handleAddressChange(
                         "postalCode",
-                        e.target.value.replace(/\D/g, "")
+                        e.target.value.replace(/\D/g, ""),
                       )
                     }
                     maxLength={5}
@@ -533,6 +564,39 @@ export default function EditProfilePage() {
               </div>
             </div>
 
+            <div className="md:col-span-2 pt-2">
+              <div
+                onClick={() =>
+                  handleAddressChange("isDefault", !addressForm.isDefault)
+                }
+                className={`flex items-center space-x-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                  addressForm.isDefault
+                    ? "border-[#0071b1] bg-blue-50/50"
+                    : "border-gray-100 bg-gray-50/30 hover:border-gray-200"
+                }`}
+              >
+                <Checkbox
+                  id="isDefault"
+                  checked={addressForm.isDefault}
+                  onCheckedChange={(checked) =>
+                    handleAddressChange("isDefault", checked)
+                  }
+                  className="data-[state=checked]:bg-[#0071b1] data-[state=checked]:border-[#0071b1]"
+                />
+                <div className="space-y-0.5 cursor-pointer">
+                  <Label
+                    htmlFor="isDefault"
+                    className="text-sm font-bold text-[#012849] cursor-pointer"
+                  >
+                    Establecer como dirección principal
+                  </Label>
+                  <p className="text-xs text-gray-500 font-medium">
+                    Usa esta dirección por defecto para tus pedidos rápidos.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {errors.general && (
               <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg text-center font-medium">
                 {errors.general}
@@ -550,6 +614,8 @@ export default function EditProfilePage() {
             >
               {saving ? (
                 <Loader2 className="animate-spin mr-2" />
+              ) : isNewAddress ? (
+                "Crear Dirección"
               ) : (
                 "Guardar Cambios"
               )}
