@@ -42,14 +42,17 @@ function LoginFormContent() {
   const onSubmit = async (data: LoginForm) => {
     setLoginError(null);
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          identifier: data.email,
-          password: data.password,
-        }),
-      });
+      const res = await fetch(
+        "https://ixoye-backend-production.up.railway.app/api/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            identifier: data.email,
+            password: data.password,
+          }),
+        },
+      );
 
       const result = await res.json();
       if (!res.ok) {

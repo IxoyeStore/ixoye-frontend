@@ -116,11 +116,14 @@ export default function RegisterPage() {
         return;
       }
 
-      const sessionRes = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jwt: result.jwt, user: result.user }),
-      });
+      const sessionRes = await fetch(
+        "https://ixoye-backend-production.up.railway.app/api/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jwt: result.jwt, user: result.user }),
+        },
+      );
 
       if (sessionRes.ok) {
         if (refreshUser) await refreshUser();

@@ -20,10 +20,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async () => {
     try {
-      const res = await fetch("/api/me", {
-        credentials: "include",
-        cache: "no-store",
-      });
+      const res = await fetch(
+        "https://ixoye-backend-production.up.railway.app/api/me",
+        {
+          credentials: "include",
+          cache: "no-store",
+        },
+      );
 
       if (!res.ok) {
         setUser(null);
@@ -55,7 +58,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch("/api/logout", { method: "POST" });
+      await fetch(
+        "https://ixoye-backend-production.up.railway.app/api/logout",
+        { method: "POST" },
+      );
     } finally {
       setUser(null);
       router.replace("/login");
