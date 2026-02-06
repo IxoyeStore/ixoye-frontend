@@ -6,10 +6,17 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
-        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "ixoye-backend-production.up.railway.app",
         pathname: "/**",
       },
     ],
+  },
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 };
 
