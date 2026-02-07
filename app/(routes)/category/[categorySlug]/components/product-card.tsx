@@ -40,9 +40,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const isLoved = lovedItems.some((item) => item.id === product.id);
 
   const isB2B = authUser?.profile?.type === "b2b";
+  const hasWholesalePrice =
+    isB2B && product.wholesalePrice && product.wholesalePrice > 0;
 
-  const displayPrice =
-    isB2B && product.wholesalePrice ? product.wholesalePrice : product.price;
+  const displayPrice = hasWholesalePrice
+    ? product.wholesalePrice
+    : product.price;
 
   return (
     <div className="relative p-2 transition-all duration-200 rounded-lg hover:shadow-md group border border-transparent hover:border-slate-100 flex flex-col h-full">
@@ -88,7 +91,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
               onClick={() => addItem(product)}
               icon={<ShoppingCart size={18} className="text-sky-700" />}
             />
-
             <IconButton
               onClick={() =>
                 isLoved ? removeLovedItem(product.id) : addLovedItem(product)
@@ -113,14 +115,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </p>
         </Link>
 
-        <div className="mt-auto pt-2">
-          <p className="font-bold text-green-600">
-            {formatPrice(displayPrice)}
+        <div className="mt-auto pt-2 flex flex-col items-center">
+          {hasWholesalePrice && (
+            <p className="text-xs text-slate-400 line-through">
+              {formatPrice(product.price)}
+            </p>
+          )}
+
+          <p className="font-bold text-green-600 text-lg">
+            {formatPrice(displayPrice!)}
           </p>
 
-          {isB2B && product.wholesalePrice && (
-            <span className="text-[10px] bg-blue-50 text-[#0071b1] px-2 py-0.5 rounded font-black uppercase mt-1 inline-block border border-blue-100">
-              Precio Mayorista
+          {hasWholesalePrice && (
+            <span className="text-[10px] bg-sky-50 text-[#0071b1] px-2 py-0.5 rounded-full font-bold uppercase mt-1 border border-sky-100">
+              Precio preferencial
             </span>
           )}
 
