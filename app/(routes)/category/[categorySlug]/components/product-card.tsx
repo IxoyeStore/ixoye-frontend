@@ -6,24 +6,43 @@ import {
   CarouselContent,
   CarouselItem,
 } from "../../../../../components/ui/carousel";
-import { ShoppingCart, Heart, Hash } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import IconButton from "@/components/ui/icon-button";
 import { formatPrice } from "@/lib/formatPrice";
 import { ProductImage } from "@/components/product-image";
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
 import Image from "next/image";
+import { useAuth } from "@/context/auth-context";
 
 type ProductCardProps = {
   product: ProductType;
 };
 
+interface AuthUserWithProfile {
+  id: number;
+  email: string;
+  profile?: {
+    type: "b2c" | "b2b";
+    firstName: string;
+    lastName: string;
+  };
+}
+
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addItem } = useCart();
   const { lovedItems, addLovedItem, removeLovedItem } = useLovedProducts();
+  const { user } = useAuth();
+
+  const authUser = user as AuthUserWithProfile | null;
 
   const hasImages = product.images && product.images.length > 0;
   const isLoved = lovedItems.some((item) => item.id === product.id);
+
+  const isB2B = authUser?.profile?.type === "b2b";
+
+  const displayPrice =
+    isB2B && product.wholesalePrice ? product.wholesalePrice : product.price;
 
   return (
     <div className="relative p-2 transition-all duration-200 rounded-lg hover:shadow-md group border border-transparent hover:border-slate-100 flex flex-col h-full">
@@ -96,8 +115,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
         <div className="mt-auto pt-2">
           <p className="font-bold text-green-600">
-            {formatPrice(product.price)}
+            {formatPrice(displayPrice)}
           </p>
+
+          {isB2B && product.wholesalePrice && (
+            <span className="text-[10px] bg-blue-50 text-[#0071b1] px-2 py-0.5 rounded font-black uppercase mt-1 inline-block border border-blue-100">
+              Precio Mayorista
+            </span>
+          )}
 
           {product.productType && (
             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mt-1">
