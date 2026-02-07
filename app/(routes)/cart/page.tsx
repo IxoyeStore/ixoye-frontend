@@ -26,7 +26,6 @@ export default function Page() {
     return total + priceToPay * (item.quantity || 1);
   }, 0);
 
-  // Cálculos de desglose de IVA (IVA incluido)
   const subtotal = totalPrice / 1.16;
   const iva = totalPrice - subtotal;
 

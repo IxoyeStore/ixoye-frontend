@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const makePaymentReques = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  baseURL: "https://ixoye-backend-production.up.railway.app",
   headers: {
-    Authorization: "bearer" + process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    "Content-Type": "application/json",
   },
 });
