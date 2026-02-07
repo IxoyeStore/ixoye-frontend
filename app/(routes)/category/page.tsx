@@ -46,9 +46,8 @@ function CategoryContent() {
         filterQuery += `&filters[productName][$containsi]=${productName}`;
 
       const res = await fetch(
-        `https://ixoye-backend-production.up.railway.app/api/products?populate=*&pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}&sort[0]=${currentSort}${filterQuery}`,
+        `https://ixoye-backend-production.up.railway.app/api/products?pagination[page]=${pageNumber}&pagination[pageSize]=${pageSize}&sort[0]=${currentSort}${filterQuery}`,
       );
-
       const json = await res.json();
 
       if (isNewLoad) {

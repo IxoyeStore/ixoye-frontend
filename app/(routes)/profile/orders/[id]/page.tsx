@@ -42,13 +42,13 @@ export default function OrderDetailPage() {
       if (!user || !user.jwt || !id) return;
       setLoading(true);
       try {
-        let url = `https://ixoye-backend-production.up.railway.app/api/orders/${id}?populate=*`;
+        let url = `https://ixoye-backend-production.up.railway.app/api/orders/${id}?`;
         let response = await fetch(url, {
           headers: { Authorization: `Bearer ${user.jwt}` },
         });
 
         if (response.status === 404) {
-          url = `https://ixoye-backend-production.up.railway.app/api/orders?filters[id][$eq]=${id}&populate=*`;
+          url = `https://ixoye-backend-production.up.railway.app/api/orders?filters[id][$eq]=${id}`;
           response = await fetch(url, {
             headers: { Authorization: `Bearer ${user.jwt}` },
           });

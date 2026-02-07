@@ -12,7 +12,7 @@ export function useGetProductBySlug(slug?: string) {
       return;
     }
 
-    const url = `https://ixoye-backend-production.up.railway.app/api/products?filters[slug][$eq]=${slug}&populate=images`;
+    const url = `https://ixoye-backend-production.up.railway.app/api/products?filters[slug][$eq]=${slug}`;
     (async () => {
       try {
         const res = await fetch(url);

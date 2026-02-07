@@ -55,7 +55,7 @@ function SearchContent() {
           });
         });
 
-        params.append("populate", "*");
+        params.append("populate", "category");
 
         const url = `https://ixoye-backend-production.up.railway.app/api/products?${params.toString()}`;
         const response = await fetch(url);

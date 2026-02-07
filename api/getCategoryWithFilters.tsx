@@ -10,7 +10,7 @@ export function useGetCategoryWithFilters(slug?: string) {
     const url =
       `https://ixoye-backend-production.up.railway.app/api/categories` +
       `?filters[slug][$eq]=${slug}` +
-      `&populate[filters]=*`;
+      `&populate=products`;
 
     const fetchData = async () => {
       setLoading(true);

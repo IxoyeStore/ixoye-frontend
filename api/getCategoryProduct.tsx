@@ -10,7 +10,7 @@ export function useGetCategoryProduct(slug?: string) {
 
     const url =
       `https://ixoye-backend-production.up.railway.app/api/products` +
-      `?populate=*` +
+      `?` +
       `&filters[category][slug][$eq]=${slug}`;
     const fetchData = async () => {
       setLoading(true);
