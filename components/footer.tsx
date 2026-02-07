@@ -154,6 +154,8 @@ export default function Footer() {
                   Horario de Atención:
                   <br />
                   Lun-Vie (9:00 - 18:00)
+                  <br />
+                  Sab (9:00 - 2:00)
                 </span>
               </li>
             </ul>
@@ -215,7 +217,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Banner de Facturación Horizontal */}
+        {/* Banner de Facturación */}
         <div className="mt-12 p-4 bg-white/5 rounded-xl border border-white/10 flex flex-col sm:flex-row items-center gap-4">
           <div className="p-2 rounded-full bg-sky-500/10">
             <Info size={20} className="text-sky-300" />

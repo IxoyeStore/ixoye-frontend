@@ -43,7 +43,7 @@ function LoginFormContent() {
     setLoginError(null);
     try {
       const res = await fetch(
-        "https://ixoye-backend-production.up.railway.app/api/login",
+        "https://ixoye-backend-production.up.railway.app/api/auth/local",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

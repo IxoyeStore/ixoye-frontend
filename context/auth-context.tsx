@@ -58,10 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch(
-        "https://ixoye-backend-production.up.railway.app/api/logout",
-        { method: "POST" },
-      );
+      await fetch("/api/logout", { method: "POST" });
     } finally {
       setUser(null);
       router.replace("/login");
