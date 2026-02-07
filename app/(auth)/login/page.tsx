@@ -56,15 +56,32 @@ function LoginFormContent() {
 
       const result = await res.json();
       if (!res.ok) {
-        setLoginError(result.error || "Credenciales inválidas");
+        setLoginError(
+          result.error?.message || result.error || "Credenciales inválidas",
+        );
         return;
       }
+      const sessionRes = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jwt: result.jwt,
+          user: result.user,
+        }),
+      });
 
-      if (result.user) setUser(result.user);
+      if (!sessionRes.ok) {
+        setLoginError("Error al crear la sesión en el navegador");
+        return;
+      }
+      setUser(result.user);
       await refreshUser();
-      window.location.href = callbackUrl || "/profile";
+
+      router.push(callbackUrl || "/profile");
+      router.refresh();
     } catch (error) {
-      setLoginError("Error al iniciar sesión");
+      console.error("Login error:", error);
+      setLoginError("Error al conectar con el servidor");
     }
   };
 
