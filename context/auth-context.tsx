@@ -21,7 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = async () => {
     try {
       const res = await fetch(
-        "https://ixoye-backend-production.up.railway.app/api/me",
+        "https://ixoye-backend-production.up.railway.app/api/users/me",
         {
           credentials: "include",
           cache: "no-store",
