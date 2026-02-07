@@ -23,7 +23,7 @@ export default function Page() {
     return <p className="text-center py-20">No se encontró el producto</p>;
   }
 
-  const hasImages = product.images && product.images.length > 0;
+  const hasImages = Array.isArray(product.images) && product.images.length > 0;
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-32 sm:px-24">
@@ -33,7 +33,7 @@ export default function Page() {
             <CarouselProduct images={product.images} />
           ) : (
             <ProductImage
-              url={product.images?.[0]?.url || ""}
+              url={product.images?.[0] || ""}
               className="w-full aspect-square shadow-sm border border-slate-100"
             />
           )}

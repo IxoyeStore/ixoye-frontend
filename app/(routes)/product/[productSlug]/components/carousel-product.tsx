@@ -7,14 +7,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-type ImageProps = {
-  id: number;
-  url: string;
-  alternativeText?: string | null;
-};
-
 interface CarouselProductProps {
-  images: ImageProps[];
+  images: string[];
 }
 
 const CarouselProduct = ({ images }: CarouselProductProps) => {
@@ -32,12 +26,13 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
         }}
       >
         <CarouselContent>
-          {images.map((image) => (
-            <CarouselItem key={image.id}>
+          {images.map((imageUrl, index) => (
+            // Usamos el index como key ya que ahora no tenemos un id de Strapi
+            <CarouselItem key={index}>
               <img
-                src={image.url}
-                alt={image.alternativeText ?? "Imagen del producto"}
-                className="rounded-lg"
+                src={imageUrl}
+                alt="Imagen del producto"
+                className="rounded-lg w-full h-auto object-cover"
               />
             </CarouselItem>
           ))}

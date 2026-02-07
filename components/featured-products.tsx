@@ -64,7 +64,7 @@ const FeaturedProducts = () => {
                           className="relative w-full aspect-square overflow-hidden cursor-pointer"
                         >
                           <ProductImage
-                            url={images?.[0]?.url}
+                            url={images?.[0]}
                             alt={productName}
                             className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
                           />

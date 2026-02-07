@@ -36,7 +36,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const authUser = user as AuthUserWithProfile | null;
 
-  const hasImages = product.images && product.images.length > 0;
+  const hasImages = Array.isArray(product.images) && product.images.length > 0;
   const isLoved = lovedItems.some((item) => item.id === product.id);
 
   const isB2B = authUser?.profile?.type === "b2b";
@@ -62,11 +62,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {hasImages ? (
             <Carousel opts={{ align: "start" }} className="w-full">
               <CarouselContent>
-                {product.images.map((image) => (
-                  <CarouselItem key={image.id}>
+                {product.images.map((imageUrl, index) => (
+                  <CarouselItem key={index}>
                     <div className="relative aspect-square">
                       <Image
-                        src={image.url}
+                        src={imageUrl}
                         alt={product.productName}
                         fill
                         className="object-cover"
@@ -79,7 +79,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </Carousel>
           ) : (
             <ProductImage
-              url={product.images?.[0]?.url}
+              url={product.images?.[0]}
               className="aspect-square w-full"
             />
           )}

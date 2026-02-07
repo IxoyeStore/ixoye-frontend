@@ -36,7 +36,7 @@ const CartItem = ({ product }: CartItemProps) => {
         className="cursor-pointer shrink-0"
       >
         <ProductImage
-          url={product.images?.[0]?.url}
+          url={product.images?.[0]}
           alt={product.productName}
           className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-xl border border-slate-100 shadow-sm"
         />

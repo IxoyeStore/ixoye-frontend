@@ -38,5 +38,5 @@ export type ProductType = {
   freeShipping: boolean;
 
   quantity?: number;
-  images: StrapiImage[];
+  images: string[];
 };

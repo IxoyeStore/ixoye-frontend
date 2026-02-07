@@ -29,7 +29,7 @@ const LovedItemProduct = ({ product }: LovedItemProductProps) => {
       <div className="shrink-0">
         <Link href={`/product/${product.slug}`}>
           <ProductImage
-            url={product.images?.[0]?.url}
+            url={product.images?.[0]}
             alt={product.productName}
             className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-lg border border-slate-50 shadow-sm"
           />
@@ -62,7 +62,7 @@ const LovedItemProduct = ({ product }: LovedItemProductProps) => {
       <button
         onClick={() => removeLovedItem(product.id)}
         className={cn(
-          "absolute top-2 right-2 rounded-full flex items-center justify-center bg-white border border-slate-100 shadow-sm p-1.5 hover:scale-110 transition text-rose-700 hover:bg-rose-50 opacity-0 group-hover:opacity-100 md:opacity-100"
+          "absolute top-2 right-2 rounded-full flex items-center justify-center bg-white border border-slate-100 shadow-sm p-1.5 hover:scale-110 transition text-rose-700 hover:bg-rose-50 opacity-0 group-hover:opacity-100 md:opacity-100",
         )}
       >
         <X size={14} />
