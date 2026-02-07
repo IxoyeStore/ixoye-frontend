@@ -14,6 +14,7 @@ import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
 import Image from "next/image";
 import { useAuth } from "@/context/auth-context";
+import { useState } from "react";
 
 type ProductCardProps = {
   product: ProductType;
@@ -33,6 +34,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addItem } = useCart();
   const { lovedItems, addLovedItem, removeLovedItem } = useLovedProducts();
   const { user } = useAuth();
+
+  const [imageError, setImageError] = useState(false);
 
   const authUser = user as AuthUserWithProfile | null;
 
@@ -59,7 +62,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         )}
 
         <Link href={`/product/${product.slug}`}>
-          {hasImages ? (
+          {hasImages && !imageError ? (
             <Carousel opts={{ align: "start" }} className="w-full">
               <CarouselContent>
                 {product.images.map((imageUrl, index) => (
@@ -71,6 +74,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        onError={() => setImageError(true)}
                       />
                     </div>
                   </CarouselItem>
@@ -78,10 +82,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               </CarouselContent>
             </Carousel>
           ) : (
-            <ProductImage
-              url={product.images?.[0]}
-              className="aspect-square w-full"
-            />
+            <ProductImage url={undefined} className="aspect-square w-full" />
           )}
         </Link>
 
