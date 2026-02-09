@@ -11,9 +11,6 @@ import {
 const images = [
   "/carousel-banner/banner-dizzel-logo.jpeg",
   "/carousel-banner/banner-ixoye-parts.jpeg",
-  // "/carousel-banner/banner-hidraulico-sensores-suspension-bombas.jpeg",
-  // "/carousel-banner/banner-dizzel-emmark.jpeg",
-  // "/carousel-banner/banner-soporte-bandas-transmision-rodamientos.jpeg",
 ];
 
 const CarouselTextBanner = () => {
