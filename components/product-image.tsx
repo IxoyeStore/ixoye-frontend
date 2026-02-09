@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { PackageSearch } from "lucide-react";
+import { useState } from "react";
 
 interface ProductImageProps {
   url?: string;
@@ -8,7 +9,15 @@ interface ProductImageProps {
 }
 
 export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
-  if (!url) {
+  const [currentUrl, setCurrentUrl] = useState(url);
+  const [hasError, setHasError] = useState(false);
+
+  if (url !== currentUrl) {
+    setCurrentUrl(url);
+    setHasError(false);
+  }
+
+  if (!url || hasError) {
     return (
       <div
         className={`flex flex-col items-center justify-center bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 rounded-xl ${className}`}
@@ -33,6 +42,7 @@ export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
         fill
         className="object-cover"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        onError={() => setHasError(true)}
       />
     </div>
   );

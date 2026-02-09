@@ -25,7 +25,9 @@ const ShipmentSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`https://ixoye-backend-production.up.railway.app/api/shipments?`)
+    fetch(
+      `https://ixoye-backend-production.up.railway.app/api/shipments?populate=*`,
+    )
       .then((res) => res.json())
       .then((response) => {
         if (response.data) {

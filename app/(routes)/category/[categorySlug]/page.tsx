@@ -51,20 +51,19 @@ export default function Page() {
       <Separator className="my-4 bg-sky-100" />
 
       <div className="w-full">
-        <div className="grid w-full gap-5 mt-8 sm:grid-cols-2 md:grid-cols-3 md:gap-10">
+        <div className="grid w-full gap-3 mt-8 grid-cols-2 md:grid-cols-3 md:gap-10">
+          {" "}
           {loading && (
             <>
               <SkeletonSchema grid={3} />
               <SkeletonSchema grid={3} />
             </>
           )}
-
           {!loading && filteredProducts && filteredProducts.length === 0 && (
             <p className="col-span-full text-center text-sky-800/60 mt-15 font-medium">
               No se encontraron productos en esta categoría.
             </p>
           )}
-
           {!loading &&
             filteredProducts &&
             filteredProducts.length > 0 &&

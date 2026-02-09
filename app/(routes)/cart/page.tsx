@@ -10,6 +10,8 @@ import CartItem from "./components/cart-item";
 import { makePaymentReques } from "@/api/payment";
 import { useAuth } from "@/context/auth-context";
 import { toast } from "sonner";
+import { ShoppingBasket, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function Page() {
   const { items, removeAll } = useCart();
@@ -82,38 +84,43 @@ export default function Page() {
   };
 
   return (
-    <div className="max-w-6xl px-4 py-16 mx-auto">
+    <div className="max-w-6xl px-4 py-16 mx-auto min-h-[75vh]">
       <h1 className="mb-8 text-4xl font-black text-sky-950 uppercase italic tracking-tighter">
         Carrito de compras
       </h1>
 
-      <div className="grid md:grid-cols-2 gap-10">
-        <div className="flex flex-col gap-4">
-          {!hasItems && (
-            <div className="space-y-4">
-              <p className="text-sky-700 font-bold italic">
-                No hay productos en el carrito.
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => (window.location.href = "/category")}
-                className="rounded-full border-sky-200 text-sky-800 font-black uppercase text-[10px] px-6 py-6"
-              >
-                Explorar productos
-              </Button>
-            </div>
-          )}
-
-          <ul className="divide-y divide-slate-100">
-            {validItems.map((item) => (
-              <CartItem key={item.id} product={item} />
-            ))}
-          </ul>
+      {/* ESTADO VACÍO CON COHERENCIA VISUAL */}
+      {!hasItems ? (
+        <div className="flex flex-col items-center justify-center py-24 sm:py-32 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100/50">
+            <ShoppingBasket size={32} className="text-slate-300" />
+          </div>
+          <p className="text-slate-500 font-black uppercase text-xs tracking-widest mb-2">
+            Tu carrito está vacío
+          </p>
+          <p className="text-slate-400 text-sm italic mb-8 max-w-xs mx-auto">
+            Parece que aún no has agregado refacciones a tu pedido.
+          </p>
+          <Link href="/category">
+            <Button className="rounded-full bg-sky-800 hover:bg-sky-950 text-white font-black uppercase text-[10px] tracking-[0.2em] px-10 py-7 shadow-xl shadow-sky-900/20 transition-all hover:scale-105 active:scale-95 flex gap-2">
+              Explorar productos
+              <ArrowRight size={14} />
+            </Button>
+          </Link>
         </div>
+      ) : (
+        /* GRID CUANDO SÍ HAY PRODUCTOS */
+        <div className="grid md:grid-cols-2 gap-10 animate-in fade-in duration-500">
+          <div className="flex flex-col gap-4">
+            <ul className="divide-y divide-slate-100">
+              {validItems.map((item) => (
+                <CartItem key={item.id} product={item} />
+              ))}
+            </ul>
+          </div>
 
-        {hasItems && (
           <div className="max-w-xl">
-            <div className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-xl shadow-sky-100/30">
+            <div className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-xl shadow-sky-100/30 sticky top-24">
               <p className="mb-4 text-xs font-black text-sky-950 uppercase tracking-widest">
                 Resumen de pedido
               </p>
@@ -131,7 +138,6 @@ export default function Page() {
                   </div>
                 )}
 
-                {/* Desglose de IVA */}
                 <div className="flex justify-between items-center">
                   <p className="text-slate-500 font-bold uppercase text-[10px]">
                     Subtotal
@@ -180,8 +186,8 @@ export default function Page() {
               </p>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

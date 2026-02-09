@@ -9,12 +9,13 @@ const BannerDiscount = () => {
       <h2 className="uppercase font-black text-2xl text-[#003366]">
         Encuentra descuentos en toda la tienda
       </h2>
-      <div className="max-w-md mx-auto sm:flex justify-center gap-8 mt-5">
+
+      <div className="max-w-md mx-auto flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-8 mt-5">
         <Link
           href="/category"
           className={buttonVariants({
             className:
-              "bg-sky-700/90 hover:bg-sky-800 text-white border-none transition-colors",
+              "w-full sm:w-auto bg-sky-700/90 hover:bg-sky-800 text-white border-none transition-colors",
           })}
         >
           Comprar
@@ -24,7 +25,7 @@ const BannerDiscount = () => {
           className={buttonVariants({
             variant: "outline",
             className:
-              "border-sky-200 text-sky-700 hover:bg-sky-50 hover:text-sky-800 transition-colors",
+              "w-full sm:w-auto border-sky-200 text-sky-700 hover:bg-sky-50 hover:text-sky-800 transition-colors",
           })}
         >
           Más información
