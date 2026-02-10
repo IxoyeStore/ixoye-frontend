@@ -24,20 +24,21 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
   const showArrows = images.length > 1;
 
   return (
-    <div className="sm:px-16">
+    <div className="px-4 sm:px-16 w-full max-w-[400px] sm:max-w-full mx-auto">
       <Carousel
         opts={{
           loop: images.length > 1,
         }}
+        className="w-full"
       >
         <CarouselContent>
           {images.map((imageUrl, index) => (
             <CarouselItem key={index}>
-              <div className="aspect-square w-full relative">
+              <div className="aspect-square w-full relative overflow-hidden rounded-xl border border-slate-100 bg-white">
                 <ProductImage
                   url={imageUrl}
                   alt={`Imagen del producto ${index + 1}`}
-                  className="w-full h-full"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </CarouselItem>

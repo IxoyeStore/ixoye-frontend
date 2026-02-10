@@ -120,25 +120,20 @@ const InfoProduct = (props: InfoProductProps) => {
           </div>
 
           {/* Serie / Modelo */}
-          <div className="flex flex-col gap-2 border-b border-slate-50 pb-3">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[100px]">
+          <div className="flex flex-col gap-2 border-b border-slate-50 pb-3 min-w-0">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               Series Compatibles
             </span>
-            <div className="flex flex-nowrap sm:flex-wrap overflow-x-auto sm:overflow-visible gap-2 pb-1 scrollbar-hide no-scrollbar">
-              {seriesList.length > 0 ? (
-                seriesList.map((serie, idx) => (
-                  <span
-                    key={idx}
-                    className="whitespace-nowrap bg-slate-50 text-slate-700 text-[11px] font-black uppercase px-3 py-1.5 rounded-md border border-slate-200 italic shadow-sm hover:bg-white transition-colors"
-                  >
-                    {serie}
-                  </span>
-                ))
-              ) : (
-                <p className="text-sm font-black text-slate-300 uppercase leading-snug">
-                  N/A
-                </p>
-              )}
+
+            <div className="flex flex-nowrap sm:flex-wrap overflow-x-auto sm:overflow-visible gap-2 pb-2 no-scrollbar min-w-0 w-full">
+              {seriesList.map((serie, idx) => (
+                <span
+                  key={idx}
+                  className="flex-shrink-0 bg-slate-100 text-slate-700 text-[10px] font-black uppercase px-2 py-1 rounded-md border border-slate-200 italic"
+                >
+                  {serie}
+                </span>
+              ))}
             </div>
           </div>
 
