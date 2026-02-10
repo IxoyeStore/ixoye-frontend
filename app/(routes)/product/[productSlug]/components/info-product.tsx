@@ -28,6 +28,9 @@ const InfoProduct = (props: InfoProductProps) => {
   const stock = Number(product.stock) ?? 0;
   const itemInCart = items.find((item) => item.id === product.id);
   const quantityInCart = itemInCart ? itemInCart.quantity || 1 : 0;
+  const seriesList = product.series
+    ? product.series.split(",").map((s) => s.trim())
+    : [];
 
   const onAddToCart = () => {
     if (quantityInCart >= stock) {
@@ -117,13 +120,26 @@ const InfoProduct = (props: InfoProductProps) => {
           </div>
 
           {/* Serie / Modelo */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 border-b border-slate-50 pb-2">
+          <div className="flex flex-col gap-2 border-b border-slate-50 pb-3">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider min-w-[100px]">
-              Serie
+              Series Compatibles
             </span>
-            <p className="text-sm font-black text-slate-700 uppercase leading-snug italic">
-              {product.series || "N/A"}
-            </p>
+            <div className="flex flex-nowrap sm:flex-wrap overflow-x-auto sm:overflow-visible gap-2 pb-1 scrollbar-hide no-scrollbar">
+              {seriesList.length > 0 ? (
+                seriesList.map((serie, idx) => (
+                  <span
+                    key={idx}
+                    className="whitespace-nowrap bg-slate-50 text-slate-700 text-[11px] font-black uppercase px-3 py-1.5 rounded-md border border-slate-200 italic shadow-sm hover:bg-white transition-colors"
+                  >
+                    {serie}
+                  </span>
+                ))
+              ) : (
+                <p className="text-sm font-black text-slate-300 uppercase leading-snug">
+                  N/A
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Línea de Aplicación */}

@@ -89,7 +89,6 @@ export default function Page() {
         Carrito de compras
       </h1>
 
-      {/* ESTADO VACÍO CON COHERENCIA VISUAL */}
       {!hasItems ? (
         <div className="flex flex-col items-center justify-center py-24 sm:py-32 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100/50">
@@ -109,7 +108,6 @@ export default function Page() {
           </Link>
         </div>
       ) : (
-        /* GRID CUANDO SÍ HAY PRODUCTOS */
         <div className="grid md:grid-cols-2 gap-10 animate-in fade-in duration-500">
           <div className="flex flex-col gap-4">
             <ul className="divide-y divide-slate-100">

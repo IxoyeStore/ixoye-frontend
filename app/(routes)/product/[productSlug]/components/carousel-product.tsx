@@ -6,6 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { ProductImage } from "@/components/product-image";
 
 interface CarouselProductProps {
   images: string[];
@@ -13,7 +14,11 @@ interface CarouselProductProps {
 
 const CarouselProduct = ({ images }: CarouselProductProps) => {
   if (!images || images.length === 0) {
-    return <p>No hay imagenes para mostrar</p>;
+    return (
+      <div className="sm:px-16">
+        <ProductImage className="aspect-square w-full" />
+      </div>
+    );
   }
 
   const showArrows = images.length > 1;
@@ -27,20 +32,21 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
       >
         <CarouselContent>
           {images.map((imageUrl, index) => (
-            // Usamos el index como key ya que ahora no tenemos un id de Strapi
             <CarouselItem key={index}>
-              <img
-                src={imageUrl}
-                alt="Imagen del producto"
-                className="rounded-lg w-full h-auto object-cover"
-              />
+              <div className="aspect-square w-full relative">
+                <ProductImage
+                  url={imageUrl}
+                  alt={`Imagen del producto ${index + 1}`}
+                  className="w-full h-full"
+                />
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>
         {showArrows && (
           <>
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious className="hidden sm:flex" />
+            <CarouselNext className="hidden sm:flex" />
           </>
         )}
       </Carousel>
