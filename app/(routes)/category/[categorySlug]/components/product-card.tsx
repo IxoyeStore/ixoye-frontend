@@ -86,16 +86,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
           )}
         </Link>
 
-        <div className="absolute w-full px-4 transition duration-300 opacity-0 group-hover:opacity-100 bottom-4 left-0 z-10">
-          <div className="flex justify-center gap-x-4">
+        <div className="absolute w-full px-4 transition duration-300 opacity-0 md:group-hover:opacity-100 bottom-4 left-0 z-10 hidden md:flex">
+          <div className="flex justify-center gap-x-4 w-full">
             <IconButton
-              onClick={() => addItem(product)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addItem(product);
+              }}
               icon={<ShoppingCart size={18} className="text-sky-700" />}
             />
             <IconButton
-              onClick={() =>
-                isLoved ? removeLovedItem(product.id) : addLovedItem(product)
-              }
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                isLoved ? removeLovedItem(product.id) : addLovedItem(product);
+              }}
               icon={
                 <Heart
                   size={18}
