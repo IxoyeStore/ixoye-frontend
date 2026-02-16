@@ -29,7 +29,7 @@ const CarouselTextBanner = () => {
   }, [isPaused, nextSlide]);
 
   return (
-    <div className="w-full bg-gradient-to-r from-[#005ba5] via-[#0161c2] to-[#0269be] select-none border-b border-slate-800">
+    <div className="w-full select-none border-b">
       <div className="w-full relative overflow-hidden">
         <Carousel className="w-full">
           <CarouselContent className="m-0">

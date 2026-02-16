@@ -20,8 +20,13 @@ const SupportMenu = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // AJUSTE: Ahora usa text-slate-800 para que se vea sobre el fondo grisáceo suave
   const iconClass = `p-2 rounded-xl transition-all duration-300 transform hover:scale-110 
-    text-sky-950 ${isOpen ? "bg-slate-100 scale-110" : "hover:bg-slate-50"}`;
+    ${
+      isOpen
+        ? "bg-red-600 text-white scale-110 shadow-lg"
+        : "text-slate-800 hover:bg-white hover:shadow-sm"
+    }`;
 
   return (
     <div className="relative" ref={menuRef}>
@@ -35,14 +40,14 @@ const SupportMenu = () => {
 
       {/* Menú Desplegable */}
       <div
-        className={`absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 transition-all duration-200 origin-top-right ${
+        className={`absolute right-0 mt-4 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[70] transition-all duration-200 origin-top-right ${
           isOpen
             ? "scale-100 opacity-100"
             : "scale-95 opacity-0 pointer-events-none"
         }`}
       >
         <div className="bg-slate-50 p-3 border-b border-slate-100">
-          <p className="text-[10px] font-bold text-sky-950 uppercase tracking-widest text-center">
+          <p className="text-[10px] font-bold text-slate-900 uppercase tracking-widest text-center italic">
             Atención al Cliente
           </p>
         </div>
@@ -52,26 +57,30 @@ const SupportMenu = () => {
             href={`https://wa.me/${whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 hover:bg-green-50 rounded-xl transition-colors"
+            className="flex items-center gap-3 p-3 hover:bg-green-50 rounded-xl transition-colors group"
           >
-            <div className="bg-green-100 p-2 rounded-lg text-green-600">
+            <div className="bg-green-100 p-2 rounded-lg text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
               <span className="flex items-center justify-center">
                 <MessageCircle size={18} />
               </span>
             </div>
-            <span className="text-sm font-medium text-slate-700">WhatsApp</span>
+            <span className="text-sm font-bold text-slate-700 uppercase italic text-[11px]">
+              WhatsApp
+            </span>
           </a>
 
           <a
             href={`mailto:${supportEmail}`}
-            className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors"
+            className="flex items-center gap-3 p-3 hover:bg-red-50 rounded-xl transition-colors group"
           >
-            <div className="bg-slate-100 p-2 rounded-lg text-sky-950">
+            <div className="bg-red-100 p-2 rounded-lg text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
               <span className="flex items-center justify-center">
                 <Mail size={18} />
               </span>
             </div>
-            <span className="text-sm font-medium text-slate-700">Correo</span>
+            <span className="text-sm font-bold text-slate-700 uppercase italic text-[11px]">
+              Correo
+            </span>
           </a>
         </div>
       </div>
