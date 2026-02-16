@@ -29,34 +29,46 @@ function SearchContent() {
       }
 
       setLoading(true);
-      setSelectedBrands([]);
 
       try {
-        const keywords = query.trim().split(/\s+/);
-        const searchFields = [
-          "productName",
-          "code",
-          "brand",
-          "series",
-          "productType",
-          "department",
-        ];
-        const params = new URLSearchParams();
+        const cleanQuery = query.trim();
+        const keywords = cleanQuery
+          .split(/\s+/)
+          .filter((word) => word.length > 2); // Ignoramos "de", "con", etc.
 
-        let globalIndex = 0;
+        const params = new URLSearchParams();
+        let i = 0;
+
+        // ESTRATEGIA: Búsqueda Multi-Nivel
+
+        // Nivel 1: Coincidencia de la frase completa en el Nombre (Prioridad Máxima)
+        params.append(
+          `filters[$or][${i}][productName][$containsi]`,
+          cleanQuery,
+        );
+        i++;
+
+        // Nivel 2: Coincidencia de palabras individuales en el Nombre
+        // Esto permite que si buscan "Motor Camisas", lo encuentre aunque el orden sea "Camisas de Motor"
         keywords.forEach((word) => {
-          searchFields.forEach((field) => {
-            params.append(
-              `filters[$or][${globalIndex}][${field}][$containsi]`,
-              word,
-            );
-            globalIndex++;
+          params.append(`filters[$or][${i}][productName][$containsi]`, word);
+          i++;
+        });
+
+        // Nivel 3: Coincidencia en otros campos técnicos
+        keywords.forEach((word) => {
+          ["code", "brand", "productType"].forEach((field) => {
+            params.append(`filters[$or][${i}][${field}][$containsi]`, word);
+            i++;
           });
         });
 
         params.append("populate", "category");
-        const url = `https://ixoye-backend-production.up.railway.app/api/products?${params.toString()}`;
-        const response = await fetch(url);
+        params.append("pagination[pageSize]", "60");
+
+        const response = await fetch(
+          `https://ixoye-backend-production.up.railway.app/api/products?${params.toString()}`,
+        );
         const json = await response.json();
 
         if (json.data) {
@@ -64,14 +76,33 @@ function SearchContent() {
             id: item.id,
             ...item,
             productName: item.productName || "PRODUCTO SIN ESPECIFICAR",
-            price: Number(item.price || 0),
-            brand: item.brand || "N/A",
-            images: item.images || { data: [] },
           }));
-          setProducts(normalizedData);
+
+          // ORDENAMIENTO DE RELEVANCIA EN CLIENTE
+          const rankedProducts = normalizedData.sort((a: any, b: any) => {
+            const nameA = a.productName.toLowerCase();
+            const nameB = b.productName.toLowerCase();
+            const q = cleanQuery.toLowerCase();
+
+            // 1. ¿Contiene la frase exacta? (Puntaje 100)
+            const aExact = nameA.includes(q) ? 100 : 0;
+            const bExact = nameB.includes(q) ? 100 : 0;
+
+            // 2. ¿Empieza con la primera palabra de la búsqueda? (Puntaje 50)
+            const aStarts = nameA.startsWith(keywords[0]?.toLowerCase())
+              ? 50
+              : 0;
+            const bStarts = nameB.startsWith(keywords[0]?.toLowerCase())
+              ? 50
+              : 0;
+
+            return bExact + bStarts - (aExact + aStarts);
+          });
+
+          setProducts(rankedProducts);
         }
       } catch (error) {
-        console.error("Search fetch error:", error);
+        console.error("Search error:", error);
       } finally {
         setLoading(false);
       }

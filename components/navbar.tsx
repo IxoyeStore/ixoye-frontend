@@ -46,8 +46,7 @@ const STATIC_BRANDS = [
 const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
   return (
     <div className="relative group">
-      {/* BOTÓN: Ahora en gris suave que resalta sobre el fondo del header */}
-      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-slate-200 text-slate-700 hover:border-red-500 hover:text-red-600 transition-all shadow-sm active:scale-95">
+      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-slate-200 text-slate-900 hover:border-red-500 hover:text-red-600 transition-all shadow-sm active:scale-95">
         <Icon size={14} className={color} />
         <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">
           {label}
@@ -130,14 +129,12 @@ export default function Header() {
     setOpen(false);
   };
 
-  // Clases actualizadas para un look grisáceo discreto
   const iconClass =
     "flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white text-slate-800 min-w-[70px]";
   const navTextClass =
     "text-[9px] font-black uppercase italic tracking-wider text-center text-slate-600 group-hover:text-red-600";
 
   return (
-    /* HEADER: Color grisáceo (slate-50) con transparencia y desenfoque de fondo */
     <header className="w-full sticky top-0 z-50 shadow-sm bg-slate-50/95 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 md:h-[110px] gap-8">
         {/* LOGO */}
@@ -173,7 +170,7 @@ export default function Header() {
           />
           <button
             type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-slate-900 text-white rounded-xl hover:bg-red-600 transition-colors shadow-md"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-slate-900 text-white rounded-xl hover:bg-red-600 transition-colors shadow-md active:scale-90"
           >
             <Search size={20} />
           </button>
@@ -217,6 +214,7 @@ export default function Header() {
           </div>
         </nav>
 
+        {/* MENÚ MÓVIL BOTÓN */}
         <button
           onClick={() => setOpen(!open)}
           className="md:hidden p-2 rounded-xl text-slate-900 hover:bg-white transition"
@@ -253,6 +251,7 @@ export default function Header() {
       {open && (
         <div className="md:hidden fixed inset-0 top-20 bg-slate-50 z-[100] overflow-y-auto animate-in slide-in-from-right duration-300">
           <div className="p-6 space-y-8 pb-24">
+            {/* BUSQUEDA MOBILE */}
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
@@ -267,18 +266,159 @@ export default function Header() {
               />
             </form>
 
+            {/* NAVEGACIÓN PRINCIPAL MOBILE */}
             <div className="grid grid-cols-2 gap-4">
               <Link
                 href="/category"
                 onClick={() => setOpen(false)}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white border border-slate-200"
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm"
               >
                 <Store className="w-6 h-6 text-slate-900" />
                 <span className="text-[10px] font-black uppercase italic text-slate-700">
                   Tienda
                 </span>
               </Link>
-              {/* ... Resto de los links móviles con el mismo estilo de bg-white/border-slate-200 ... */}
+              <Link
+                href="/profile"
+                onClick={() => setOpen(false)}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm"
+              >
+                <UserRound className="w-6 h-6 text-slate-900" />
+                <span className="text-[10px] font-black uppercase italic text-slate-700">
+                  Mi Perfil
+                </span>
+              </Link>
+              <Link
+                href="/loved-product"
+                onClick={() => setOpen(false)}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm relative"
+              >
+                <Heart
+                  className={`w-6 h-6 ${lovedItems.length > 0 ? "fill-red-600 text-red-600" : "text-slate-900"}`}
+                />
+                <span className="text-[10px] font-black uppercase italic text-slate-700">
+                  Favoritos
+                </span>
+                {lovedItems.length > 0 && (
+                  <span className="absolute top-3 right-8 w-2 h-2 bg-red-600 rounded-full" />
+                )}
+              </Link>
+              <Link
+                href="/cart"
+                onClick={() => setOpen(false)}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm relative"
+              >
+                <ShoppingCart className="w-6 h-6 text-slate-900" />
+                <span className="text-[10px] font-black uppercase italic text-slate-700">
+                  Carrito
+                </span>
+                {cart.items.length > 0 && (
+                  <span className="absolute top-3 right-8 bg-red-600 text-white text-[9px] font-black h-4 w-4 flex items-center justify-center rounded-full">
+                    {cart.items.length}
+                  </span>
+                )}
+              </Link>
+            </div>
+
+            {/* FILTROS DINÁMICOS MOBILE */}
+            <div className="space-y-4 pt-4 border-t border-slate-200">
+              <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] italic">
+                Explorar por
+              </p>
+              <div className="space-y-3">
+                <details className="group">
+                  <summary className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-200 text-emerald-700 list-none cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <Package size={18} />
+                      <span className="text-[11px] font-black uppercase italic">
+                        Tipos de Producto
+                      </span>
+                    </div>
+                    <ChevronDown
+                      size={16}
+                      className="group-open:rotate-180 transition-transform"
+                    />
+                  </summary>
+                  <div className="grid grid-cols-1 gap-1 mt-2 pl-4 border-l-2 border-emerald-100">
+                    {dynamicProductTypes.map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => handleStaticSelect(type, "category")}
+                        className="text-left py-3.5 text-[10px] font-bold text-slate-600 uppercase italic border-b border-slate-100 last:border-0"
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </details>
+
+                <details className="group">
+                  <summary className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-200 text-red-700 list-none cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <ShieldCheck size={18} />
+                      <span className="text-[11px] font-black uppercase italic">
+                        Nuestras Marcas
+                      </span>
+                    </div>
+                    <ChevronDown
+                      size={16}
+                      className="group-open:rotate-180 transition-transform"
+                    />
+                  </summary>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2 pl-4 border-l-2 border-red-100">
+                    {STATIC_BRANDS.map((brand) => (
+                      <button
+                        key={brand}
+                        onClick={() => handleStaticSelect(brand, "brand")}
+                        className="text-left py-3.5 text-[10px] font-bold text-slate-600 uppercase italic border-b border-slate-100"
+                      >
+                        {brand}
+                      </button>
+                    ))}
+                  </div>
+                </details>
+              </div>
+            </div>
+
+            {/* SOPORTE MOBILE */}
+            <div className="pt-6 border-t border-slate-200">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Headset size={16} className="text-red-600" />
+                <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] italic">
+                  Atención al Cliente
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-3">
+                <a
+                  href="https://wa.me/3111234567"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-between px-6 py-5 rounded-2xl bg-emerald-600 text-white shadow-lg active:scale-95 transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageCircle size={20} />
+                    <span className="text-[11px] font-black uppercase tracking-widest italic">
+                      WhatsApp
+                    </span>
+                  </div>
+                  <ChevronDown size={16} className="-rotate-90 opacity-50" />
+                </a>
+                <a
+                  href="mailto:soporte@refaccionesixoye.mx"
+                  className="w-full flex items-center justify-between px-6 py-5 rounded-2xl bg-slate-900 text-white shadow-lg active:scale-95 transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <Mail size={20} />
+                    <span className="text-[11px] font-black uppercase tracking-widest italic">
+                      Enviar Correo
+                    </span>
+                  </div>
+                  <ChevronDown size={16} className="-rotate-90 opacity-50" />
+                </a>
+              </div>
+              <p className="text-[9px] text-center text-slate-400 font-bold uppercase italic mt-6 italic">
+                Horario de Atención: Lun - Vie / 9:00 - 18:00, Sab / 9:00 - 2:00
+              </p>
             </div>
           </div>
         </div>
