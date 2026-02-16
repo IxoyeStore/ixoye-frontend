@@ -6,7 +6,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { ProductType } from "@/types/product";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProductCard from "../category/[categorySlug]/components/product-card";
-import { Search, Target, ChevronRight } from "lucide-react";
+import { Search, Target, ChevronRight, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -32,7 +33,6 @@ function SearchContent() {
 
       try {
         const keywords = query.trim().split(/\s+/);
-
         const searchFields = [
           "productName",
           "code",
@@ -41,7 +41,6 @@ function SearchContent() {
           "productType",
           "department",
         ];
-
         const params = new URLSearchParams();
 
         let globalIndex = 0;
@@ -56,7 +55,6 @@ function SearchContent() {
         });
 
         params.append("populate", "category");
-
         const url = `https://ixoye-backend-production.up.railway.app/api/products?${params.toString()}`;
         const response = await fetch(url);
         const json = await response.json();
@@ -93,9 +91,9 @@ function SearchContent() {
   }, [products, selectedBrands]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 min-h-[70vh] bg-white">
+    <div className="max-w-[1440px] mx-auto px-4 py-12 min-h-[70vh] bg-white">
       <div className="flex flex-col md:flex-row gap-12">
-        {!isQueryTooShort && query.length >= 2 && (
+        {!isQueryTooShort && query.length >= 2 && products.length > 0 && (
           <aside className="w-full md:w-64 shrink-0">
             <div className="sticky top-32">
               <div className="flex items-center justify-between mb-6">
@@ -163,29 +161,8 @@ function SearchContent() {
               </h2>
               <p className="text-slate-500 text-sm mb-10 max-w-sm text-center font-medium">
                 Ingrese al menos dos caracteres para realizar una consulta
-                técnica en el catálogo de componentes.
+                técnica.
               </p>
-
-              <div className="w-full max-w-md">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 text-center">
-                  Consultas frecuentes
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {["BALERO", "EM120", "FORD", "CLUTCH"].map((term) => (
-                    <button
-                      key={term}
-                      onClick={() => router.push(`/search?query=${term}`)}
-                      className="flex items-center justify-between bg-white border border-slate-200 px-5 py-3 rounded-lg text-[11px] font-bold text-slate-700 hover:border-slate-900 hover:bg-slate-900 hover:text-white transition-all duration-300 group"
-                    >
-                      {term}
-                      <ChevronRight
-                        size={14}
-                        className="text-slate-300 group-hover:text-white"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           ) : (
             <>
@@ -211,19 +188,19 @@ function SearchContent() {
               </div>
 
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {[1, 2, 3].map((i) => (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                  {[1, 2, 3, 4].map((i) => (
                     <Skeleton key={i} className="h-96 w-full rounded-none" />
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                   {filteredProducts.length > 0 ? (
                     filteredProducts.map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))
                   ) : (
-                    <div className="col-span-full text-center py-32">
+                    <div className="col-span-full text-center py-32 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
                       <Search
                         size={40}
                         className="mx-auto text-slate-200 mb-6 stroke-[1]"
@@ -231,9 +208,18 @@ function SearchContent() {
                       <p className="text-slate-900 font-bold uppercase tracking-tight text-lg">
                         No se encontraron coincidencias
                       </p>
-                      <p className="text-slate-400 text-xs mt-2 uppercase tracking-widest font-medium">
+                      <p className="text-slate-400 text-xs mt-2 uppercase tracking-widest font-medium mb-8">
                         Verifique el código OEM o la descripción técnica
                       </p>
+
+                      {/* EL BOTÓN DE SALIDA */}
+                      <Button
+                        onClick={() => router.push("/category")}
+                        className="bg-sky-700 hover:bg-sky-800 text-white px-8 py-6 font-bold rounded-xl shadow-lg transition-all active:scale-95 uppercase text-xs tracking-widest"
+                      >
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Ver todo el
+                        catálogo
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -250,13 +236,8 @@ export default function SearchPage() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <Skeleton className="h-10 w-48 mb-8" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Skeleton className="h-96" />
-            <Skeleton className="h-96" />
-            <Skeleton className="h-96" />
-          </div>
+        <div className="max-w-[1440px] mx-auto px-4 py-12">
+          <Skeleton className="h-96 w-full" />
         </div>
       }
     >
