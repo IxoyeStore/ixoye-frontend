@@ -256,7 +256,7 @@ export default function OrderDetailPage() {
                       {item.productName || item.name}
                     </td>
                     <td className="p-4 text-center font-medium">
-                      {item.quantity || 1}
+                      {item.quantity || 1}f
                     </td>
                     <td className="p-4 text-right font-bold">
                       {formatPrice(item.price * (item.quantity || 1))}

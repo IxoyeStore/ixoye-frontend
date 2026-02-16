@@ -72,7 +72,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative w-full bg-[#003366] bg-gradient-to-b from-[#0055a4] to-[#003366] text-white/80 py-12 mt-20">
+    <footer className="w-full min-h-[1px] bg-[#003366] bg-gradient-to-b from-[#0055a4] to-[#003366] text-white/80 py-12 mt-20 [transform:translateZ(0)]">
       <div className="max-w-7xl mx-auto px-6">
         {/* Top section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-12">

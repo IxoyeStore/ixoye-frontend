@@ -35,7 +35,7 @@ function CategoryContent() {
       if (isNewLoad) setLoading(true);
       else setLoadingMore(true);
 
-      const pageSize = 24;
+      const pageSize = 16;
 
       let filterQuery = "";
       if (category)
@@ -81,7 +81,8 @@ function CategoryContent() {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="max-w-6xl py-4 mx-auto sm:py-16 px-4 sm:px-24">
+    <div className="w-full max-w-[1440px] py-4 mx-auto sm:py-16 px-4 md:px-8">
+      {" "}
       <div className="flex items-center justify-between gap-2 mb-2">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-sky-900 uppercase tracking-tighter truncate">
@@ -98,13 +99,10 @@ function CategoryContent() {
           <ProductSort />
         </div>
       </div>
-
       <Separator className="my-4 bg-sky-100" />
-
       <div className="flex flex-col">
-        <div className="grid w-full grid-cols-2 gap-3 mt-8 md:grid-cols-3 md:gap-10">
-          {loading && <SkeletonSchema grid={6} />}
-
+        <div className="grid w-full grid-cols-2 gap-4 mt-8 lg:grid-cols-4 md:gap-6">
+          {loading && <SkeletonSchema grid={16} />}
           {!loading && result.length === 0 && (
             <div className="col-span-full text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
               <p className="text-sky-800/60 font-black uppercase italic tracking-widest">
@@ -119,7 +117,6 @@ function CategoryContent() {
               </Button>
             </div>
           )}
-
           {!loading &&
             result.map((product) => (
               <ProductCard key={product.id} product={product} />
@@ -146,8 +143,8 @@ export default function Page() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-6xl py-4 mx-auto sm:py-16 px-4 sm:px-24">
-          <SkeletonSchema grid={6} />
+        <div className="w-full max-w-[1440px] py-4 mx-auto sm:py-16 px-4 md:px-8">
+          <SkeletonSchema grid={16} />
         </div>
       }
     >
