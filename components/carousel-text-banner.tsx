@@ -43,7 +43,6 @@ const CarouselTextBanner = () => {
                     : "opacity-0 absolute top-0 left-0 w-full h-full"
                 }`}
               >
-                {/* Contenedor con altura fija para evitar saltos */}
                 <div
                   className="relative w-full h-[200px] md:h-[400px] lg:h-[500px] flex items-center justify-center overflow-hidden cursor-pointer"
                   onMouseDown={() => setIsPaused(true)}
@@ -52,14 +51,12 @@ const CarouselTextBanner = () => {
                   onTouchStart={() => setIsPaused(true)}
                   onTouchEnd={() => setIsPaused(false)}
                 >
-                  {/* FONPO DE RELLENO: Imagen difuminada para cubrir los bordes */}
                   <img
                     src={src}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-110"
                   />
 
-                  {/* IMAGEN PRINCIPAL: Se ve completa sin cortes */}
                   <img
                     src={src}
                     alt={`Banner ${index + 1}`}

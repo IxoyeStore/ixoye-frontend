@@ -34,28 +34,22 @@ function SearchContent() {
         const cleanQuery = query.trim();
         const keywords = cleanQuery
           .split(/\s+/)
-          .filter((word) => word.length > 2); // Ignoramos "de", "con", etc.
+          .filter((word) => word.length > 2);
 
         const params = new URLSearchParams();
         let i = 0;
 
-        // ESTRATEGIA: Búsqueda Multi-Nivel
-
-        // Nivel 1: Coincidencia de la frase completa en el Nombre (Prioridad Máxima)
         params.append(
           `filters[$or][${i}][productName][$containsi]`,
           cleanQuery,
         );
         i++;
 
-        // Nivel 2: Coincidencia de palabras individuales en el Nombre
-        // Esto permite que si buscan "Motor Camisas", lo encuentre aunque el orden sea "Camisas de Motor"
         keywords.forEach((word) => {
           params.append(`filters[$or][${i}][productName][$containsi]`, word);
           i++;
         });
 
-        // Nivel 3: Coincidencia en otros campos técnicos
         keywords.forEach((word) => {
           ["code", "brand", "productType"].forEach((field) => {
             params.append(`filters[$or][${i}][${field}][$containsi]`, word);
@@ -78,17 +72,14 @@ function SearchContent() {
             productName: item.productName || "PRODUCTO SIN ESPECIFICAR",
           }));
 
-          // ORDENAMIENTO DE RELEVANCIA EN CLIENTE
           const rankedProducts = normalizedData.sort((a: any, b: any) => {
             const nameA = a.productName.toLowerCase();
             const nameB = b.productName.toLowerCase();
             const q = cleanQuery.toLowerCase();
 
-            // 1. ¿Contiene la frase exacta? (Puntaje 100)
             const aExact = nameA.includes(q) ? 100 : 0;
             const bExact = nameB.includes(q) ? 100 : 0;
 
-            // 2. ¿Empieza con la primera palabra de la búsqueda? (Puntaje 50)
             const aStarts = nameA.startsWith(keywords[0]?.toLowerCase())
               ? 50
               : 0;
@@ -243,7 +234,6 @@ function SearchContent() {
                         Verifique el código OEM o la descripción técnica
                       </p>
 
-                      {/* EL BOTÓN DE SALIDA */}
                       <Button
                         onClick={() => router.push("/category")}
                         className="bg-sky-700 hover:bg-sky-800 text-white px-8 py-6 font-bold rounded-xl shadow-lg transition-all active:scale-95 uppercase text-xs tracking-widest"

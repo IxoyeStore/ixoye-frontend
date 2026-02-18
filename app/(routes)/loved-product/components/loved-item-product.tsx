@@ -62,10 +62,11 @@ const LovedItemProduct = ({ product }: LovedItemProductProps) => {
       <button
         onClick={() => removeLovedItem(product.id)}
         className={cn(
-          "absolute top-2 right-2 rounded-full flex items-center justify-center bg-white border border-slate-100 shadow-sm p-1.5 hover:scale-110 transition text-rose-700 hover:bg-rose-50 opacity-0 group-hover:opacity-100 md:opacity-100",
+          "absolute top-2 right-2 rounded-full flex items-center justify-center bg-white border border-slate-100 shadow-sm p-2 hover:scale-110 transition text-rose-700 hover:bg-rose-50",
+          "opacity-100 md:opacity-0 md:group-hover:opacity-100",
         )}
       >
-        <X size={14} />
+        <X size={16} />
       </button>
     </div>
   );

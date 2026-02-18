@@ -13,8 +13,6 @@ import {
   Heart,
   UserRound,
   Search,
-  Tractor,
-  Settings,
   Package,
   ShieldCheck,
   ChevronDown,
@@ -319,7 +317,7 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* FILTROS DINÁMICOS MOBILE */}
+            {/* FILTROS MOBILE */}
             <div className="space-y-4 pt-4 border-t border-slate-200">
               <p className="text-[10px] font-black text-sky-950 uppercase tracking-[0.2em] italic">
                 Explorar por
