@@ -138,8 +138,8 @@ const FeaturedProducts = () => {
             })}
         </CarouselContent>
 
-        <CarouselPrevious className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 left-12" />
-        <CarouselNext className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 right-12" />
+        <CarouselPrevious className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 -left-12" />
+        <CarouselNext className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 -right-12" />
       </Carousel>
     </div>
   );

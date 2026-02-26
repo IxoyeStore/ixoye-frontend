@@ -17,29 +17,30 @@ const ChooseCategory = () => {
   const { result, loading }: ResponeType = useGetCategories();
 
   return (
-    <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
-      <h3 className="px-6 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter">
+    <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24">
+      <h3 className="px-6 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
         Categorías destacadas
       </h3>
 
       <Carousel className="w-full">
         <CarouselContent className="-ml-2 md:-ml-4">
-          {loading && (
-            <div className="flex px-4 gap-2 w-full">
-              {[1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="basis-1/2 sm:basis-1/3 aspect-[4/5] bg-gray-100 animate-pulse rounded-xl"
-                />
-              ))}
-            </div>
-          )}
+          {loading &&
+            [1, 2, 3, 4].map((i) => (
+              <CarouselItem
+                key={i}
+                className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4"
+              >
+                <div className="p-1">
+                  <div className="w-full aspect-[4/5] bg-gray-100 animate-pulse rounded-xl" />
+                </div>
+              </CarouselItem>
+            ))}
 
           {!loading &&
             result?.map((category: CategoryType) => (
               <CarouselItem
                 key={category.id}
-                className="pl-2 md:pl-4 basis-1/2 sm:basis-1/2 lg:basis-1/3"
+                className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4"
               >
                 <div className="p-1">
                   <Link
@@ -77,8 +78,8 @@ const ChooseCategory = () => {
             ))}
         </CarouselContent>
 
-        <CarouselPrevious className="hidden md:flex text-sky-700 border-sky-200" />
-        <CarouselNext className="hidden md:flex text-sky-700 border-sky-200" />
+        <CarouselPrevious className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 -left-12" />
+        <CarouselNext className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 -right-12" />
       </Carousel>
     </div>
   );
