@@ -44,14 +44,14 @@ const STATIC_BRANDS = [
 const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
   return (
     <div className="relative group">
-      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-slate-200 text-sky-950 hover:border-sky-500 hover:text-sky-600 transition-all shadow-sm active:scale-95">
+      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-slate-200 text-sky-950 hover:border-sky-500 hover:bg-sky-50 transition-all shadow-sm active:scale-95">
         <Icon size={14} className={color} />
         <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">
           {label}
         </span>
         <ChevronDown
           size={12}
-          className="opacity-50 group-hover:rotate-180 transition-transform"
+          className="opacity-30 group-hover:rotate-180 transition-transform"
         />
       </button>
 
@@ -221,7 +221,10 @@ export default function Header() {
       </div>
 
       {/* FILTROS DESKTOP */}
-      <div className="hidden md:flex justify-center items-center gap-3 pb-5 pt-1">
+      <div className="hidden md:flex justify-center items-center gap-3 pb-5 pt-">
+        <span className="text-[12px] font-bold text-sky-950 uppercase italic tracking-[0.1em]">
+          Búsqueda por:
+        </span>
         <NavDropdown
           label="Producto"
           items={dynamicProductTypes}
