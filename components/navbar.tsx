@@ -31,7 +31,7 @@ const STATIC_BRANDS = [
   "FERSA",
   "EDTPART",
   "KANADIAN",
-  "BW",
+  "BALDWIN",
   "PFI",
   "RYCO",
   "KOMAN",

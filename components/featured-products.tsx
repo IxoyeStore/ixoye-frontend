@@ -31,14 +31,14 @@ const FeaturedProducts = () => {
   const { user } = useAuth();
 
   return (
-    <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
-      <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter">
+    <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
+      <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
         Productos destacados
       </h3>
 
       <Carousel className="w-full">
         <CarouselContent className="-ml-2 md:-ml-4">
-          {loading && <FeaturedSkeleton items={3} />}
+          {loading && <FeaturedSkeleton items={4} />}
 
           {!loading &&
             result?.map((product: ProductType) => {
@@ -54,7 +54,7 @@ const FeaturedProducts = () => {
               return (
                 <CarouselItem
                   key={id}
-                  className="basis-1/2 md:basis-1/2 lg:basis-1/3 pl-2 md:pl-4 group"
+                  className="basis-1/2 md:basis-1/3 lg:basis-1/4 pl-2 md:pl-4 group"
                 >
                   <div className="h-full">
                     <Card className="group flex h-full flex-col py-3 sm:py-4 border border-sky-100 shadow-sm hover:shadow-lg hover:shadow-sky-100/50 transition-all duration-300 bg-white rounded-2xl">
@@ -138,8 +138,8 @@ const FeaturedProducts = () => {
             })}
         </CarouselContent>
 
-        <CarouselPrevious className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 left-[-20px]" />
-        <CarouselNext className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 right-[-20px]" />
+        <CarouselPrevious className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 left-12" />
+        <CarouselNext className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 right-12" />
       </Carousel>
     </div>
   );
