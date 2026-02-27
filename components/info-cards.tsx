@@ -12,7 +12,7 @@ const InfoCards = () => {
           <div>
             <h3 className="text-lg font-bold text-sky-900">Envíos en México</h3>
             <p className="text-sm text-sky-600">
-              Realizamos envíos a todo México de forma rápida y segura.
+              Consulta la disponibilidad de envíos.
             </p>
           </div>
         </div>

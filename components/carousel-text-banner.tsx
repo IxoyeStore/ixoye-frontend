@@ -31,7 +31,8 @@ const CarouselTextBanner = () => {
 
   return (
     <div className="w-full select-none">
-      <div className="w-full relative overflow-hidden bg-slate-100">
+      {/* Contenedor principal con fondo oscuro para evitar saltos de luz */}
+      <div className="w-full relative overflow-hidden bg-[#001529]">
         <Carousel className="w-full">
           <CarouselContent className="m-0">
             {images.map((src, index) => (
@@ -44,7 +45,7 @@ const CarouselTextBanner = () => {
                 }`}
               >
                 <div
-                  className="relative w-full h-[200px] md:h-[400px] lg:h-[500px] flex items-center justify-center overflow-hidden"
+                  className="relative w-full max-w-[2560px] mx-auto h-[250px] md:h-[400px] lg:h-[450px] flex items-center justify-center overflow-hidden"
                   onMouseDown={() => isMultiple && setIsPaused(true)}
                   onMouseUp={() => isMultiple && setIsPaused(false)}
                   onMouseLeave={() => isMultiple && setIsPaused(false)}
@@ -53,17 +54,13 @@ const CarouselTextBanner = () => {
                 >
                   <img
                     src={src}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-110"
-                  />
-
-                  <img
-                    src={src}
                     alt={
                       isMultiple ? `Banner ${index + 1}` : "Banner Principal"
                     }
-                    className="relative z-10 h-full w-full object-contain drop-shadow-md"
+                    className="absolute inset-0 w-full h-full object-cover object-center"
                   />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10" />
                 </div>
               </CarouselItem>
             ))}
@@ -79,7 +76,7 @@ const CarouselTextBanner = () => {
                 className={`h-1.5 transition-all duration-500 rounded-full border-none cursor-pointer shadow-sm ${
                   index === currentIndex
                     ? "w-10 bg-sky-500"
-                    : "w-2 bg-slate-400/50 hover:bg-slate-500"
+                    : "w-2 bg-white/50 hover:bg-white"
                 }`}
                 aria-label={`Ir a imagen ${index + 1}`}
               />

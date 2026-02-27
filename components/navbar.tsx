@@ -44,14 +44,14 @@ const STATIC_BRANDS = [
 const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
   return (
     <div className="relative group">
-      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-slate-200 text-sky-950 hover:border-sky-500 hover:bg-sky-50 transition-all shadow-sm active:scale-95">
+      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white hover:border-sky-400 hover:bg-white/10 transition-all active:scale-95">
         <Icon size={14} className={color} />
         <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">
           {label}
         </span>
         <ChevronDown
           size={12}
-          className="opacity-30 group-hover:rotate-180 transition-transform"
+          className="opacity-40 group-hover:rotate-180 transition-transform"
         />
       </button>
 
@@ -108,7 +108,7 @@ export default function Header() {
           setDynamicProductTypes(uniqueTypes.sort());
         }
       } catch (error) {
-        console.error("Error cargando tipos de producto:", error);
+        console.error(error);
       }
     };
     fetchProductTypes();
@@ -128,117 +128,119 @@ export default function Header() {
   };
 
   const iconClass =
-    "flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white text-sky-950 min-w-[70px]";
+    "flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/10 text-white/90 min-w-[70px]";
   const navTextClass =
     "text-[9px] font-black uppercase italic tracking-wider text-center";
-
   return (
-    <header className="w-full bg-slate-50 border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 md:h-[110px] gap-8">
-        {/* LOGO */}
-        <div className="flex items-center shrink-0">
-          <Link href="/" className="flex items-center gap-4 group">
+    <header className="w-full sticky top-0 z-50 shadow-lg">
+      {/* FRANJA SUPERIOR */}
+
+      <div className="w-full bg-[#003366] bg-gradient-to-t from-[#0055a4] to-[#003366] text-white">
+        <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 md:h-24 gap-8">
+          <Link href="/" className="flex items-center gap-4 group shrink-0">
             <img
               src="/logo-ixoye.png"
-              className="h-10 md:h-16 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-2deg]"
+              className="h-10 md:h-14 w-auto object-contain brightness-0 invert"
               alt="logo"
             />
-            <div className="hidden lg:flex flex-col justify-center">
-              <h1 className="text-sky-950 font-black text-xl tracking-tighter leading-none uppercase italic">
+            <div className="hidden lg:flex flex-col justify-center border-l border-white/20 pl-4">
+              <h1 className="text-white font-black text-lg uppercase italic">
                 Refacciones
               </h1>
-              <span className="text-sky-500 font-bold text-[10px] uppercase tracking-[0.3em] leading-tight">
+              <span className="text-sky-300 font-bold text-[9px] uppercase tracking-[0.3em]">
                 Diesel y Agrícola
               </span>
             </div>
           </Link>
-        </div>
 
-        {/* BÚSQUEDA DESKTOP */}
-        <form
-          onSubmit={handleSearch}
-          className="hidden md:flex flex-1 max-w-lg relative group"
-        >
-          <input
-            type="text"
-            placeholder="Nombre, OEM, Serie o Marca..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-2xl py-3 px-6 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all text-sky-950 font-medium placeholder:text-slate-400"
-          />
-          <button
-            type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-sky-900 text-white rounded-xl hover:bg-sky-950 transition-colors shadow-md"
+          <form
+            onSubmit={handleSearch}
+            className="hidden md:flex flex-1 max-w-xl relative group"
           >
-            <Search size={20} />
-          </button>
-        </form>
-
-        {/* NAVEGACIÓN DESKTOP */}
-        <nav className="hidden md:flex gap-1 items-center">
-          <Link href="/category" className={iconClass}>
-            <Store className="w-7 h-7" />
-            <span className={navTextClass}>Tienda</span>
-          </Link>
-          <Link href="/profile" className={iconClass}>
-            <UserRound className="w-7 h-7" />
-            <span className={navTextClass}>Perfil</span>
-          </Link>
-          <Link href="/loved-product" className={iconClass}>
-            <Heart
-              className={`w-7 h-7 transition-colors ${lovedItems.length > 0 ? "fill-sky-950 text-sky-950" : ""}`}
+            <input
+              type="text"
+              placeholder="Nombre, OEM, Serie o Marca..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/10 border border-white/20 rounded-2xl py-2.5 px-6 text-white placeholder:text-white/50 focus:bg-white focus:text-slate-900 transition-all shadow-inner"
             />
-            <span className={navTextClass}>Favoritos</span>
-          </Link>
-          <Link href="/cart" className={`relative ${iconClass}`}>
-            {cart.items.length === 0 ? (
-              <ShoppingCart className="w-7 h-7" />
-            ) : (
-              <BaggageClaim
-                strokeWidth={2.5}
-                className="w-7 h-7 text-sky-950"
-              />
-            )}
-            <span className={navTextClass}>Carrito</span>
-            {cart.items.length > 0 && (
-              <span className="absolute top-1 right-2 bg-sky-600 text-white text-[10px] font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
-                {cart.items.length}
-              </span>
-            )}
-          </Link>
-          <div className={iconClass}>
-            <SupportMenu />
-            <span className={navTextClass}>Soporte</span>
-          </div>
-        </nav>
+            <button
+              type="submit"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-sky-500 text-white rounded-xl hover:bg-sky-400 transition-colors"
+            >
+              <Search size={18} />
+            </button>
+          </form>
 
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden p-2 rounded-xl text-sky-950 hover:bg-white transition"
-        >
-          {open ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
-        </button>
+          <nav className="hidden md:flex gap-1 items-center">
+            <Link href="/category" className={iconClass}>
+              <Store className="w-6 h-6" />
+              <span className={navTextClass}>Tienda</span>
+            </Link>
+            <Link href="/profile" className={iconClass}>
+              <UserRound className="w-6 h-6" />
+              <span className={navTextClass}>Perfil</span>
+            </Link>
+            <Link href="/loved-product" className={iconClass}>
+              <Heart
+                className={`w-6 h-6 ${lovedItems.length > 0 ? "fill-sky-400 text-sky-400" : ""}`}
+              />
+              <span className={navTextClass}>Deseos</span>
+            </Link>
+            <Link href="/cart" className={`relative ${iconClass}`}>
+              {cart.items.length === 0 ? (
+                <ShoppingCart className="w-6 h-6" />
+              ) : (
+                <BaggageClaim className="w-6 h-6 text-sky-300" />
+              )}
+              <span className={navTextClass}>Carrito</span>
+              {cart.items.length > 0 && (
+                <span className="absolute top-1 right-2 bg-rose-500 text-white text-[9px] font-black h-4 w-4 flex items-center justify-center rounded-full border border-white animate-pulse">
+                  {cart.items.length}
+                </span>
+              )}
+            </Link>
+            <div className={iconClass}>
+              <SupportMenu />
+              <span className={navTextClass}>Ayuda</span>
+            </div>
+          </nav>
+
+          <button
+            onClick={() => setOpen(!open)}
+            className="md:hidden p-2 text-white"
+          >
+            {open ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
+          </button>
+        </div>
       </div>
 
-      {/* FILTROS DESKTOP */}
-      <div className="hidden md:flex justify-center items-center gap-3 pb-5 pt-">
-        <span className="text-[12px] font-bold text-sky-950 uppercase italic tracking-[0.1em]">
-          Búsqueda por:
-        </span>
-        <NavDropdown
-          label="Producto"
-          items={dynamicProductTypes}
-          icon={Package}
-          color="text-emerald-500"
-          onSelect={(val: string) => handleStaticSelect(val, "category")}
-        />
-        <NavDropdown
-          label="Marcas"
-          items={STATIC_BRANDS}
-          icon={ShieldCheck}
-          color="text-rose-500"
-          onSelect={(val: string) => handleStaticSelect(val, "brand")}
-        />
+      {/* FRANJA INFERIOR */}
+      <div className="hidden md:flex w-full bg-[#004a99] border-b border-white/10 py-3 justify-center items-center gap-8 shadow-md">
+        <div className="flex items-center gap-2 mr-4">
+          <div className="h-2 w-2 bg-[#00a3e0] rounded-full shadow-[0_0_10px_rgba(0,163,224,0.4)]" />
+          <span className="text-[11px] font-bold text-white uppercase italic tracking-widest antialiased">
+            Búsqueda por:
+          </span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <NavDropdown
+            label="Categoría"
+            items={dynamicProductTypes}
+            icon={Package}
+            color="text-sky-300"
+            onSelect={(val: string) => handleStaticSelect(val, "category")}
+          />
+
+          <NavDropdown
+            label="Marcas"
+            items={STATIC_BRANDS}
+            icon={ShieldCheck}
+            color="text-sky-300"
+            onSelect={(val: string) => handleStaticSelect(val, "brand")}
+          />
+        </div>
       </div>
 
       <TechnicalFilterModal
@@ -249,7 +251,7 @@ export default function Header() {
 
       {/* MENU MOBILE */}
       {open && (
-        <div className="md:hidden fixed inset-0 top-20 bg-slate-50 z-[100] overflow-y-auto animate-in slide-in-from-right duration-300">
+        <div className="md:hidden fixed inset-0 top-20 bg-white z-[100] overflow-y-auto animate-in slide-in-from-right duration-300">
           <div className="p-6 space-y-8 pb-24">
             {/* BUSQUEDA MOBILE */}
             <form onSubmit={handleSearch} className="relative">

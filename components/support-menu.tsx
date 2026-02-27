@@ -20,12 +20,12 @@ const SupportMenu = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // AJUSTE: Ahora usa text-slate-800 para que se vea sobre el fondo grisáceo suave
+  // Ajustado: Texto blanco por defecto y celeste cuando abre, acorde al Header
   const iconClass = `p-2 rounded-xl transition-all duration-300 transform hover:scale-110 
     ${
       isOpen
-        ? "bg-red-600 text-white scale-110 shadow-lg"
-        : "text-slate-800 hover:bg-white hover:shadow-sm"
+        ? "bg-sky-500 text-white scale-110 shadow-lg"
+        : "text-white/90 hover:bg-white/10"
     }`;
 
   return (
@@ -46,7 +46,8 @@ const SupportMenu = () => {
             : "scale-95 opacity-0 pointer-events-none"
         }`}
       >
-        <div className="bg-slate-50 p-3 border-b border-slate-100">
+        {/* Cambiado bg-slate-50 por un tono azul muy tenue */}
+        <div className="bg-sky-50/50 p-3 border-b border-slate-100">
           <p className="text-[10px] font-bold text-slate-900 uppercase tracking-widest text-center italic">
             Atención al Cliente
           </p>
@@ -71,9 +72,10 @@ const SupportMenu = () => {
 
           <a
             href={`mailto:${supportEmail}`}
-            className="flex items-center gap-3 p-3 hover:bg-red-50 rounded-xl transition-colors group"
+            className="flex items-center gap-3 p-3 hover:bg-sky-50 rounded-xl transition-colors group"
           >
-            <div className="bg-red-100 p-2 rounded-lg text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+            {/* Cambiado rojo por azul para que no parezca un error/alerta */}
+            <div className="bg-sky-100 p-2 rounded-lg text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-colors">
               <span className="flex items-center justify-center">
                 <Mail size={18} />
               </span>
