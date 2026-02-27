@@ -86,7 +86,7 @@ function CategoryContent() {
       <div className="flex items-center justify-between gap-2 mb-2">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-sky-900 uppercase tracking-tighter truncate">
-            Tienda
+            Tienda Principal
           </h1>
           {(category || brand || series) && (
             <p className="text-[10px] font-bold text-sky-500 uppercase italic">
