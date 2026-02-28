@@ -185,7 +185,7 @@ export default function Header() {
               <Heart
                 className={`w-6 h-6 ${lovedItems.length > 0 ? "fill-sky-400 text-sky-400" : ""}`}
               />
-              <span className={navTextClass}>Deseos</span>
+              <span className={navTextClass}>Favoritos</span>
             </Link>
             <Link href="/cart" className={`relative ${iconClass}`}>
               {cart.items.length === 0 ? (
@@ -202,7 +202,7 @@ export default function Header() {
             </Link>
             <div className={iconClass}>
               <SupportMenu />
-              <span className={navTextClass}>Ayuda</span>
+              <span className={navTextClass}>Soporte</span>
             </div>
           </nav>
 
