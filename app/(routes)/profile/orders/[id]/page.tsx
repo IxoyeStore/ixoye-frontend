@@ -7,6 +7,7 @@ import { useAuth } from "@/context/auth-context";
 import { formatPrice } from "@/lib/formatPrice";
 import { ChevronLeft, Printer } from "lucide-react";
 import Link from "next/link";
+import QRCode from "react-qr-code";
 
 const statusMap: Record<string, { label: string; class: string }> = {
   pending: {
@@ -216,13 +217,15 @@ export default function OrderDetailPage() {
               Validación Digital
             </h3>
             <div className="flex items-center gap-4">
-              <img
-                src={`https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(
-                  qrUrl,
-                )}&chs=120x120&chld=L|0`}
-                className="w-16 h-16 grayscale"
-                alt="QR"
-              />
+              <div className="bg-white p-1 border border-slate-100 rounded-lg shadow-sm">
+                <QRCode
+                  size={80}
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  value={qrUrl}
+                  viewBox={`0 0 256 256`}
+                  fgColor="#000000"
+                />
+              </div>
               <div className="space-y-1">
                 <p className="text-slate-400 text-[8px] leading-tight uppercase font-bold tracking-tighter">
                   Referencia de rastreo:
@@ -256,7 +259,7 @@ export default function OrderDetailPage() {
                       {item.productName || item.name}
                     </td>
                     <td className="p-4 text-center font-medium">
-                      {item.quantity || 1}f
+                      {item.quantity || 1}
                     </td>
                     <td className="p-4 text-right font-bold">
                       {formatPrice(item.price * (item.quantity || 1))}
