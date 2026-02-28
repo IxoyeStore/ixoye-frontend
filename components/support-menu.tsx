@@ -8,7 +8,7 @@ const SupportMenu = () => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const whatsappNumber = "523111234567";
-  const supportEmail = "soporte@refaccionesixoye.mx";
+  const supportEmail = "soporte@ixoye-store.com";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -19,13 +19,8 @@ const SupportMenu = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const iconClass = `p-2 rounded-xl transition-all duration-300 transform hover:scale-110 
-    ${
-      isOpen
-        ? "bg-red-600 text-white scale-110 shadow-lg"
-        : "text-slate-800 hover:bg-white hover:shadow-sm"
-    }`;
+  const iconClass = `p-2 text-white/90 rounded-xl transition-all duration-300 transform hover:scale-110 
+    ${isOpen ? " text-white scale-110 shadow-lg" : "text-slate-800"}`;
 
   return (
     <div className="relative" ref={menuRef}>
