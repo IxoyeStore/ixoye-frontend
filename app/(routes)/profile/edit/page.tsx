@@ -406,7 +406,7 @@ export default function EditProfilePage() {
               {isNewAddress
                 ? "Agregar Nueva Dirección"
                 : addressId
-                  ? "Editar Dirección"
+                  ? "Editar Perfil"
                   : "Editar Perfil"}
             </CardTitle>
           </CardHeader>
