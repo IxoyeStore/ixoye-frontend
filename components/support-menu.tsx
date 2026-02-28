@@ -8,7 +8,7 @@ const SupportMenu = () => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const whatsappNumber = "523111234567";
-  const supportEmail = "soporte@ixoye-store.com";
+  const supportEmail = "soporte@refaccionesixoye.mx";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -20,7 +20,6 @@ const SupportMenu = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Ajustado: Texto blanco por defecto y celeste cuando abre, acorde al Header
   const iconClass = `p-2 rounded-xl transition-all duration-300 transform hover:scale-110 
     ${
       isOpen
@@ -46,7 +45,6 @@ const SupportMenu = () => {
             : "scale-95 opacity-0 pointer-events-none"
         }`}
       >
-        {/* Cambiado bg-slate-50 por un tono azul muy tenue */}
         <div className="bg-sky-50/50 p-3 border-b border-slate-100">
           <p className="text-[10px] font-bold text-slate-900 uppercase tracking-widest text-center italic">
             Atención al Cliente
@@ -74,7 +72,6 @@ const SupportMenu = () => {
             href={`mailto:${supportEmail}`}
             className="flex items-center gap-3 p-3 hover:bg-sky-50 rounded-xl transition-colors group"
           >
-            {/* Cambiado rojo por azul para que no parezca un error/alerta */}
             <div className="bg-sky-100 p-2 rounded-lg text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-colors">
               <span className="flex items-center justify-center">
                 <Mail size={18} />
