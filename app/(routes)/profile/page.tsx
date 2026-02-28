@@ -453,7 +453,10 @@ function OrderCard({ order }: { order: any }) {
             <Button
               onClick={handleReorder}
               disabled={isReordering}
-              className="flex-1 md:flex-none h-14 px-8 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 hover:border-sky-500 hover:text-sky-600 text-[11px] font-black uppercase tracking-widest transition-all"
+              className="flex-1 md:flex-none h-14 px-8 rounded-2xl 
+           bg-sky-50 border-2 border-sky-100 text-[#0055a4] 
+           hover:bg-[#0055a4] hover:text-white hover:border-[#0055a4] 
+           text-[11px] font-black uppercase tracking-widest transition-all shadow-sm"
             >
               {isReordering ? (
                 <Loader2 className="animate-spin" />
@@ -476,8 +479,6 @@ function OrderCard({ order }: { order: any }) {
     </Card>
   );
 }
-
-/* OTROS COMPONENTES SE MANTIENEN IGUAL PERO CON AJUSTES DE TEXTO */
 
 function AddressCard({
   address,
