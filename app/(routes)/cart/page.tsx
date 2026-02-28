@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
@@ -12,11 +12,17 @@ import { useAuth } from "@/context/auth-context";
 import { toast } from "sonner";
 import { ShoppingBasket, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import router from "next/router";
 
 export default function Page() {
   const { items, removeAll } = useCart();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [shippingQuote, setShippingQuote] = useState<{
+    cost: number;
+    label: string;
+  } | null>(null);
+  const [userCP, setUserCP] = useState("");
 
   const validItems = items.filter(Boolean);
   const hasItems = validItems.length > 0;
@@ -44,7 +50,13 @@ export default function Page() {
       )}`;
       return;
     }
-
+    if (!userCP) {
+      toast.error(
+        "Por favor, configura una dirección de envío en tu perfil antes de pagar.",
+      );
+      router.push("/profile/edit?new=true");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -56,6 +68,10 @@ export default function Page() {
             id: item.id,
             quantity: item.quantity || 1,
           })),
+          shippingPrice: shippingQuote?.cost || 0,
+          shippingLabel: shippingQuote?.label || "Envío Estándar",
+          postalCode: userCP,
+          total: finalTotal,
         },
       };
 
@@ -83,6 +99,79 @@ export default function Page() {
     }
   };
 
+  useEffect(() => {
+    const fetchDefaultAddress = async () => {
+      if (user?.id && user?.jwt) {
+        try {
+          const res = await fetch(
+            `https://ixoye-backend-production.up.railway.app/api/addresses?filters[users_permissions_user][id][$eq]=${user.id}&filters[isDefault][$eq]=true`,
+            { headers: { Authorization: `Bearer ${user.jwt}` } },
+          );
+          const json = await res.json();
+          if (json.data?.[0]) {
+            const cp = json.data[0].postalCode;
+            setUserCP(cp);
+            calculateShipping(cp);
+          }
+        } catch (e) {
+          console.error("Error cargando CP:", e);
+        }
+      }
+    };
+    fetchDefaultAddress();
+  }, [user]);
+
+  const calculateShipping = async (cp: string) => {
+    if (cp.length !== 5) return;
+
+    const cacheKey = "shipping_cache";
+    const cache = localStorage.getItem(cacheKey);
+
+    if (cache) {
+      const parsedCache = JSON.parse(cache);
+      if (parsedCache.cp === cp) {
+        setShippingQuote({ cost: parsedCache.cost, label: parsedCache.label });
+        return;
+      }
+    }
+
+    try {
+      const res = await fetch(
+        `https://api.copomex.com/query/info_cp/${cp}?token=${process.env.NEXT_PUBLIC_COPOMEX_TOKEN}`,
+      );
+      const data = await res.json();
+
+      if (res.ok && data[0]) {
+        const estado = data[0].response.estado;
+        let cost = 250;
+        let label = "Envío Estándar";
+
+        if (estado === "Nayarit") {
+          cost = 0;
+          label = "Entrega Local";
+        } else if (["Jalisco", "Sinaloa"].includes(estado)) {
+          cost = 180;
+          label = "Envío Regional";
+        }
+
+        const newQuote = { cost, label };
+        setShippingQuote(newQuote);
+
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            cp,
+            ...newQuote,
+          }),
+        );
+      }
+    } catch (e) {
+      setShippingQuote({ cost: 250, label: "Envío Nacional" });
+    }
+  };
+
+  const finalTotal = totalPrice + (shippingQuote?.cost || 0);
+
   return (
     <div className="max-w-6xl px-4 py-16 mx-auto min-h-[75vh]">
       <h1 className="mb-8 text-4xl font-black text-sky-950 uppercase italic tracking-tighter">
@@ -98,7 +187,7 @@ export default function Page() {
             Tu carrito está vacío
           </p>
           <p className="text-slate-400 text-sm italic mb-8 max-w-xs mx-auto">
-            Parece que aún no has agregado refacciones a tu pedido.
+            Parece que aún no has agregado productos a tu pedido.
           </p>
           <Link href="/category">
             <Button className="rounded-full bg-sky-800 hover:bg-sky-950 text-white font-black uppercase text-[10px] tracking-[0.2em] px-10 py-7 shadow-xl shadow-sky-900/20 transition-all hover:scale-105 active:scale-95 flex gap-2">
@@ -154,7 +243,30 @@ export default function Page() {
                   </p>
                 </div>
 
-                <Separator className="bg-slate-50" />
+                {/* SECCIÓN DE ENVÍO */}
+                <div className="flex justify-between items-center pt-2 border-t border-slate-50">
+                  <div className="flex flex-col">
+                    <p className="text-slate-500 font-bold uppercase text-[10px]">
+                      Envío {shippingQuote ? `(${shippingQuote.label})` : ""}
+                    </p>
+                    {!userCP && (
+                      <p className="text-[9px] text-amber-600 font-black uppercase tracking-tight italic">
+                        Configura tu dirección en el perfil
+                      </p>
+                    )}
+                  </div>
+                  <p
+                    className={`text-sm font-black ${shippingQuote?.cost === 0 ? "text-green-600" : "text-slate-600"}`}
+                  >
+                    {shippingQuote
+                      ? shippingQuote.cost === 0
+                        ? "¡GRATIS!"
+                        : formatPrice(shippingQuote.cost)
+                      : "---"}
+                  </p>
+                </div>
+
+                <Separator className="bg-slate-100" />
 
                 <div className="flex justify-between items-center">
                   <p className="text-sky-950 font-black uppercase text-[10px]">
@@ -162,7 +274,8 @@ export default function Page() {
                   </p>
                   <div className="text-right">
                     <p className="text-2xl font-black text-green-600 tracking-tighter italic">
-                      {formatPrice(totalPrice)}
+                      {/* Usamos finalTotal aquí para que sume el envío */}
+                      {formatPrice(totalPrice + (shippingQuote?.cost || 0))}
                     </p>
                     <p className="text-[8px] text-slate-400 font-bold uppercase">
                       IVA Incluido

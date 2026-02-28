@@ -12,7 +12,7 @@ import { ubicaciones } from "@/constants/cities-and-states";
 import Link from "next/link";
 
 const MEXICO_STATES = Object.keys(ubicaciones) as (keyof typeof ubicaciones)[];
-const COPOMEX_TOKEN = "90bf7482-083d-4584-a0db-2a59019d4957";
+const COPOMEX_TOKEN = process.env.NEXT_PUBLIC_COPOMEX_TOKEN;
 
 export default function EditProfilePage() {
   const { user, refreshUser } = useAuth();
@@ -26,6 +26,12 @@ export default function EditProfilePage() {
   const [cpError, setCpError] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [coloniasSugericdas, setColoniasSugeridas] = useState<string[]>([]);
+  const [showColonias, setShowColonias] = useState(false);
+
+  const [shippingQuote, setShippingQuote] = useState<{
+    cost: number;
+    label: string;
+  } | null>(null);
 
   const [originalData, setOriginalData] = useState({
     form: {},
@@ -63,50 +69,75 @@ export default function EditProfilePage() {
 
   useEffect(() => {
     const fetchCP = async () => {
-      if (addressForm.postalCode.length === 5) {
-        setLoadingCP(true);
-        setCpError(false);
-        try {
-          const res = await fetch(
-            `https://api.copomex.com/query/info_cp/${addressForm.postalCode}?token=${COPOMEX_TOKEN}`,
-          );
-
-          if (!res.ok) {
-            setCpError(false);
-            setColoniasSugeridas([]);
-            return;
-          }
-
-          const data = await res.json();
-
-          if (Array.isArray(data) && data.length > 0) {
-            const listaColonias = data.map(
-              (item: any) => item.response.asentamiento,
-            );
-            setColoniasSugeridas(listaColonias);
-            const info = data[0].response;
-
-            setAddressForm((prev) => ({
-              ...prev,
-              state: info.estado,
-              city: info.municipio,
-              neighborhood: info.asentamiento,
-            }));
-          } else {
-            setCpError(true);
-            setColoniasSugeridas([]);
-          }
-        } catch (error) {
-          setCpError(false);
-          setLoadingCP(false);
-        } finally {
-          setLoadingCP(false);
-        }
-      } else {
+      if (addressForm.postalCode.length !== 5) {
         setColoniasSugeridas([]);
         setCpError(false);
+        setShippingQuote(null);
+        return;
+      }
+
+      setLoadingCP(true);
+      setCpError(false);
+
+      try {
+        const res = await fetch(
+          `https://api.copomex.com/query/info_cp/${addressForm.postalCode}?token=${COPOMEX_TOKEN}`,
+        );
+
+        const data = await res.json();
+
+        if (res.ok && Array.isArray(data) && data.length > 0) {
+          const info = data[0].response;
+          const listaColonias = data.map(
+            (item: any) => item.response.asentamiento,
+          );
+
+          let nombreEstado = info.estado;
+          if (nombreEstado === "México") nombreEstado = "Estado de México";
+          if (nombreEstado === "Distrito Federal")
+            nombreEstado = "Ciudad de México";
+
+          let cost = 250;
+          let label = "Envío Estándar Nacional";
+
+          if (info.estado === "Nayarit") {
+            cost = 0;
+            label = "Entrega Local Gratis";
+          } else if (["Jalisco", "Sinaloa"].includes(info.estado)) {
+            cost = 180;
+            label = "Envío Regional Económico";
+          }
+
+          setShippingQuote({ cost, label });
+          setColoniasSugeridas(listaColonias);
+
+          if (listaColonias.length > 1) {
+            setShowColonias(true);
+          }
+
+          setAddressForm((prev) => ({
+            ...prev,
+            state: nombreEstado,
+            city: info.municipio,
+            neighborhood:
+              listaColonias.length === 1
+                ? listaColonias[0]
+                : listaColonias.includes(prev.neighborhood)
+                  ? prev.neighborhood
+                  : "",
+          }));
+        } else {
+          throw new Error("CP no encontrado");
+        }
+      } catch (error) {
+        setCpError(true);
+        setColoniasSugeridas([]);
+        setShippingQuote(null);
+      } finally {
+        setLoadingCP(false);
       }
     };
+
     fetchCP();
   }, [addressForm.postalCode]);
 
@@ -207,15 +238,43 @@ export default function EditProfilePage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddressChange = (field: string, value: any) => {
+  type AddressFormKeys = keyof typeof addressForm;
+  const handleAddressChange = (field: AddressFormKeys, value: any) => {
     setAddressForm((prev) => {
-      const newState = { ...prev, [field]: value };
-      if (field === "state") newState.city = "";
-      return newState;
+      const newState = {
+        ...prev,
+        [field]: value,
+      };
+
+      if (field === "state") {
+        newState.city = "";
+      }
+
+      return newState as typeof addressForm;
     });
   };
 
   const handleSave = async () => {
+    const requiredFields = {
+      street: "Calle y Número",
+      postalCode: "Código Postal",
+      neighborhood: "Colonia",
+      state: "Estado",
+      city: "Ciudad",
+    };
+
+    for (const [key, label] of Object.entries(requiredFields)) {
+      const value = addressForm[key as keyof typeof addressForm];
+      if (
+        value === undefined ||
+        value === null ||
+        value.toString().trim() === ""
+      ) {
+        setErrors({ general: `El campo ${label} es obligatorio.` });
+        return;
+      }
+    }
+
     if (
       addressForm.street.trim() === "" ||
       addressForm.postalCode.length < 5 ||
@@ -475,45 +534,129 @@ export default function EditProfilePage() {
                   >
                     Código Postal *
                   </Label>
-                  <Input
-                    value={addressForm.postalCode}
-                    onChange={(e) =>
-                      handleAddressChange(
-                        "postalCode",
-                        e.target.value.replace(/\D/g, ""),
-                      )
-                    }
-                    maxLength={5}
-                  />
+                  <div className="relative">
+                    <Input
+                      value={addressForm.postalCode}
+                      onChange={(e) =>
+                        handleAddressChange(
+                          "postalCode",
+                          e.target.value.replace(/\D/g, ""),
+                        )
+                      }
+                      maxLength={5}
+                      className={`${
+                        cpError ? "border-red-500 focus:ring-red-500" : ""
+                      } transition-colors`}
+                    />
+                    {loadingCP && (
+                      <Loader2 className="absolute right-3 top-2.5 h-5 w-5 animate-spin text-gray-400" />
+                    )}
+                  </div>
+
+                  {/* Mensaje de estado de envío */}
+                  {shippingQuote && !loadingCP && (
+                    <div
+                      className={`flex items-center gap-1.5 mt-1 animate-in fade-in duration-300`}
+                    >
+                      <div
+                        className={`h-1.5 w-1.5 rounded-full ${shippingQuote.cost === 0 ? "bg-green-500" : "bg-blue-500"}`}
+                      />
+                      <p
+                        className={`text-xs font-medium ${
+                          shippingQuote.cost === 0
+                            ? "text-green-600"
+                            : "text-blue-600"
+                        }`}
+                      >
+                        {shippingQuote.label}:{" "}
+                        <span className="font-bold">
+                          {shippingQuote.cost === 0
+                            ? "¡Gratis!"
+                            : `$${shippingQuote.cost}`}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Mensaje de Error */}
+                  {cpError && (
+                    <p className="text-xs text-red-500 font-medium mt-1 flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                      CP no encontrado. Por favor, verifica los 5 dígitos.
+                    </p>
+                  )}
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 relative">
                   <Label className="text-sm font-bold text-[#012849]">
                     Colonia *
                   </Label>
-                  <Input
-                    list="neighborhood-list"
-                    value={addressForm.neighborhood}
-                    onChange={(e) =>
-                      handleAddressChange("neighborhood", e.target.value)
-                    }
-                  />
-                  <datalist id="neighborhood-list">
-                    {coloniasSugericdas.map((col, idx) => (
-                      <option key={idx} value={col} />
-                    ))}
-                  </datalist>
+
+                  <div className="relative">
+                    <Input
+                      placeholder={
+                        loadingCP ? "Buscando..." : "Selecciona tu colonia"
+                      }
+                      value={addressForm.neighborhood}
+                      readOnly={coloniasSugericdas.length > 0}
+                      onClick={() => setShowColonias(!showColonias)}
+                      onChange={(e) =>
+                        handleAddressChange("neighborhood", e.target.value)
+                      }
+                      className="cursor-pointer bg-white"
+                    />
+
+                    {/* Icono indicador */}
+                    <div className="absolute right-3 top-2.5 text-gray-400 pointer-events-none">
+                      <ChevronLeft
+                        size={16}
+                        className={`transition-transform duration-200 ${showColonias ? "-rotate-90" : "rotate-0"}`}
+                      />
+                    </div>
+
+                    {/* LISTA DESPLEGABLE  */}
+                    {showColonias && coloniasSugericdas.length > 0 && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setShowColonias(false)}
+                        />
+
+                        <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+                          <div className="p-2 space-y-1">
+                            {coloniasSugericdas.map((col, idx) => (
+                              <button
+                                key={`${idx}-${col}`}
+                                type="button"
+                                className={`w-full text-left px-4 py-3 text-sm rounded-lg transition-colors ${
+                                  addressForm.neighborhood === col
+                                    ? "bg-blue-50 text-[#0071b1] font-bold"
+                                    : "hover:bg-gray-50 text-gray-700"
+                                }`}
+                                onClick={() => {
+                                  handleAddressChange("neighborhood", col);
+                                  setShowColonias(false);
+                                }}
+                              >
+                                {col}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 text-left">
                   <Label className="text-sm font-bold text-[#012849]">
                     Estado *
                   </Label>
                   <select
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#0071b1]"
+                    className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#0071b1] text-black"
                     value={addressForm.state}
                     onChange={(e) =>
-                      handleAddressChange("state", e.target.value)
+                      handleAddressChange("state", e.target.value as string)
                     }
                   >
                     <option value="">Selecciona Estado</option>
@@ -525,19 +668,33 @@ export default function EditProfilePage() {
                   </select>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 text-left">
                   <Label className="text-sm font-bold text-[#012849]">
                     Ciudad *
                   </Label>
+
                   <select
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#0071b1] disabled:opacity-50"
+                    className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-black"
                     value={addressForm.city}
                     onChange={(e) =>
-                      handleAddressChange("city", e.target.value)
+                      handleAddressChange("city", e.target.value as string)
                     }
                     disabled={!addressForm.state}
                   >
                     <option value="">Selecciona Ciudad</option>
+
+                    {addressForm.city &&
+                      addressForm.state &&
+                      !(
+                        ubicaciones[
+                          addressForm.state as keyof typeof ubicaciones
+                        ] as unknown as readonly string[]
+                      )?.includes(addressForm.city) && (
+                        <option value={addressForm.city}>
+                          {addressForm.city}
+                        </option>
+                      )}
+
                     {addressForm.state &&
                       ubicaciones[
                         addressForm.state as keyof typeof ubicaciones
