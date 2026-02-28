@@ -53,9 +53,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <div className="relative p-2 transition-all duration-200 rounded-lg hover:shadow-md group border border-transparent hover:border-slate-100 flex flex-col h-full">
       <div className="relative rounded-xl overflow-hidden">
+        {/* CÓDIGO */}
+        {product.code && (
+          <div className="absolute top-2 left-2 z-20">
+            <span className="bg-slate-900/70 backdrop-blur-md text-white text-[8px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wider">
+              REF: {product.code}
+            </span>
+          </div>
+        )}
+
+        {/* MARCA */}
         {product.brand && (
-          <div className="absolute top-2 right-2 z-20 pointer-events-none">
-            <span className="bg-white/90 backdrop-blur-sm text-[#0055a4] text-[9px] font-black px-2 py-1 rounded shadow-sm border border-slate-100 uppercase">
+          <div className="absolute top-2 right-2 z-20">
+            <span className="bg-sky-100 text-[#0055a4] text-[9px] font-bold px-2 py-1 rounded shadow-sm border border-sky-200 uppercase">
               {product.brand}
             </span>
           </div>
