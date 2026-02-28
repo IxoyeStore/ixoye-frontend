@@ -23,8 +23,8 @@ const SupportMenu = () => {
   const iconClass = `p-2 rounded-xl transition-all duration-300 transform hover:scale-110 
     ${
       isOpen
-        ? "bg-sky-500 text-white scale-110 shadow-lg"
-        : "text-white/90 hover:bg-white/10"
+        ? "bg-red-600 text-white scale-110 shadow-lg"
+        : "text-slate-800 hover:bg-white hover:shadow-sm"
     }`;
 
   return (
@@ -39,11 +39,13 @@ const SupportMenu = () => {
 
       {/* Menú Desplegable */}
       <div
-        className={`absolute right-0 mt-4 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[70] transition-all duration-200 origin-top-right
-       ${isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95"} 
-  ${isOpen ? "visible" : "invisible"}`}
+        className={`absolute right-0 mt-4 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[70] transition-all duration-200 origin-top-right ${
+          isOpen
+            ? "scale-100 opacity-100"
+            : "scale-95 opacity-0 pointer-events-none"
+        }`}
       >
-        <div className="bg-sky-50/50 p-3 border-b border-slate-100">
+        <div className="bg-slate-50 p-3 border-b border-slate-100">
           <p className="text-[10px] font-bold text-slate-900 uppercase tracking-widest text-center italic">
             Atención al Cliente
           </p>
@@ -68,12 +70,9 @@ const SupportMenu = () => {
 
           <a
             href={`mailto:${supportEmail}`}
-            onClick={() => {
-              window.location.href = `mailto:${supportEmail}`;
-            }}
-            className="flex items-center gap-3 p-3 hover:bg-sky-50 rounded-xl transition-colors group"
+            className="flex items-center gap-3 p-3 hover:bg-red-50 rounded-xl transition-colors group"
           >
-            <div className="bg-sky-100 p-2 rounded-lg text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-colors">
+            <div className="bg-red-100 p-2 rounded-lg text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
               <span className="flex items-center justify-center">
                 <Mail size={18} />
               </span>
