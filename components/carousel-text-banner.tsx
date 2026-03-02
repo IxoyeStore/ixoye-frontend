@@ -30,9 +30,8 @@ const CarouselTextBanner = () => {
   }, [isPaused, nextSlide, isMultiple]);
 
   return (
-    <div className="w-full select-none">
-      {/* Contenedor principal con fondo oscuro para evitar saltos de luz */}
-      <div className="w-full relative overflow-hidden bg-[#001529]">
+    <div className="w-full select-none mt-4 px-4 md:px-8 lg:px-12">
+      <div className="w-full relative overflow-hidden rounded-xl shadow-lg">
         <Carousel className="w-full">
           <CarouselContent className="m-0">
             {images.map((src, index) => (
@@ -45,7 +44,7 @@ const CarouselTextBanner = () => {
                 }`}
               >
                 <div
-                  className="relative w-full max-w-[2560px] mx-auto h-[250px] md:h-[400px] lg:h-[450px] flex items-center justify-center overflow-hidden"
+                  className="relative w-full max-w-[2560px] mx-auto h-[200px] md:h-[350px] lg:h-[450px] flex items-center justify-center overflow-hidden"
                   onMouseDown={() => isMultiple && setIsPaused(true)}
                   onMouseUp={() => isMultiple && setIsPaused(false)}
                   onMouseLeave={() => isMultiple && setIsPaused(false)}
@@ -57,10 +56,10 @@ const CarouselTextBanner = () => {
                     alt={
                       isMultiple ? `Banner ${index + 1}` : "Banner Principal"
                     }
-                    className="absolute inset-0 w-full h-full object-cover object-center"
+                    className="w-full h-full object-contain object-center transition-transform duration-700"
                   />
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10 pointer-events-none" />
                 </div>
               </CarouselItem>
             ))}
@@ -68,7 +67,7 @@ const CarouselTextBanner = () => {
         </Carousel>
 
         {isMultiple && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 z-20">
             {images.map((_, index) => (
               <button
                 key={index}
