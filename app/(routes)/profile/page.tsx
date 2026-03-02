@@ -35,6 +35,8 @@ export default function ProfilePage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [visibleOrders, setVisibleOrders] = useState(5);
+  const ITEMS_PER_PAGE = 5;
 
   const activeTab = searchParams.get("tab") || "info";
 
@@ -76,7 +78,7 @@ export default function ProfilePage() {
       setLoadingOrders(true);
       try {
         const response = await fetch(
-          `https://ixoye-backend-production.up.railway.app/api/orders?sort[0]=createdAt:desc`,
+          `https://ixoye-backend-production.up.railway.app/api/orders?sort[0]=createdAt:desc&pagination[limit]=10`,
           { headers: { Authorization: `Bearer ${user.jwt}` } },
         );
         const { data } = await response.json();
@@ -106,6 +108,10 @@ export default function ProfilePage() {
     }, 200);
     return () => clearTimeout(timer);
   }, [activeTab]);
+
+  const handleLoadMore = () => {
+    setVisibleOrders((prev) => prev + ITEMS_PER_PAGE);
+  };
 
   const handleDeleteAddress = async (id: string | number) => {
     if (!user || !confirm("¿Estás seguro de eliminar esta dirección?")) return;
@@ -315,9 +321,21 @@ export default function ProfilePage() {
             </div>
           ) : orders.length > 0 ? (
             <div className="grid gap-6">
-              {orders.map((order) => (
+              {orders.slice(0, visibleOrders).map((order) => (
                 <OrderCard key={order.id} order={order} />
               ))}
+
+              {visibleOrders < orders.length && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    onClick={handleLoadMore}
+                    variant="outline"
+                    className="rounded-2xl border-2 border-sky-100 text-sky-700 font-black uppercase text-[10px] tracking-widest px-10 py-6 hover:bg-sky-50 transition-all shadow-sm"
+                  >
+                    Cargar pedidos anteriores
+                  </Button>
+                </div>
+              )}
             </div>
           ) : (
             <EmptyOrders />
