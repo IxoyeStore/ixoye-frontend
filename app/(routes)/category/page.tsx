@@ -82,24 +82,35 @@ function CategoryContent() {
 
   return (
     <div className="w-full max-w-[1440px] py-4 mx-auto sm:py-16 px-4 md:px-8">
-      {" "}
-      <div className="flex items-center justify-between gap-2 mb-2">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-sky-900 uppercase tracking-tighter truncate">
+      <div className="flex flex-col items-center gap-6 mb-8 w-full">
+        <div className="text-center space-y-2 w-full max-w-2xl px-4">
+          <h1 className="text-3xl sm:text-5xl font-black text-sky-900 uppercase tracking-tighter italic leading-none">
             Tienda Principal
           </h1>
+
           {(category || brand || series) && (
-            <p className="text-[10px] font-bold text-sky-500 uppercase italic">
-              Filtrando por: {category || brand || series}
-            </p>
+            <div className="flex items-center justify-center gap-2">
+              <span className="h-[1px] w-8 bg-sky-200" />
+              <p className="text-[10px] font-bold text-sky-500 uppercase italic tracking-[0.2em]">
+                Filtrando por:{" "}
+                <span className="text-sky-700 underline decoration-sky-300 underline-offset-4">
+                  {category || brand || series}
+                </span>
+              </p>
+              <span className="h-[1px] w-8 bg-sky-200" />
+            </div>
           )}
         </div>
 
-        <div className="shrink-0">
-          <ProductSort />
+        <div className="w-full flex justify-center md:justify-end md:absolute md:right-8 lg:right-12">
+          <div className="relative z-10">
+            <ProductSort />
+          </div>
         </div>
       </div>
+
       <Separator className="my-4 bg-sky-100" />
+
       <div className="flex flex-col">
         <div className="grid w-full grid-cols-2 gap-4 mt-8 lg:grid-cols-4 md:gap-6">
           {loading && <SkeletonSchema grid={16} />}
