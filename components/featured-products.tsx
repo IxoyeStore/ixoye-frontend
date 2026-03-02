@@ -112,7 +112,6 @@ const FeaturedProducts = () => {
                         <h3 className="text-xs sm:text-lg font-bold text-sky-900 line-clamp-2 min-h-[2rem] sm:min-h-[3rem]">
                           {productName}
                         </h3>
-
                         {/* Sección de Precio Dinámico */}
                         <div className="flex flex-col mb-2">
                           {isB2B && wholesalePrice && (
@@ -120,11 +119,12 @@ const FeaturedProducts = () => {
                               {formatPrice(price)}
                             </p>
                           )}
-                          <div className="flex items-center gap-2 text-green-600 font-black italic text-sm sm:text-base">
+
+                          <div className="flex flex-col items-start gap-1 text-green-600 font-black italic text-sm sm:text-base">
                             <p>{formatPrice(finalPrice)}</p>
 
                             {isB2B && wholesalePrice && (
-                              <span className="bg-blue-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase not-italic tracking-normal shadow-sm">
+                              <span className="bg-blue-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase not-italic tracking-normal shadow-sm inline-block">
                                 Preferencial
                               </span>
                             )}
