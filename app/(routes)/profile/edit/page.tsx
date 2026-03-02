@@ -748,7 +748,7 @@ export default function EditProfilePage() {
                     Establecer como dirección principal
                   </Label>
                   <p className="text-xs text-gray-500 font-medium">
-                    Usa esta dirección por defecto para tus pedidos rápidos.
+                    Usar esta dirección por defecto para mis pedidos.
                   </p>
                 </div>
               </div>

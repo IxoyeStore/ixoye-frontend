@@ -91,6 +91,22 @@ export default function ProfilePage() {
     if (user) fetchData();
   }, [user]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const activeElement = document.querySelector(
+        '[data-state="active"][role="tab"]',
+      );
+      if (activeElement) {
+        activeElement.scrollIntoView({
+          behavior: "smooth",
+          inline: "center",
+          block: "nearest",
+        });
+      }
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
+
   const handleDeleteAddress = async (id: string | number) => {
     if (!user || !confirm("¿Estás seguro de eliminar esta dirección?")) return;
     try {
@@ -165,26 +181,39 @@ export default function ProfilePage() {
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <TabsList className="flex w-full md:w-fit bg-slate-100/80 p-1 mb-8 rounded-2xl border border-slate-200 shadow-inner overflow-x-auto no-scrollbar">
-          <TabsTrigger
-            value="info"
-            className="flex-1 md:flex-none px-6 md:px-10 py-3 gap-2 font-black uppercase text-[11px] tracking-widest data-[state=active]:bg-white data-[state=active]:text-sky-700 data-[state=active]:shadow-md rounded-xl transition-all"
-          >
-            <UserCircle size={16} /> <span>Perfil</span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="addresses"
-            className="flex-1 md:flex-none px-6 md:px-10 py-3 gap-2 font-black uppercase text-[11px] tracking-widest data-[state=active]:bg-white data-[state=active]:text-sky-700 data-[state=active]:shadow-md rounded-xl transition-all"
-          >
-            <MapPin size={16} /> <span>Direcciones</span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="orders"
-            className="flex-1 md:flex-none px-6 md:px-10 py-3 gap-2 font-black uppercase text-[11px] tracking-widest data-[state=active]:bg-white data-[state=active]:text-sky-700 data-[state=active]:shadow-md rounded-xl transition-all"
-          >
-            <Package size={16} /> <span>Pedidos</span>
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full mb-10 px-1">
+          <TabsList className="grid grid-cols-3 gap-2 bg-transparent p-0 h-auto w-full border-none shadow-none overflow-visible">
+            <TabsTrigger
+              value="info"
+              className="flex flex-col items-center justify-center py-4 px-2 gap-2 bg-slate-50 border border-slate-200 rounded-2xl transition-all data-[state=active]:bg-white data-[state=active]:text-sky-700 data-[state=active]:border-sky-300 data-[state=active]:shadow-xl data-[state=active]:ring-1 data-[state=active]:ring-sky-100"
+            >
+              <UserCircle size={20} />
+              <span className="font-black uppercase text-[9px] tracking-tighter">
+                Perfil
+              </span>
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="addresses"
+              className="flex flex-col items-center justify-center py-4 px-2 gap-2 bg-slate-50 border border-slate-200 rounded-2xl transition-all data-[state=active]:bg-white data-[state=active]:text-sky-700 data-[state=active]:border-sky-300 data-[state=active]:shadow-xl data-[state=active]:ring-1 data-[state=active]:ring-sky-100"
+            >
+              <MapPin size={20} />
+              <span className="font-black uppercase text-[9px] tracking-tighter">
+                Direcciones
+              </span>
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="orders"
+              className="flex flex-col items-center justify-center py-4 px-2 gap-2 bg-slate-50 border border-slate-200 rounded-2xl transition-all data-[state=active]:bg-white data-[state=active]:text-sky-700 data-[state=active]:border-sky-300 data-[state=active]:shadow-xl data-[state=active]:ring-1 data-[state=active]:ring-sky-100"
+            >
+              <Package size={20} />
+              <span className="font-black uppercase text-[9px] tracking-tighter">
+                Pedidos
+              </span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent
           value="info"
@@ -203,7 +232,7 @@ export default function ProfilePage() {
                     </CardTitle>
                     {profileData?.type === "b2b" && (
                       <span className="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
-                        Socio B2B
+                        Cliente Preferente
                       </span>
                     )}
                   </div>
