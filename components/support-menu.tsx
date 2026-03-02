@@ -7,8 +7,8 @@ const SupportMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const whatsappNumber = "523111234567";
-  const supportEmail = "soporte@ixoye-store.com";
+  const whatsappNumber = "523112377582";
+  const supportEmail = "soporte@refaccionesixoye.mx";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
