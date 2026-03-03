@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { formatPrice } from "@/lib/formatPrice";
-import { ChevronLeft, Printer } from "lucide-react";
+import { ChevronLeft, Printer, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import QRCode from "react-qr-code";
 
@@ -37,32 +37,33 @@ export default function OrderDetailPage() {
   const { user } = useAuth();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
       if (!user || !user.jwt || !id) return;
       setLoading(true);
+
       try {
-        let url = `https://ixoye-backend-production.up.railway.app/api/orders/${id}?`;
-        let response = await fetch(url, {
+        const baseUrl = `https://ixoye-backend-production.up.railway.app/api/orders`;
+        const filters = `?filters[documentId][$eq]=${id}&filters[user][id][$eq]=${user.id}`;
+
+        const response = await fetch(`${baseUrl}${filters}`, {
           headers: { Authorization: `Bearer ${user.jwt}` },
         });
 
-        if (response.status === 404) {
-          url = `https://ixoye-backend-production.up.railway.app/api/orders?filters[id][$eq]=${id}`;
-          response = await fetch(url, {
-            headers: { Authorization: `Bearer ${user.jwt}` },
-          });
-          const result = await response.json();
-          if (result.data && result.data.length > 0) {
-            setOrder(result.data[0]);
-            return;
-          }
+        const result = await response.json();
+        console.log("Respuesta de Strapi:", result);
+
+        if (!result.data || result.data.length === 0) {
+          setIsUnauthorized(true);
+          setOrder(null);
+        } else {
+          setOrder(result.data[0]);
+          setIsUnauthorized(false);
         }
-        const { data } = await response.json();
-        setOrder(data);
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error de seguridad/red:", error);
         setOrder(null);
       } finally {
         setLoading(false);
@@ -78,9 +79,29 @@ export default function OrderDetailPage() {
   if (loading)
     return (
       <div className="p-20 text-center font-bold text-slate-400 animate-pulse uppercase tracking-widest text-[10px]">
-        Generando vista de ticket...
+        Verificando credenciales...
       </div>
     );
+
+  if (isUnauthorized)
+    return (
+      <div className="p-20 text-center space-y-4">
+        <ShieldAlert className="mx-auto text-red-500" size={48} />
+        <h2 className="font-black text-slate-900 uppercase tracking-tighter text-xl">
+          Acceso Denegado
+        </h2>
+        <p className="text-slate-500 text-sm max-w-xs mx-auto">
+          No tienes permisos para ver esta orden o el documento no existe.
+        </p>
+        <Link
+          href="/profile?tab=orders"
+          className="inline-block bg-slate-900 text-white px-6 py-2 text-[10px] font-bold uppercase tracking-widest"
+        >
+          Volver a mis pedidos
+        </Link>
+      </div>
+    );
+
   if (!order)
     return (
       <div className="p-20 text-center">
@@ -90,8 +111,8 @@ export default function OrderDetailPage() {
       </div>
     );
 
-  const data = order.attributes || order;
-  const orderId = order.id;
+  const data = order?.attributes || order;
+  const orderId = order?.id || id;
   const qrUrl = typeof window !== "undefined" ? window.location.href : "";
   const currentStatus = statusMap[data.orderStatus?.toLowerCase()] || {
     label: "Procesado",

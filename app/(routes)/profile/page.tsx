@@ -78,7 +78,7 @@ export default function ProfilePage() {
       setLoadingOrders(true);
       try {
         const response = await fetch(
-          `https://ixoye-backend-production.up.railway.app/api/orders?sort[0]=createdAt:desc&pagination[limit]=10`,
+          `https://ixoye-backend-production.up.railway.app/api/orders?filters[user][id][$eq]=${user.id}&sort[0]=createdAt:desc&pagination[limit]=10`,
           { headers: { Authorization: `Bearer ${user.jwt}` } },
         );
         const { data } = await response.json();
