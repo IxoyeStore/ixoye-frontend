@@ -151,11 +151,13 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <Headset size={16} className="text-sky-300 mt-0.5 shrink-0" />
                 <span className="leading-tight">
-                  Horario de Atención:
+                  <strong>Horario de Atención:</strong>
                   <br />
                   Lun-Vie (9:00 - 18:00)
                   <br />
                   Sab (9:00 - 2:00)
+                  <br />
+                  Zona horaria del Pacifico (GMT-7)
                 </span>
               </li>
             </ul>

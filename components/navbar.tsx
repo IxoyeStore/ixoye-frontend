@@ -421,7 +421,8 @@ export default function Header() {
                 </a>
               </div>
               <p className="text-[9px] text-center text-slate-400 font-bold uppercase italic mt-6">
-                Horario de Atención: Lun - Vie / 9:00 - 18:00, Sab / 9:00 - 2:00
+                Horario de Atención: Lun - Vie / 9:00 - 18:00, Sab / 9:00 -
+                15:00
               </p>
             </div>
           </div>
