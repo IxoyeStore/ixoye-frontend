@@ -24,7 +24,11 @@ function LoginFormContent() {
   const { setUser, refreshUser } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
-
+  const [isResending, setIsResending] = useState(false);
+  const [resendStatus, setResendStatus] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
   const callbackUrl = searchParams.get("callbackUrl");
 
   useEffect(() => {
@@ -34,10 +38,55 @@ function LoginFormContent() {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
+
+  const onResendConfirmation = async () => {
+    const email = getValues("email");
+    if (!email || errors.email) {
+      setResendStatus({
+        type: "error",
+        message: "Ingresa un correo válido primero",
+      });
+      return;
+    }
+
+    setIsResending(true);
+    setResendStatus(null);
+
+    try {
+      const res = await fetch(
+        "https://ixoye-backend-production.up.railway.app/api/auth/send-email-confirmation",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        },
+      );
+
+      if (res.ok) {
+        setResendStatus({
+          type: "success",
+          message:
+            "Si el correo existe y no ha sido verificado, recibirás un nuevo enlace pronto.",
+        });
+        setLoginError(null);
+      } else {
+        const data = await res.json();
+        setResendStatus({
+          type: "error",
+          message: data.error?.message || "Error al solicitar el reenvío",
+        });
+      }
+    } catch (error) {
+      setResendStatus({ type: "error", message: "Error de conexión" });
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const onSubmit = async (data: LoginForm) => {
     setLoginError(null);
@@ -55,10 +104,27 @@ function LoginFormContent() {
       );
 
       const result = await res.json();
+
       if (!res.ok) {
-        setLoginError(
-          result.error?.message || result.error || "Credenciales inválidas",
-        );
+        const message = result.error?.message || "";
+
+        let translatedError = "Credenciales inválidas";
+
+        if (message === "Your account email is not confirmed") {
+          translatedError =
+            "Tu cuenta aún no ha sido verificada. Revisa tu correo electrónico para verificar tu cuenta .";
+        } else if (message === "Invalid identifier or password") {
+          translatedError = "El correo o la contraseña son incorrectos.";
+        } else if (
+          message === "Too many attempts, please try again in a minute"
+        ) {
+          translatedError =
+            "Demasiados intentos. Por favor, intenta de nuevo en un minuto.";
+        } else if (result.error?.message) {
+          translatedError = result.error.message;
+        }
+
+        setLoginError(translatedError);
         return;
       }
       const sessionRes = await fetch("/api/login", {
@@ -151,9 +217,37 @@ function LoginFormContent() {
             )}
           </div>
 
+          {/* Sección de Errores y Reenvío */}
           {loginError && (
-            <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-100 text-center font-medium">
-              {loginError}
+            <div className="space-y-3">
+              <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-100 text-center font-medium">
+                {loginError}
+              </p>
+
+              {loginError.includes("verificada") && (
+                <button
+                  type="button"
+                  onClick={onResendConfirmation}
+                  disabled={isResending}
+                  className="w-full text-xs font-bold text-[#0071b1] hover:text-[#012849] transition-colors disabled:opacity-50"
+                >
+                  {isResending
+                    ? "Enviando..."
+                    : "¿No recibiste el correo? Reenviar confirmación"}
+                </button>
+              )}
+            </div>
+          )}
+
+          {resendStatus && (
+            <p
+              className={`text-xs p-2 rounded text-center font-medium ${
+                resendStatus.type === "success"
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "bg-amber-50 text-amber-700"
+              }`}
+            >
+              {resendStatus.message}
             </p>
           )}
 
