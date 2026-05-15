@@ -32,10 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
 
       if (data.user) {
-        setUser({
-          ...data.user,
-          jwt: data.jwt,
-        });
+        setUser(data.user);
       } else {
         setUser(null);
       }
@@ -73,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used dentro de AuthProvider");
+    throw new Error("useAuth debe ser usado dentro de AuthProvider");
   }
   return context;
 }

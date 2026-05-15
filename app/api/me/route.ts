@@ -9,7 +9,7 @@ export async function GET() {
 
   try {
     const userRes = await fetch(
-      `https://ixoye-backend-production.up.railway.app/api/users/me`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
       {
         headers: { Authorization: `Bearer ${jwt}` },
         cache: "no-store",
@@ -19,7 +19,7 @@ export async function GET() {
     if (!userRes.ok) return NextResponse.json({ user: null }, { status: 401 });
     const userData = await userRes.json();
 
-    const profileUrl = `https://ixoye-backend-production.up.railway.app/api/profiles?filters[users_permissions_user][id][$eq]=${userData.id}`;
+    const profileUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/profiles?filters[users_permissions_user][id][$eq]=${userData.id}`;
 
     const profileRes = await fetch(profileUrl, {
       headers: { Authorization: `Bearer ${jwt}` },
@@ -40,10 +40,8 @@ export async function GET() {
     return NextResponse.json({
       user: {
         ...userData,
-        jwt: jwt,
         profile: profileContent,
       },
-      jwt: jwt,
     });
   } catch (error) {
     console.error("Error en api/me:", error);

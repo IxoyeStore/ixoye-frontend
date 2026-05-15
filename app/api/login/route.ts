@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     if (!finalJwt) {
       const res = await fetch(
-        `https://ixoye-backend-production.up.railway.app/api/auth/local`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
