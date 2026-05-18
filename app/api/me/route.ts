@@ -9,7 +9,7 @@ export async function GET() {
 
   try {
     const userRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me?populate=role`,
       {
         headers: { Authorization: `Bearer ${jwt}` },
         cache: "no-store",

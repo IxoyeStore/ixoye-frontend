@@ -1,0 +1,477 @@
+/* eslint-disable @next/next/no-img-element */
+"use client";
+
+import { useEffect, useState, useCallback, useRef } from "react";
+import Link from "next/link";
+import { formatPrice } from "@/lib/formatPrice";
+import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2 } from "lucide-react";
+import { ProductImage } from "@/components/product-image";
+import { toast } from "sonner";
+
+type EditingCell = { docId: string; field: "price" | "wholesalePrice" | "stock" };
+
+const BULK_ACTIONS = [
+  { value: "activate", label: "Activar seleccionados", needsValue: false },
+  { value: "deactivate", label: "Desactivar seleccionados", needsValue: false },
+  { value: "price_pct", label: "Ajustar precio público (%)", needsValue: true, placeholder: "Ej: 10 o -5" },
+  { value: "wholesale_pct", label: "Ajustar precio mayoreo (%)", needsValue: true, placeholder: "Ej: 10 o -5" },
+  { value: "set_stock", label: "Establecer stock", needsValue: true, placeholder: "Cantidad exacta" },
+  { value: "delete", label: "Eliminar seleccionados", needsValue: false },
+];
+
+export default function AdminProductsPage() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
+  const [active, setActive] = useState("");
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+
+  // Selection
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const [togglingActive, setTogglingActive] = useState<string | null>(null);
+
+  // Inline editing
+  const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
+  const [cellValue, setCellValue] = useState("");
+  const [savingCell, setSavingCell] = useState<string | null>(null);
+  const cellInputRef = useRef<HTMLInputElement>(null);
+
+  // Bulk action
+  const [bulkAction, setBulkAction] = useState("");
+  const [bulkValue, setBulkValue] = useState("");
+  const [applyingBulk, setApplyingBulk] = useState(false);
+
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    const params = new URLSearchParams({ page: String(page) });
+    if (query) params.set("search", query);
+    if (active !== "") params.set("active", active);
+    const res = await fetch(`/api/admin/products?${params}`);
+    const data = await res.json();
+    setProducts(data.data || []);
+    setTotal(data.meta?.pagination?.total || 0);
+    setSelected(new Set());
+    setLoading(false);
+  }, [page, query, active]);
+
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+  useEffect(() => {
+    if (editingCell) cellInputRef.current?.focus();
+  }, [editingCell]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setQuery(search);
+    setPage(1);
+  };
+
+  // --- Selection ---
+  const allDocIds = products.map((p) => p.documentId || String(p.id));
+  const allSelected = allDocIds.length > 0 && allDocIds.every((id) => selected.has(id));
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(allDocIds));
+    }
+  };
+
+  const toggleOne = (docId: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(docId) ? next.delete(docId) : next.add(docId);
+      return next;
+    });
+  };
+
+  // --- Inline editing ---
+  const startEdit = (docId: string, field: EditingCell["field"], currentValue: any) => {
+    setEditingCell({ docId, field });
+    setCellValue(String(currentValue ?? ""));
+  };
+
+  const cancelEdit = () => { setEditingCell(null); setCellValue(""); };
+
+  const saveCell = async () => {
+    if (!editingCell) return;
+    const { docId, field } = editingCell;
+    const parsed = field === "stock" ? parseInt(cellValue) : parseFloat(cellValue);
+    if (isNaN(parsed)) { cancelEdit(); return; }
+
+    setSavingCell(docId + field);
+    const res = await fetch(`/api/admin/products/${docId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [field]: parsed }),
+    });
+
+    if (res.ok) {
+      setProducts((prev) =>
+        prev.map((p) => (p.documentId === docId || String(p.id) === docId) ? { ...p, [field]: parsed } : p)
+      );
+      toast.success("Guardado");
+    } else {
+      toast.error("Error al guardar");
+    }
+    setSavingCell(null);
+    cancelEdit();
+  };
+
+  const handleCellKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") saveCell();
+    if (e.key === "Escape") cancelEdit();
+  };
+
+  const toggleActive = async (docId: string, current: boolean) => {
+    setTogglingActive(docId);
+    const res = await fetch(`/api/admin/products/${docId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ active: !current }),
+    });
+    if (res.ok) {
+      setProducts((prev) =>
+        prev.map((p) => (p.documentId === docId || String(p.id) === docId) ? { ...p, active: !current } : p)
+      );
+    } else {
+      toast.error("Error al cambiar estado");
+    }
+    setTogglingActive(null);
+  };
+
+  const handleDelete = async (documentId: string, name: string) => {
+    if (!confirm(`¿Eliminar "${name}"? Esta acción no se puede deshacer.`)) return;
+    const res = await fetch(`/api/admin/products/${documentId}`, { method: "DELETE" });
+    if (res.ok) { toast.success("Producto eliminado"); fetchProducts(); }
+    else toast.error("Error al eliminar el producto");
+  };
+
+  // --- Bulk actions ---
+  const applyBulk = async () => {
+    if (!bulkAction || selected.size === 0) return;
+    const action = BULK_ACTIONS.find((a) => a.value === bulkAction);
+    if (!action) return;
+    if (action.needsValue && !bulkValue.trim()) { toast.error("Ingresa un valor"); return; }
+
+    if (bulkAction === "delete") {
+      if (!confirm(`¿Eliminar ${selected.size} producto(s)? Esta acción no se puede deshacer.`)) return;
+      setApplyingBulk(true);
+      const results = await Promise.all(
+        [...selected].map((docId) => fetch(`/api/admin/products/${docId}`, { method: "DELETE" }))
+      );
+      const failed = results.filter((r) => !r.ok).length;
+      toast.success(`${selected.size - failed} eliminado(s)${failed ? `, ${failed} con error` : ""}`);
+      setApplyingBulk(false);
+      setBulkAction("");
+      setBulkValue("");
+      fetchProducts();
+      return;
+    }
+
+    setApplyingBulk(true);
+    const updates = [...selected].map((docId) => {
+      const product = products.find((p) => (p.documentId || String(p.id)) === docId);
+      if (!product) return null;
+
+      let body: any = {};
+      if (bulkAction === "activate") body = { active: true };
+      else if (bulkAction === "deactivate") body = { active: false };
+      else if (bulkAction === "price_pct") {
+        const pct = parseFloat(bulkValue) / 100;
+        body = { price: Math.round(product.price * (1 + pct) * 100) / 100 };
+      } else if (bulkAction === "wholesale_pct") {
+        const pct = parseFloat(bulkValue) / 100;
+        const base = product.wholesalePrice || product.price;
+        body = { wholesalePrice: Math.round(base * (1 + pct) * 100) / 100 };
+      } else if (bulkAction === "set_stock") {
+        body = { stock: parseInt(bulkValue) };
+      }
+
+      return fetch(`/api/admin/products/${docId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    }).filter(Boolean);
+
+    const results = await Promise.all(updates as Promise<Response>[]);
+    const failed = results.filter((r) => !r.ok).length;
+    toast.success(`${results.length - failed} producto(s) actualizados${failed ? `, ${failed} con error` : ""}`);
+    setApplyingBulk(false);
+    setBulkAction("");
+    setBulkValue("");
+    fetchProducts();
+  };
+
+  const totalPages = Math.ceil(total / 20);
+  const selectedAction = BULK_ACTIONS.find((a) => a.value === bulkAction);
+
+  const EditableCell = ({
+    docId, field, value, format,
+  }: { docId: string; field: EditingCell["field"]; value: number | null; format?: (v: number) => string }) => {
+    const isEditing = editingCell?.docId === docId && editingCell?.field === field;
+    const isSaving = savingCell === docId + field;
+
+    if (isEditing) {
+      return (
+        <input
+          ref={cellInputRef}
+          type="number"
+          value={cellValue}
+          onChange={(e) => setCellValue(e.target.value)}
+          onBlur={saveCell}
+          onKeyDown={handleCellKey}
+          className="w-24 text-right border border-sky-400 rounded-lg px-2 py-1 text-[11px] font-black focus:outline-none bg-sky-50"
+          step={field === "stock" ? "1" : "0.01"}
+          min="0"
+        />
+      );
+    }
+
+    return (
+      <button
+        onClick={() => startEdit(docId, field, value ?? "")}
+        disabled={isSaving}
+        title="Clic para editar"
+        className={`text-right font-black rounded px-1 py-0.5 transition-all hover:bg-sky-50 hover:text-sky-700 cursor-pointer group ${isSaving ? "opacity-50" : ""} ${value == null ? "text-slate-300" : field === "stock" ? (Number(value) <= 0 ? "text-red-500" : Number(value) <= 5 ? "text-amber-500" : "text-slate-900") : field === "wholesalePrice" ? "text-blue-700" : "text-slate-900"}`}
+      >
+        {value == null ? "—" : (format ? format(Number(value)) : String(value))}
+        <span className="ml-1 opacity-0 group-hover:opacity-100 text-[8px] text-sky-400 transition-opacity">✎</span>
+      </button>
+    );
+  };
+
+  return (
+    <div className="p-8 space-y-6 w-[85%] mx-auto">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-black tracking-tighter uppercase text-slate-900 italic">Productos</h1>
+          <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest">{total} productos en total</p>
+        </div>
+        <Link
+          href="/admin/products/new"
+          className="flex items-center gap-2 px-4 py-3 bg-sky-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg shadow-sky-200"
+        >
+          <Plus size={16} /> Nuevo Producto
+        </Link>
+      </div>
+
+      {/* Search + Filters */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Nombre o código..."
+              className="pl-8 pr-4 py-2 rounded-xl border border-slate-200 text-[11px] font-bold focus:outline-none focus:border-sky-400 w-56 bg-white"
+            />
+          </div>
+          <button type="submit" className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-all">
+            Buscar
+          </button>
+        </form>
+        <select
+          value={active}
+          onChange={(e) => { setActive(e.target.value); setPage(1); }}
+          className="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-black bg-white focus:outline-none focus:border-sky-400"
+        >
+          <option value="">Todos</option>
+          <option value="true">Activos</option>
+          <option value="false">Inactivos</option>
+        </select>
+      </div>
+
+      {/* Bulk action toolbar */}
+      {selected.size > 0 && (
+        <div className="flex items-center gap-3 bg-sky-950 text-white rounded-2xl px-5 py-4 flex-wrap shadow-xl shadow-sky-900/30">
+          <span className="text-[11px] font-black uppercase tracking-widest shrink-0">
+            {selected.size} seleccionado{selected.size !== 1 ? "s" : ""}
+          </span>
+          <div className="flex-1 flex items-center gap-3 flex-wrap">
+            <div className="relative">
+              <select
+                value={bulkAction}
+                onChange={(e) => { setBulkAction(e.target.value); setBulkValue(""); }}
+                className="appearance-none bg-sky-800 border border-sky-700 text-white rounded-xl px-4 py-2 pr-8 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-sky-400 cursor-pointer"
+              >
+                <option value="">Acción masiva...</option>
+                {BULK_ACTIONS.map((a) => (
+                  <option key={a.value} value={a.value}>{a.label}</option>
+                ))}
+              </select>
+              <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-sky-300" />
+            </div>
+
+            {selectedAction?.needsValue && (
+              <input
+                type="number"
+                value={bulkValue}
+                onChange={(e) => setBulkValue(e.target.value)}
+                placeholder={selectedAction.placeholder}
+                className="bg-sky-800 border border-sky-700 text-white rounded-xl px-4 py-2 text-[11px] font-black focus:outline-none focus:border-sky-400 w-40 placeholder:text-sky-500"
+              />
+            )}
+
+            <button
+              onClick={applyBulk}
+              disabled={!bulkAction || applyingBulk}
+              className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-40 ${
+                bulkAction === "delete"
+                  ? "bg-red-500 hover:bg-red-400 text-white"
+                  : "bg-white text-sky-950 hover:bg-sky-50"
+              }`}
+            >
+              {applyingBulk ? "Aplicando..." : "Aplicar"}
+            </button>
+          </div>
+          <button
+            onClick={() => setSelected(new Set())}
+            className="p-1.5 rounded-lg text-sky-400 hover:text-white hover:bg-sky-800 transition-all"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[16px]">
+            <thead>
+              <tr className="border-b border-slate-200 text-slate-600 uppercase font-black tracking-widest bg-slate-200">
+                <th className="px-4 py-4 w-10">
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={toggleAll}
+                    className="w-4 h-4 rounded border-slate-300 accent-sky-600 cursor-pointer"
+                  />
+                </th>
+                <th className="text-left px-4 py-4">Nombre</th>
+                <th className="text-left px-4 py-4">Código</th>
+                <th className="text-left px-4 py-4">Categoría</th>
+                <th className="text-right px-4 py-4">Precio Público</th>
+                <th className="text-right px-4 py-4">Precio Mayoreo</th>
+                <th className="text-right px-4 py-4">Stock</th>
+                <th className="text-center px-4 py-4">Estado</th>
+                <th className="px-4 py-4" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 [&_td]:align-middle">
+              {loading ? (
+                Array.from({ length: 8 }).map((_, i) => (
+                  <tr key={i}>
+                    <td colSpan={9} className="px-4 py-4">
+                      <div className="h-4 bg-slate-100 rounded animate-pulse" />
+                    </td>
+                  </tr>
+                ))
+              ) : products.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="text-center py-16 text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                    Sin resultados
+                  </td>
+                </tr>
+              ) : (
+                products.map((p: any) => {
+                  const docId = p.documentId || String(p.id);
+                  const isSelected = selected.has(docId);
+                  return (
+                    <tr
+                      key={p.id}
+                      className={`transition-colors ${isSelected ? "bg-sky-50" : "hover:bg-slate-50"}`}
+                    >
+                      <td className="px-4 py-3">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleOne(docId)}
+                          className="w-4 h-4 rounded border-slate-300 accent-sky-600 cursor-pointer"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-28 h-28 shrink-0">
+                            <ProductImage
+                              url={Array.isArray(p.images) && p.images[0] ? p.images[0] : undefined}
+                              alt={p.productName}
+                              className="w-full h-full"
+                            />
+                          </div>
+                          <span className="font-black text-slate-900 max-w-[160px] leading-snug">{p.productName}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-mono text-slate-600">{p.code}</td>
+                      <td className="px-4 py-3 text-slate-500">{p.category?.categoryName || "—"}</td>
+                      <td className="px-4 py-3 text-right">
+                        <EditableCell docId={docId} field="price" value={p.price} format={formatPrice} />
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <EditableCell docId={docId} field="wholesalePrice" value={p.wholesalePrice ?? null} format={formatPrice} />
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <EditableCell docId={docId} field="stock" value={p.stock} />
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => toggleActive(docId, p.active)}
+                          disabled={togglingActive === docId}
+                          title="Clic para cambiar estado"
+                          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-black uppercase transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-70 ${p.active ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-red-100 text-red-700 hover:bg-red-200"}`}
+                        >
+                          {togglingActive === docId
+                            ? <Loader2 size={11} className="animate-spin" />
+                            : null}
+                          {p.active ? "Activo" : "Inactivo"}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          <Link
+                            href={`/admin/products/${docId}`}
+                            className="p-2 rounded-lg text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition-all"
+                          >
+                            <Pencil size={14} />
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(docId, p.productName)}
+                            className="p-2 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Página {page} de {totalPages}</p>
+            <div className="flex gap-2">
+              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-200 disabled:opacity-40 hover:border-sky-300 transition-all">
+                ← Anterior
+              </button>
+              <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-200 disabled:opacity-40 hover:border-sky-300 transition-all">
+                Siguiente →
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
