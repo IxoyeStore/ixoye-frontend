@@ -12,11 +12,14 @@ export async function GET(
   if (!jwt) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
   const res = await fetch(
-    `${API}/api/orders/${id}?populate[user][fields][0]=username&populate[user][fields][1]=email&populate[address]=*`,
+    `${API}/api/orders/${id}?populate[user][fields][0]=id&populate[user][fields][1]=username&populate[user][fields][2]=email`,
     { headers: { Authorization: `Bearer ${jwt}` }, cache: "no-store" }
   );
   const data = await res.json();
-  return NextResponse.json(data);
+  if (!res.ok) {
+    console.error("[admin/orders/[id]] Strapi error:", res.status, data);
+  }
+  return NextResponse.json(data, { status: res.status });
 }
 
 export async function PUT(

@@ -6,14 +6,13 @@ export async function POST() {
     const cookieStore = await cookies();
 
     cookieStore.delete("jwt");
+    cookieStore.delete("role");
 
     const response = NextResponse.json({ success: true });
 
-    response.cookies.set("jwt", "", {
-      path: "/",
-      maxAge: 0,
-      expires: new Date(0),
-    });
+    const expiredCookie = { path: "/", maxAge: 0, expires: new Date(0) };
+    response.cookies.set("jwt", "", expiredCookie);
+    response.cookies.set("role", "", expiredCookie);
 
     return response;
   } catch (error) {

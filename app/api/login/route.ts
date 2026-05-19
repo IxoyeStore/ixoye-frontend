@@ -31,18 +31,29 @@ export async function POST(request: Request) {
       finalUser = data.user;
     }
 
+    // Strapi v5 login response does not populate role — fetch it separately.
+    const meRes = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me?populate=role`,
+      { headers: { Authorization: `Bearer ${finalJwt}` }, cache: "no-store" },
+    );
+    const meData = meRes.ok ? await meRes.json() : null;
+    const roleName: string = meData?.role?.name ?? "Authenticated";
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    };
+
     const response = NextResponse.json({
       user: finalUser,
       jwt: finalJwt,
     });
 
-    response.cookies.set("jwt", finalJwt, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    response.cookies.set("jwt", finalJwt, cookieOptions);
+    response.cookies.set("role", roleName, cookieOptions);
 
     return response;
   } catch (error) {

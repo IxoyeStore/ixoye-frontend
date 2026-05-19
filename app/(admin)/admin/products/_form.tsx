@@ -161,12 +161,12 @@ export default function ProductForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-8 space-y-8 max-w-4xl">
-      <div className="flex items-center gap-4">
+    <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full md:max-w-4xl">
+      <div className="flex flex-wrap items-center gap-2 md:gap-4">
         <Link href="/admin/products" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 flex items-center gap-1 transition-colors">
           <ChevronLeft size={14} /> Productos
         </Link>
-        <h1 className="text-3xl font-black tracking-tighter uppercase text-slate-900 italic">
+        <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase text-slate-900 italic">
           {documentId ? "Editar Producto" : "Nuevo Producto"}
         </h1>
       </div>
@@ -220,7 +220,7 @@ export default function ProductForm({
 
       <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-6">
         <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Precios y Stock</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <Field label="Precio (MXN)" required>
             <input type="number" min="0" step="0.01" value={form.price} onChange={set("price")} required className={inputCls} />
           </Field>

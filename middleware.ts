@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("jwt")?.value;
+  const role = request.cookies.get("role")?.value;
   const { pathname } = request.nextUrl;
 
   const isAuthPage =
@@ -10,7 +11,16 @@ export function middleware(request: NextRequest) {
   const isProfilePage = pathname.startsWith("/profile");
   const isAdminPage = pathname.startsWith("/admin");
 
-  if (!token && (isProfilePage || isAdminPage)) {
+  if (isAdminPage) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    if (role !== "Admin") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
+  if (!token && isProfilePage) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
