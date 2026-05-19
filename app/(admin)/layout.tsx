@@ -20,6 +20,8 @@ import {
 import { useOrderNotifications } from "@/hooks/use-order-notifications";
 import { AdminThemeToggle } from "@/components/admin-theme-toggle";
 
+const THEME_KEY = "admin-theme";
+
 const navItems = [
   { href: "/admin",               label: "Dashboard",     icon: LayoutDashboard, exact: true },
   { href: "/admin/orders",        label: "Pedidos",        icon: ShoppingCart,    exact: false },
@@ -35,6 +37,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setIsDark(localStorage.getItem(THEME_KEY) === "dark");
+  }, []);
+
+  const toggleTheme = () => {
+    setIsDark((prev) => {
+      const next = !prev;
+      localStorage.setItem(THEME_KEY, next ? "dark" : "light");
+      return next;
+    });
+  };
   const { newOrders, newCount, clearNotifications, removeOrder } = useOrderNotifications();
 
   useEffect(() => { setSidebarOpen(false); }, [pathname]);
@@ -68,7 +83,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden">
+    <div className={`flex h-screen bg-slate-50 overflow-hidden${isDark ? " dark" : ""}`}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/60 z-20 md:hidden" onClick={() => setSidebarOpen(false)} />
@@ -180,7 +195,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <div className="flex items-center gap-1">
-            <AdminThemeToggle />
+            <AdminThemeToggle isDark={isDark} onToggle={toggleTheme} />
             <button
               onClick={toggleNotif}
               className={`relative p-2 rounded-xl transition-all ${
@@ -255,7 +270,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
           <span className="font-black text-slate-900 dark:text-white text-sm uppercase tracking-widest italic">Ixoye Admin</span>
           <div className="ml-auto flex items-center gap-1">
-            <AdminThemeToggle />
+            <AdminThemeToggle isDark={isDark} onToggle={toggleTheme} />
             <button
               onClick={toggleNotif}
               className="relative p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"

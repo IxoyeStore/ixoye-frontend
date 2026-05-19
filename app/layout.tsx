@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/context/auth-context";
-import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { Toaster } from "sonner";
 import Script from "next/script";
@@ -29,7 +28,6 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <Script
           src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"
           strategy="beforeInteractive"
@@ -81,7 +79,6 @@ export default function RootLayout({
             loading: <div />,
           }}
         />
-        </ThemeProvider>
       </body>
     </html>
   );
