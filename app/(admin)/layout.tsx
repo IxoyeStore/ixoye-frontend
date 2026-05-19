@@ -83,7 +83,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className={`flex h-screen bg-slate-50 overflow-hidden${isDark ? " dark" : ""}`}>
+    <div className={isDark ? "dark" : ""}>
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/60 z-20 md:hidden" onClick={() => setSidebarOpen(false)} />
@@ -287,6 +288,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+    </div>
     </div>
   );
 }
