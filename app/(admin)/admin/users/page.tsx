@@ -64,53 +64,53 @@ export default function AdminUsersPage() {
   const totalPages = Math.ceil(total / 20);
 
   return (
-    <div className="p-8 space-y-6 w-[85%] mx-auto">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6 w-full md:w-[85%] mx-auto">
       <div>
-        <h1 className="text-3xl font-black tracking-tighter uppercase text-slate-900 italic">Usuarios</h1>
-        <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest">{total} usuarios registrados</p>
+        <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase text-slate-900 dark:text-white italic">Usuarios</h1>
+        <p className="text-slate-400 dark:text-slate-500 text-[11px] font-bold uppercase tracking-widest">{total} usuarios registrados</p>
       </div>
 
-      <form onSubmit={handleSearch} className="flex gap-2">
-        <div className="relative">
+      <form onSubmit={handleSearch} className="flex flex-wrap gap-2">
+        <div className="relative flex-1 sm:flex-none">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Usuario o correo..."
-            className="pl-8 pr-4 py-2 rounded-xl border border-slate-200 text-[11px] font-bold focus:outline-none focus:border-sky-400 w-64 bg-white"
+            className="pl-8 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] font-bold focus:outline-none focus:border-sky-400 w-full sm:w-64 bg-white dark:bg-slate-800 dark:text-white dark:placeholder-slate-500"
           />
         </div>
-        <button type="submit" className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-all">
+        <button type="submit" className="px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 dark:hover:bg-slate-600 transition-all">
           Buscar
         </button>
       </form>
 
-      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-600 uppercase font-black tracking-widest bg-slate-200">
-                <th className="text-left px-6 py-5">Usuario</th>
-                <th className="text-left px-6 py-5">Correo</th>
-                <th className="text-left px-6 py-5">Rol</th>
-                <th className="text-left px-6 py-5">Registro</th>
-                <th className="text-center px-6 py-5">Estado</th>
-                <th className="px-6 py-5" />
+              <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 uppercase font-black tracking-widest bg-slate-200 dark:bg-slate-700/50">
+                <th className="text-left px-4 md:px-6 py-5">Usuario</th>
+                <th className="text-left px-4 md:px-6 py-5 hidden sm:table-cell">Correo</th>
+                <th className="text-left px-4 md:px-6 py-5">Rol</th>
+                <th className="text-left px-4 md:px-6 py-5 hidden md:table-cell">Registro</th>
+                <th className="text-center px-4 md:px-6 py-5">Estado</th>
+                <th className="px-4 md:px-6 py-5" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {loading ? (
                 Array.from({ length: 8 }).map((_, i) => (
                   <tr key={i}>
                     <td colSpan={6} className="px-6 py-5">
-                      <div className="h-5 bg-slate-100 rounded animate-pulse" />
+                      <div className="h-5 bg-slate-100 dark:bg-slate-700 rounded animate-pulse" />
                     </td>
                   </tr>
                 ))
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-20 text-slate-400 font-black uppercase text-[11px] tracking-widest">
+                  <td colSpan={6} className="text-center py-20 text-slate-400 dark:text-slate-500 font-black uppercase text-[11px] tracking-widest">
                     Sin resultados
                   </td>
                 </tr>
@@ -121,41 +121,41 @@ export default function AdminUsersPage() {
                     ? new Date(u.createdAt).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })
                     : "—";
                   return (
-                    <tr key={u.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-5">
+                    <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                      <td className="px-4 md:px-6 py-5">
                         <div className="flex items-center gap-2">
-                          <span className="font-black text-slate-900 text-base">{u.username}</span>
+                          <span className="font-black text-slate-900 dark:text-white text-sm md:text-base">{u.username}</span>
                           {isMe && (
-                            <span className="px-2 py-0.5 bg-sky-100 text-sky-700 rounded-full text-[9px] font-black uppercase tracking-widest">Tú</span>
+                            <span className="px-2 py-0.5 bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-400 rounded-full text-[9px] font-black uppercase tracking-widest">Tú</span>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-slate-500">{u.email}</td>
-                      <td className="px-6 py-5">
-                        <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase ${u.role?.name === "Admin" ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-600"}`}>
+                      <td className="px-4 md:px-6 py-5 text-slate-500 dark:text-slate-400 hidden sm:table-cell">{u.email}</td>
+                      <td className="px-4 md:px-6 py-5">
+                        <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase ${u.role?.name === "Admin" ? "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400" : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400"}`}>
                           {u.role?.name || "—"}
                         </span>
                       </td>
-                      <td className="px-6 py-5 text-slate-500">{date}</td>
-                      <td className="px-6 py-5 text-center">
-                        <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase ${u.blocked ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-700"}`}>
+                      <td className="px-4 md:px-6 py-5 text-slate-500 dark:text-slate-400 hidden md:table-cell">{date}</td>
+                      <td className="px-4 md:px-6 py-5 text-center">
+                        <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase ${u.blocked ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"}`}>
                           {u.blocked ? "Bloqueado" : "Activo"}
                         </span>
                       </td>
-                      <td className="px-6 py-5">
+                      <td className="px-4 md:px-6 py-5">
                         <div className="flex items-center gap-1">
                           {!isMe && (
                             <>
                               <button
                                 onClick={() => handleToggleBlock(u.id, u.blocked, u.username)}
                                 title={u.blocked ? "Desbloquear" : "Bloquear"}
-                                className={`p-2.5 rounded-lg transition-all ${u.blocked ? "text-slate-400 hover:bg-emerald-50 hover:text-emerald-600" : "text-slate-400 hover:bg-amber-50 hover:text-amber-600"}`}
+                                className={`p-2.5 rounded-lg transition-all ${u.blocked ? "text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600" : "text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600"}`}
                               >
                                 {u.blocked ? <ShieldCheck size={17} /> : <ShieldOff size={17} />}
                               </button>
                               <button
                                 onClick={() => handleDelete(u.id, u.username)}
-                                className="p-2.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all"
+                                className="p-2.5 rounded-lg text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-all"
                               >
                                 <Trash2 size={17} />
                               </button>
@@ -172,20 +172,20 @@ export default function AdminUsersPage() {
         </div>
 
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Página {page} de {totalPages}</p>
+          <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Página {page} de {totalPages}</p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-200 disabled:opacity-40 hover:border-sky-300 transition-all"
+                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-200 dark:border-slate-700 dark:text-slate-300 disabled:opacity-40 hover:border-sky-300 dark:hover:border-sky-600 transition-all"
               >
                 ← Anterior
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-200 disabled:opacity-40 hover:border-sky-300 transition-all"
+                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-200 dark:border-slate-700 dark:text-slate-300 disabled:opacity-40 hover:border-sky-300 dark:hover:border-sky-600 transition-all"
               >
                 Siguiente →
               </button>

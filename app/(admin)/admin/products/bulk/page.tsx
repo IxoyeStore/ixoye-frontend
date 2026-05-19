@@ -45,7 +45,7 @@ type ImportResult = {
 
 const EMPTY_FILTERS: Filters = { search: "", category: "", active: "", priceMin: "", priceMax: "" };
 
-const inputCls = "w-full rounded-xl border border-slate-200 px-3 py-2.5 text-[12px] font-bold bg-white focus:outline-none focus:border-sky-400 transition-colors";
+const inputCls = "w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3 py-2.5 text-[12px] font-bold bg-white dark:bg-slate-700 dark:text-white focus:outline-none focus:border-sky-400 transition-colors dark:placeholder-slate-500";
 
 export default function BulkProductsPage() {
   const [filters, setFilters]     = useState<Filters>(EMPTY_FILTERS);
@@ -236,22 +236,22 @@ export default function BulkProductsPage() {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-3xl mx-auto">
+    <div className="p-4 sm:p-6 md:p-8 space-y-8 w-full md:max-w-3xl mx-auto">
       <div>
-        <h1 className="text-3xl font-black tracking-tighter uppercase text-slate-900 italic">Editor Masivo</h1>
-        <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest mt-1">
+        <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase text-slate-900 dark:text-white italic">Editor Masivo</h1>
+        <p className="text-slate-400 dark:text-slate-500 text-[11px] font-bold uppercase tracking-widest mt-1">
           Filtra, exporta a Excel, edita y vuelve a importar
         </p>
       </div>
 
       {/* ── Filters ─────────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-5">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Filtros de Exportación</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Filtros de Exportación</h2>
           {hasFilters && (
             <button
               onClick={clearFilters}
-              className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-700 transition-colors"
+              className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
             >
               <X size={12} /> Limpiar
             </button>
@@ -273,7 +273,7 @@ export default function BulkProductsPage() {
 
           {/* Category */}
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-1.5">
               Categoría
             </label>
             <select value={filters.category} onChange={set("category")} className={inputCls}>
@@ -286,7 +286,7 @@ export default function BulkProductsPage() {
 
           {/* Active */}
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-1.5">
               Estado
             </label>
             <div className="flex gap-2">
@@ -301,7 +301,7 @@ export default function BulkProductsPage() {
                   className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
                     filters.active === opt.value
                       ? "bg-sky-600 text-white border-sky-600"
-                      : "border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600"
+                      : "border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-sky-300 dark:hover:border-sky-600 hover:text-sky-600 dark:hover:text-sky-400"
                   }`}
                 >
                   {opt.label}
@@ -312,7 +312,7 @@ export default function BulkProductsPage() {
 
           {/* Price range */}
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-1.5">
               Precio mínimo (MXN)
             </label>
             <input
@@ -325,7 +325,7 @@ export default function BulkProductsPage() {
             />
           </div>
           <div>
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-1.5">
               Precio máximo (MXN)
             </label>
             <input
@@ -340,16 +340,16 @@ export default function BulkProductsPage() {
         </div>
 
         {/* Count badge */}
-        <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+        <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700">
           <div className="flex items-center gap-2">
             {counting ? (
               <Loader2 size={13} className="animate-spin text-slate-400" />
             ) : (
-              <span className={`text-2xl font-black ${count === 0 ? "text-red-500" : "text-slate-900"}`}>
+              <span className={`text-2xl font-black ${count === 0 ? "text-red-500" : "text-slate-900 dark:text-white"}`}>
                 {count ?? "—"}
               </span>
             )}
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               productos encontrados
             </span>
           </div>
@@ -357,7 +357,7 @@ export default function BulkProductsPage() {
           <button
             onClick={handleExport}
             disabled={exporting || counting || count === 0}
-            className="flex items-center gap-2 px-5 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 disabled:opacity-40 transition-all shadow-lg shadow-emerald-100"
+            className="flex items-center gap-2 px-5 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 disabled:opacity-40 transition-all shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20"
           >
             {exporting
               ? <Loader2 size={13} className="animate-spin" />
@@ -368,23 +368,23 @@ export default function BulkProductsPage() {
       </div>
 
       {/* ── Warning ─────────────────────────────────────────────────────────── */}
-      <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-start gap-3">
+      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 rounded-2xl p-4 flex items-start gap-3">
         <AlertCircle size={15} className="text-amber-500 mt-0.5 shrink-0" />
-        <p className="text-[11px] text-amber-700 font-bold">
+        <p className="text-[11px] text-amber-700 dark:text-amber-400 font-bold">
           No modifiques ni elimines la columna <strong>ID (no editar)</strong> del Excel — se usa para
           identificar cada producto al importar. El resto de columnas son editables.
         </p>
       </div>
 
       {/* ── Import ──────────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-4">
         <div className="flex items-start gap-4">
-          <div className="w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center shrink-0">
-            <Upload size={18} className="text-sky-600" />
+          <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center shrink-0">
+            <Upload size={18} className="text-sky-600 dark:text-sky-400" />
           </div>
           <div>
-            <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-900">Importar cambios</h2>
-            <p className="text-[11px] text-slate-400 font-bold mt-0.5">
+            <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Importar cambios</h2>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold mt-0.5">
               Sube el Excel modificado para actualizar los productos en masa
             </p>
           </div>
@@ -393,8 +393,8 @@ export default function BulkProductsPage() {
         <label
           className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer w-fit ${
             importing
-              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-              : "bg-sky-600 text-white hover:bg-sky-700 shadow-lg shadow-sky-100"
+              ? "bg-slate-100 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
+              : "bg-sky-600 text-white hover:bg-sky-700 shadow-lg shadow-sky-100 dark:shadow-sky-900/20"
           }`}
         >
           {importing ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
@@ -404,14 +404,14 @@ export default function BulkProductsPage() {
 
         {importing && (
           <div className="space-y-2">
-            <div className="w-full bg-slate-100 rounded-full h-2.5">
+            <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5">
               <div
                 className="bg-sky-500 h-2.5 rounded-full transition-all duration-200"
                 style={{ width: `${progress}%` }}
               />
             </div>
             {progressLabel && (
-              <p className="text-[10px] font-bold text-slate-500 truncate">{progressLabel}</p>
+              <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">{progressLabel}</p>
             )}
           </div>
         )}
@@ -419,30 +419,30 @@ export default function BulkProductsPage() {
 
       {/* ── Results ─────────────────────────────────────────────────────────── */}
       {result && (
-        <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-5">
-          <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-900">Resultado de importación</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-5">
+          <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Resultado de importación</h2>
 
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-slate-50 rounded-xl p-4 text-center">
-              <p className="text-3xl font-black text-slate-900">{result.total}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">Total</p>
+            <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-4 text-center">
+              <p className="text-3xl font-black text-slate-900 dark:text-white">{result.total}</p>
+              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">Total</p>
             </div>
-            <div className="bg-emerald-50 rounded-xl p-4 text-center">
-              <p className="text-3xl font-black text-emerald-700">{result.success}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-emerald-500 mt-1">Exitosos</p>
+            <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded-xl p-4 text-center">
+              <p className="text-3xl font-black text-emerald-700 dark:text-emerald-400">{result.success}</p>
+              <p className="text-[9px] font-black uppercase tracking-widest text-emerald-500 dark:text-emerald-500 mt-1">Exitosos</p>
             </div>
-            <div className={`rounded-xl p-4 text-center ${result.failed > 0 ? "bg-red-50" : "bg-slate-50"}`}>
-              <p className={`text-3xl font-black ${result.failed > 0 ? "text-red-700" : "text-slate-300"}`}>
+            <div className={`rounded-xl p-4 text-center ${result.failed > 0 ? "bg-red-50 dark:bg-red-900/30" : "bg-slate-50 dark:bg-slate-700"}`}>
+              <p className={`text-3xl font-black ${result.failed > 0 ? "text-red-700 dark:text-red-400" : "text-slate-300 dark:text-slate-600"}`}>
                 {result.failed}
               </p>
-              <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${result.failed > 0 ? "text-red-400" : "text-slate-300"}`}>
+              <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${result.failed > 0 ? "text-red-400" : "text-slate-300 dark:text-slate-600"}`}>
                 Con Error
               </p>
             </div>
           </div>
 
           {result.failed === 0 ? (
-            <div className="flex items-center gap-2 text-emerald-600 text-[11px] font-black bg-emerald-50 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-[11px] font-black bg-emerald-50 dark:bg-emerald-900/30 rounded-xl px-4 py-3">
               <CheckCircle size={16} />
               Todos los productos fueron actualizados correctamente
             </div>
@@ -451,10 +451,10 @@ export default function BulkProductsPage() {
               <p className="text-[10px] font-black uppercase tracking-widest text-red-500">Errores:</p>
               <div className="max-h-56 overflow-y-auto space-y-1.5 custom-scrollbar pr-1">
                 {result.errors.map((e, i) => (
-                  <div key={i} className="flex items-start gap-2 bg-red-50 rounded-xl px-3 py-2.5">
+                  <div key={i} className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 rounded-xl px-3 py-2.5">
                     <XCircle size={13} className="text-red-400 mt-0.5 shrink-0" />
-                    <span className="text-[11px] font-black text-red-700 flex-1 truncate">{e.name}</span>
-                    <span className="text-[10px] text-red-400 font-bold shrink-0">{e.error}</span>
+                    <span className="text-[11px] font-black text-red-700 dark:text-red-400 flex-1 truncate">{e.name}</span>
+                    <span className="text-[10px] text-red-400 dark:text-red-500 font-bold shrink-0">{e.error}</span>
                   </div>
                 ))}
               </div>
