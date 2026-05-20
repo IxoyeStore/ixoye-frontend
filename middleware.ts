@@ -1,20 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifySignedSession } from "@/lib/session";
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get("jwt")?.value;
-  const role = request.cookies.get("role")?.value;
+export async function middleware(request: NextRequest) {
+  const token   = request.cookies.get("jwt")?.value;
+  const session = request.cookies.get("session")?.value;
   const { pathname } = request.nextUrl;
 
-  const isAuthPage =
-    pathname.startsWith("/login") || pathname.startsWith("/register");
+  const isAuthPage    = pathname.startsWith("/login") || pathname.startsWith("/register");
   const isProfilePage = pathname.startsWith("/profile");
-  const isAdminPage = pathname.startsWith("/admin");
+  const isAdminPage   = pathname.startsWith("/admin");
 
   if (isAdminPage) {
-    if (!token) {
+    if (!token || !session) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
+    const role = await verifySignedSession(session);
     if (role !== "Admin") {
       return NextResponse.redirect(new URL("/", request.url));
     }

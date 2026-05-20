@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createSignedSession } from "@/lib/session";
 
 export async function POST(request: Request) {
   try {
@@ -47,13 +48,15 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 7,
     };
 
+    const sessionToken = await createSignedSession(roleName);
+
     const response = NextResponse.json({
       user: finalUser,
       jwt: finalJwt,
     });
 
     response.cookies.set("jwt", finalJwt, cookieOptions);
-    response.cookies.set("role", roleName, cookieOptions);
+    response.cookies.set("session", sessionToken, cookieOptions);
 
     return response;
   } catch (error) {

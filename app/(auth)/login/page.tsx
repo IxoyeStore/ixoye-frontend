@@ -143,7 +143,8 @@ function LoginFormContent() {
       setUser(result.user);
       await refreshUser();
 
-      router.push(callbackUrl || "/profile");
+      const isAdmin = result.user?.role?.name === "Admin";
+      router.push(callbackUrl || (isAdmin ? "/admin" : "/profile"));
       router.refresh();
     } catch (error) {
       console.error("Login error:", error);

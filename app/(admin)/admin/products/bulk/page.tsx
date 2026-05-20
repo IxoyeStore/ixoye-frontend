@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Download, Upload, FileSpreadsheet, Loader2,
-  CheckCircle, XCircle, AlertCircle, Search, X,
+  CheckCircle, XCircle, AlertCircle, Search, X, FolderOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
@@ -48,16 +48,30 @@ const EMPTY_FILTERS: Filters = { search: "", category: "", active: "", priceMin:
 const inputCls = "w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3 py-2.5 text-[12px] font-bold bg-white dark:bg-slate-700 dark:text-white focus:outline-none focus:border-sky-400 transition-colors dark:placeholder-slate-500";
 
 export default function BulkProductsPage() {
-  const [filters, setFilters]     = useState<Filters>(EMPTY_FILTERS);
+  const [filters, setFilters]       = useState<Filters>(EMPTY_FILTERS);
   const [categories, setCategories] = useState<any[]>([]);
-  const [count, setCount]         = useState<number | null>(null);
-  const [counting, setCounting]   = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [importing, setImporting] = useState(false);
-  const [progress, setProgress]   = useState(0);
+  const [count, setCount]           = useState<number | null>(null);
+  const [counting, setCounting]     = useState(false);
+  const [exporting, setExporting]   = useState(false);
+
+  // Import modal state
+  const [showModal, setShowModal]   = useState(false);
+  const [importing, setImporting]   = useState(false);
+  const [progress, setProgress]     = useState(0);
   const [progressLabel, setProgressLabel] = useState("");
-  const [result, setResult]       = useState<ImportResult | null>(null);
-  const countDebounce             = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [result, setResult]         = useState<ImportResult | null>(null);
+  const [dragOver, setDragOver]     = useState(false);
+
+  const fileInputRef  = useRef<HTMLInputElement>(null);
+  const countDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Block ESC while importing
+  useEffect(() => {
+    if (!showModal) return;
+    const onKey = (e: KeyboardEvent) => { if (importing && e.key === "Escape") e.preventDefault(); };
+    window.addEventListener("keydown", onKey, { capture: true });
+    return () => window.removeEventListener("keydown", onKey, { capture: true });
+  }, [showModal, importing]);
 
   // Fetch categories for the dropdown
   useEffect(() => {
@@ -99,6 +113,19 @@ export default function BulkProductsPage() {
   const clearFilters = () => setFilters(EMPTY_FILTERS);
   const hasFilters = Object.values(filters).some(Boolean);
 
+  const openModal = () => {
+    setResult(null);
+    setProgress(0);
+    setProgressLabel("");
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    if (importing) return;
+    setShowModal(false);
+    setResult(null);
+  };
+
   // ── Export ─────────────────────────────────────────────────────────────────
   const handleExport = async () => {
     if (count === 0) { toast.error("No hay productos con los filtros seleccionados"); return; }
@@ -136,8 +163,7 @@ export default function BulkProductsPage() {
   };
 
   // ── Import ─────────────────────────────────────────────────────────────────
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const processFile = async (file: File) => {
     if (!file) return;
 
     setImporting(true);
@@ -146,9 +172,9 @@ export default function BulkProductsPage() {
     setResult(null);
 
     try {
-      const buffer = await file.arrayBuffer();
-      const wb     = XLSX.read(buffer, { type: "array" });
-      const ws     = wb.Sheets[wb.SheetNames[0]];
+      const buffer  = await file.arrayBuffer();
+      const wb      = XLSX.read(buffer, { type: "array" });
+      const ws      = wb.Sheets[wb.SheetNames[0]];
       const rawRows = XLSX.utils.sheet_to_json<any[]>(ws, { header: 1 });
 
       if (rawRows.length < 2) {
@@ -231,7 +257,23 @@ export default function BulkProductsPage() {
     } finally {
       setImporting(false);
       setProgressLabel("");
-      e.target.value = "";
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && (file.name.endsWith(".xlsx") || file.name.endsWith(".xls"))) {
+      processFile(file);
+    } else {
+      toast.error("Solo se aceptan archivos .xlsx o .xls");
     }
   };
 
@@ -376,7 +418,7 @@ export default function BulkProductsPage() {
         </p>
       </div>
 
-      {/* ── Import ──────────────────────────────────────────────────────────── */}
+      {/* ── Import trigger ──────────────────────────────────────────────────── */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-4">
         <div className="flex items-start gap-4">
           <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center shrink-0">
@@ -390,76 +432,170 @@ export default function BulkProductsPage() {
           </div>
         </div>
 
-        <label
-          className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer w-fit ${
-            importing
-              ? "bg-slate-100 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-              : "bg-sky-600 text-white hover:bg-sky-700 shadow-lg shadow-sky-100 dark:shadow-sky-900/20"
-          }`}
+        <button
+          onClick={openModal}
+          className="flex items-center gap-2 px-6 py-3 bg-sky-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-sky-700 shadow-lg shadow-sky-100 dark:shadow-sky-900/20 transition-all"
         >
-          {importing ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-          {importing ? `Importando... ${progress}%` : "Subir Excel"}
-          <input type="file" accept=".xlsx,.xls" disabled={importing} onChange={handleImport} className="hidden" />
-        </label>
-
-        {importing && (
-          <div className="space-y-2">
-            <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5">
-              <div
-                className="bg-sky-500 h-2.5 rounded-full transition-all duration-200"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            {progressLabel && (
-              <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">{progressLabel}</p>
-            )}
-          </div>
-        )}
+          <Upload size={14} />
+          Subir Excel
+        </button>
       </div>
 
-      {/* ── Results ─────────────────────────────────────────────────────────── */}
-      {result && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-5">
-          <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Resultado de importación</h2>
+      {/* ── Import Modal ────────────────────────────────────────────────────── */}
+      {showModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={importing ? undefined : closeModal}
+        >
+          <div
+            className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100 dark:border-slate-700">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center">
+                  <FileSpreadsheet size={16} className="text-sky-600 dark:text-sky-400" />
+                </div>
+                <h3 className="text-[13px] font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                  {importing ? "Importando..." : result ? "Resultado" : "Seleccionar archivo"}
+                </h3>
+              </div>
+              {!importing && (
+                <button
+                  onClick={closeModal}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+                >
+                  <X size={15} />
+                </button>
+              )}
+            </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-4 text-center">
-              <p className="text-3xl font-black text-slate-900 dark:text-white">{result.total}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">Total</p>
-            </div>
-            <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded-xl p-4 text-center">
-              <p className="text-3xl font-black text-emerald-700 dark:text-emerald-400">{result.success}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-emerald-500 dark:text-emerald-500 mt-1">Exitosos</p>
-            </div>
-            <div className={`rounded-xl p-4 text-center ${result.failed > 0 ? "bg-red-50 dark:bg-red-900/30" : "bg-slate-50 dark:bg-slate-700"}`}>
-              <p className={`text-3xl font-black ${result.failed > 0 ? "text-red-700 dark:text-red-400" : "text-slate-300 dark:text-slate-600"}`}>
-                {result.failed}
-              </p>
-              <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${result.failed > 0 ? "text-red-400" : "text-slate-300 dark:text-slate-600"}`}>
-                Con Error
-              </p>
+            <div className="p-6 space-y-5">
+
+              {/* ── Pick file state ── */}
+              {!importing && !result && (
+                <>
+                  <div
+                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={handleDrop}
+                    className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
+                      dragOver
+                        ? "border-sky-400 bg-sky-50 dark:bg-sky-900/20"
+                        : "border-slate-200 dark:border-slate-600 hover:border-sky-300 dark:hover:border-sky-600"
+                    }`}
+                  >
+                    <FileSpreadsheet size={32} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+                    <p className="text-[12px] font-black text-slate-500 dark:text-slate-400">
+                      Arrastra tu archivo aquí
+                    </p>
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-1 mb-4">
+                      .xlsx o .xls
+                    </p>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-sky-700 transition-all"
+                    >
+                      <FolderOpen size={13} />
+                      Buscar archivo
+                    </button>
+                  </div>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleFileInput}
+                    className="hidden"
+                  />
+                </>
+              )}
+
+              {/* ── Importing state (locked) ── */}
+              {importing && (
+                <div className="space-y-5">
+                  <div className="flex items-center justify-center py-2">
+                    <Loader2 size={36} className="animate-spin text-sky-500" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      <span>Progreso</span>
+                      <span>{progress}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5">
+                      <div
+                        className="bg-sky-500 h-2.5 rounded-full transition-all duration-200"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    {progressLabel && (
+                      <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate text-center pt-1">
+                        {progressLabel}
+                      </p>
+                    )}
+                  </div>
+
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 text-center">
+                    No cierres esta ventana hasta que termine la importación
+                  </p>
+                </div>
+              )}
+
+              {/* ── Result state ── */}
+              {result && !importing && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 text-center">
+                      <p className="text-2xl font-black text-slate-900 dark:text-white">{result.total}</p>
+                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">Total</p>
+                    </div>
+                    <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded-xl p-3 text-center">
+                      <p className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{result.success}</p>
+                      <p className="text-[9px] font-black uppercase tracking-widest text-emerald-500 mt-1">Exitosos</p>
+                    </div>
+                    <div className={`rounded-xl p-3 text-center ${result.failed > 0 ? "bg-red-50 dark:bg-red-900/30" : "bg-slate-50 dark:bg-slate-700"}`}>
+                      <p className={`text-2xl font-black ${result.failed > 0 ? "text-red-700 dark:text-red-400" : "text-slate-300 dark:text-slate-600"}`}>
+                        {result.failed}
+                      </p>
+                      <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${result.failed > 0 ? "text-red-400" : "text-slate-300 dark:text-slate-600"}`}>
+                        Con Error
+                      </p>
+                    </div>
+                  </div>
+
+                  {result.failed === 0 ? (
+                    <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-[11px] font-black bg-emerald-50 dark:bg-emerald-900/30 rounded-xl px-4 py-3">
+                      <CheckCircle size={15} />
+                      Todos los productos fueron actualizados correctamente
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-red-500">Errores:</p>
+                      <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1">
+                        {result.errors.map((e, i) => (
+                          <div key={i} className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 rounded-xl px-3 py-2">
+                            <XCircle size={12} className="text-red-400 mt-0.5 shrink-0" />
+                            <span className="text-[10px] font-black text-red-700 dark:text-red-400 flex-1 truncate">{e.name}</span>
+                            <span className="text-[9px] text-red-400 dark:text-red-500 font-bold shrink-0">{e.error}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={closeModal}
+                    className="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 dark:hover:bg-slate-100 transition-all"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              )}
+
             </div>
           </div>
-
-          {result.failed === 0 ? (
-            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-[11px] font-black bg-emerald-50 dark:bg-emerald-900/30 rounded-xl px-4 py-3">
-              <CheckCircle size={16} />
-              Todos los productos fueron actualizados correctamente
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-widest text-red-500">Errores:</p>
-              <div className="max-h-56 overflow-y-auto space-y-1.5 custom-scrollbar pr-1">
-                {result.errors.map((e, i) => (
-                  <div key={i} className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 rounded-xl px-3 py-2.5">
-                    <XCircle size={13} className="text-red-400 mt-0.5 shrink-0" />
-                    <span className="text-[11px] font-black text-red-700 dark:text-red-400 flex-1 truncate">{e.name}</span>
-                    <span className="text-[10px] text-red-400 dark:text-red-500 font-bold shrink-0">{e.error}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>

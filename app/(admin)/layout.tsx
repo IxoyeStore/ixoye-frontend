@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   Bell,
+  Home,
 } from "lucide-react";
 import { useOrderNotifications } from "@/hooks/use-order-notifications";
 import { AdminThemeToggle } from "@/components/admin-theme-toggle";
@@ -63,7 +64,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-950 text-white text-[10px] uppercase tracking-widest font-black animate-pulse">
+      <div className="flex h-screen items-center justify-center bg-slate-950 text-white text-[20px] uppercase tracking-widest font-black animate-pulse">
         Verificando acceso...
       </div>
     );
@@ -85,12 +86,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className={isDark ? "dark" : ""}>
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden">
-      {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/60 z-20 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Notification popover click-outside overlay */}
       {notifOpen && (
         <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
       )}
@@ -191,7 +190,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Brand header + toggle + bell */}
         <div className="p-5 border-b border-slate-800 flex items-center justify-between gap-3">
           <div>
-            <p className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Panel Admin</p>
+            <p className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Admin Panel</p>
             <h1 className="text-white font-black text-xl uppercase tracking-tighter italic">Ixoye</h1>
           </div>
 
@@ -244,11 +243,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* User + logout */}
-        <div className="p-3 border-t border-slate-800">
-          <div className="px-4 py-2 mb-1">
+        <div className="p-3 border-t border-slate-800 space-y-0.5">
+          <div className="px-4 py-2">
             <p className="text-[9px] text-slate-500 uppercase tracking-widest">Conectado como</p>
             <p className="text-white text-[11px] font-black truncate">{user.username}</p>
           </div>
+          <Link
+            href="/"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-800 hover:text-white transition-all"
+          >
+            <Home size={15} />
+            Ir a la Tienda
+          </Link>
           <button
             onClick={logout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest text-red-400 hover:bg-red-950 hover:text-red-300 transition-all"
@@ -271,6 +277,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
           <span className="font-black text-slate-900 dark:text-white text-sm uppercase tracking-widest italic">Ixoye Admin</span>
           <div className="ml-auto flex items-center gap-1">
+            <Link
+              href="/"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              title="Ir a la Tienda"
+            >
+              <Home size={20} />
+            </Link>
             <AdminThemeToggle isDark={isDark} onToggle={toggleTheme} />
             <button
               onClick={toggleNotif}

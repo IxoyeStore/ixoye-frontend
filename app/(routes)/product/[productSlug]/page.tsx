@@ -1,128 +1,183 @@
-/* eslint-disable @next/next/no-img-element */
-"use client";
+import { Metadata } from "next";
+import Link from "next/link";
+import { ChevronRight, Hash } from "lucide-react";
+import { ProductType } from "@/types/product";
+import ProductGallery from "./components/product-gallery";
+import InfoProduct from "./components/info-product";
+import ProductDescription from "./components/product-description";
 
-import { useState } from "react";
-import { useGetProductBySlug } from "@/api/getProductBySlug";
-import { useParams } from "next/navigation";
-import SkeletonProduct from "./components/skeleton-product";
-import InfoProduct from "@/app/(routes)/product/[productSlug]/components/info-product";
-import { ProductImage } from "@/components/product-image";
-import { ChevronUp, ChevronDown } from "lucide-react";
+const API = process.env.NEXT_PUBLIC_API_URL;
 
-const THUMBS_VISIBLE = 5;
+async function fetchProduct(slug: string): Promise<ProductType | null> {
+  try {
+    const res = await fetch(
+      `${API}/api/products?filters[slug][$eq]=${slug}&populate[category][fields][0]=categoryName&populate[category][fields][1]=slug`,
+      { next: { revalidate: 60 } },
+    );
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data?.[0] ?? null;
+  } catch {
+    return null;
+  }
+}
 
-export default function Page() {
-  const params = useParams();
-  const productSlug = Array.isArray(params.productSlug)
-    ? params.productSlug[0]
-    : params.productSlug;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ productSlug: string }>;
+}): Promise<Metadata> {
+  const { productSlug } = await params;
+  const product = await fetchProduct(productSlug);
+  if (!product) return { title: "Producto no encontrado | Ixoye" };
 
-  const { product, loading, error } = useGetProductBySlug(productSlug);
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const [thumbOffset, setThumbOffset] = useState(0);
+  const desc = product.description
+    ? product.description.slice(0, 155)
+    : `${product.productName} — Código: ${product.code}. Marca: ${product.brand || "Estándar"}.`;
 
-  if (loading) return <SkeletonProduct />;
-  if (error || !product) return <p className="text-center py-20">No se encontró el producto</p>;
+  return {
+    title: `${product.productName} | Ixoye`,
+    description: desc,
+    openGraph: {
+      title: product.productName,
+      description: desc,
+      images: product.images?.[0] ? [{ url: product.images[0] }] : [],
+      type: "website",
+    },
+  };
+}
 
-  const images: string[] = Array.isArray(product.images) && product.images.length > 0
-    ? product.images
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ productSlug: string }>;
+}) {
+  const { productSlug } = await params;
+  const product = await fetchProduct(productSlug);
+
+  if (!product) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-center px-4">
+        <p className="text-2xl font-black text-slate-300 uppercase tracking-widest">
+          Producto no encontrado
+        </p>
+        <Link href="/" className="mt-6 text-sm font-bold text-sky-600 hover:underline">
+          Volver a la tienda
+        </Link>
+      </div>
+    );
+  }
+
+  const images: string[] =
+    Array.isArray(product.images) && product.images.length > 0 ? product.images : [];
+
+  const seriesList = product.series
+    ? product.series.split(",").map((s) => s.trim())
     : [];
 
-  const safeIdx = Math.min(selectedIdx, Math.max(0, images.length - 1));
-  const canScrollUp = thumbOffset > 0;
-  const canScrollDown = thumbOffset + THUMBS_VISIBLE < images.length;
-
   return (
-    <div className="max-w-6xl py-4 mx-auto sm:py-20 sm:px-16">
+    <div className="max-w-6xl py-6 mx-auto sm:py-12 sm:px-16 space-y-8">
 
-      {/* ── Desktop: thumbnails | main image | info ── */}
-      <div className="hidden sm:grid gap-6 items-start"
-        style={{ gridTemplateColumns: images.length > 1 ? "72px 1fr 1fr" : "1fr 1fr" }}>
-
-        {/* Thumbnail strip (only when multiple images) */}
-        {images.length > 1 && (
-          <div className="flex flex-col items-center gap-2">
-            {images.length > THUMBS_VISIBLE && (
-              <button
-                onClick={() => setThumbOffset((o) => Math.max(0, o - 1))}
-                disabled={!canScrollUp}
-                className="w-full flex justify-center py-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 transition-colors"
-              >
-                <ChevronUp size={16} />
-              </button>
-            )}
-
-            {images.slice(thumbOffset, thumbOffset + THUMBS_VISIBLE).map((url, i) => {
-              const realIdx = thumbOffset + i;
-              const isActive = realIdx === safeIdx;
-              return (
-                <button
-                  key={realIdx}
-                  onClick={() => setSelectedIdx(realIdx)}
-                  className={`w-[68px] h-[68px] rounded-xl overflow-hidden border-2 transition-all bg-white shrink-0 ${
-                    isActive
-                      ? "border-sky-500 shadow-md shadow-sky-100"
-                      : "border-slate-100 opacity-55 hover:opacity-100 hover:border-slate-300"
-                  }`}
-                >
-                  <img src={url} alt={`Miniatura ${realIdx + 1}`} className="w-full h-full object-contain" />
-                </button>
-              );
-            })}
-
-            {images.length > THUMBS_VISIBLE && (
-              <button
-                onClick={() => setThumbOffset((o) => Math.min(images.length - THUMBS_VISIBLE, o + 1))}
-                disabled={!canScrollDown}
-                className="w-full flex justify-center py-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 transition-colors"
-              >
-                <ChevronDown size={16} />
-              </button>
-            )}
-          </div>
+      {/* ── Breadcrumb (desktop) ─────────────────────────────────────────── */}
+      <nav className="hidden sm:flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-wider">
+        <Link href="/" className="hover:text-slate-700 transition-colors">Inicio</Link>
+        <ChevronRight size={15} className="text-slate-300 shrink-0" />
+        <Link href="/category" className="hover:text-slate-700 transition-colors">Tienda</Link>
+        <ChevronRight size={15} className="text-slate-300 shrink-0" />
+        {product.category && (
+          <>
+            <Link href={`/category/${product.category.slug}`} className="hover:text-slate-700 transition-colors">
+              {product.category.categoryName}
+            </Link>
+            <ChevronRight size={15} className="text-slate-300 shrink-0" />
+          </>
         )}
+        <span className="text-slate-600 truncate max-w-[280px]">{product.productName}</span>
+      </nav>
 
-        {/* Main image */}
-        <div className="aspect-square w-full rounded-2xl overflow-hidden border border-slate-100 bg-white">
-          {images.length > 0
-            ? <img src={images[safeIdx]} alt={product.productName} className="w-full h-full object-contain" />
-            : <ProductImage className="w-full h-full" />}
+      {/* ── Mobile back link ─────────────────────────────────────────────── */}
+      <div className="sm:hidden flex items-center gap-1 px-3">
+        <Link
+          href={product.category ? `/category/${product.category.slug}` : "/category"}
+          className="flex items-center gap-1 text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-700 transition-colors"
+        >
+          <ChevronRight size={12} className="rotate-180" />
+          {product.category ? product.category.categoryName : "Tienda"}
+        </Link>
+      </div>
+
+      {/* ── Top grid: image | title + price + buttons ───────────────────── */}
+      <div className="grid sm:grid-cols-2 gap-0 sm:gap-10 items-start overflow-visible">
+        <div className="px-3 sm:px-0">
+          <ProductGallery images={images} productName={product.productName} />
         </div>
-
-        {/* Product info */}
-        <div className="px-4">
+        {/* pb-36 on mobile so sticky CTA bar doesn't cover content */}
+        <div className="pb-36 sm:pb-0">
           <InfoProduct product={product} />
         </div>
       </div>
 
-      {/* ── Mobile: main image → thumbnails strip → info ── */}
-      <div className="flex flex-col gap-4 sm:hidden px-3">
-        <div className="aspect-square w-full rounded-2xl overflow-hidden border border-slate-100 bg-white">
-          {images.length > 0
-            ? <img src={images[safeIdx]} alt={product.productName} className="w-full h-full object-contain" />
-            : <ProductImage className="w-full h-full" />}
+      {/* ── Bottom grid: description | tech info ─────────────────────────── */}
+      <div className="grid sm:grid-cols-2 gap-6 sm:gap-10 items-start px-3 sm:px-0 pb-10 sm:pb-0">
+
+        <ProductDescription text={product.description || "Sin descripción adicional disponible."} />
+
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+          <div className="bg-slate-50 px-5 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Hash size={16} className="text-[#0055a4]" strokeWidth={3} />
+              <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                Código de Parte
+              </span>
+            </div>
+            <span className="text-lg font-mono font-black text-[#001e36] tracking-tighter">
+              {product.code}
+            </span>
+          </div>
+
+          <div className="p-5 flex flex-col gap-4">
+            <div className="flex justify-between items-baseline border-b border-slate-50 pb-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Marca</span>
+              <p className="text-sm font-black text-slate-700 uppercase">{product.brand || "Estandarizado"}</p>
+            </div>
+
+            <div className="flex justify-between items-baseline border-b border-slate-50 pb-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipo</span>
+              <p className="text-sm font-black text-slate-700 uppercase">{product.productType || "—"}</p>
+            </div>
+
+            <div className="flex justify-between items-baseline border-b border-slate-50 pb-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Línea</span>
+              <p className="text-sm font-black text-slate-700 uppercase text-right">
+                {product.department}
+                {product.subDepartment && (
+                  <span className="text-slate-400 font-medium"> / {product.subDepartment}</span>
+                )}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Series Compatibles</span>
+              <div className="flex flex-wrap gap-2">
+                {seriesList.length > 0 ? (
+                  seriesList.map((serie, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex whitespace-nowrap bg-slate-100 text-slate-700 text-[10px] font-black uppercase px-2 py-1 rounded-md border border-slate-200 italic shadow-sm"
+                    >
+                      {serie}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-sm font-black text-slate-300 uppercase">N/A</p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {images.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            {images.map((url, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedIdx(i)}
-                className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all bg-white ${
-                  i === safeIdx
-                    ? "border-sky-500 shadow-md shadow-sky-100"
-                    : "border-slate-100 opacity-55 hover:opacity-100"
-                }`}
-              >
-                <img src={url} alt={`Miniatura ${i + 1}`} className="w-full h-full object-contain" />
-              </button>
-            ))}
-          </div>
-        )}
-
-        <InfoProduct product={product} />
       </div>
+
     </div>
   );
 }
