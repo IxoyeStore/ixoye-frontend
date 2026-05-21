@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, MessageSquareOff } from "lucide-react";
 import Image from "next/image";
 
 interface Shipment {
@@ -23,20 +23,25 @@ interface Shipment {
 const ShipmentSection = () => {
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetch(
       `https://ixoye-backend-production.up.railway.app/api/shipments?populate=*`,
     )
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then((response) => {
-        if (response.data) {
+        if (Array.isArray(response.data)) {
           setShipments(response.data);
         }
         setLoading(false);
       })
       .catch((err) => {
         console.error("Error al cargar envíos:", err);
+        setError(true);
         setLoading(false);
       });
   }, []);
@@ -47,7 +52,27 @@ const ShipmentSection = () => {
         Cargando Evidencias...
       </div>
     );
-  if (shipments.length === 0) return null;
+
+  if (error || shipments.length === 0) {
+    if (error) {
+      return (
+        <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#003366] tracking-tight px-2">
+              Nuestros Clientes respaldan nuestro trabajo
+            </h2>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 rounded-2xl bg-sky-50/40">
+            <MessageSquareOff className="w-10 h-10 text-sky-200" strokeWidth={1.5} />
+            <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 text-center px-4">
+              No se pudieron cargar las reseñas
+            </p>
+          </div>
+        </section>
+      );
+    }
+    return null;
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16 bg-white">

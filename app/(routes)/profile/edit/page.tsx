@@ -10,9 +10,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronLeft, Building2, User, Loader2, Info } from "lucide-react";
 import { ubicaciones } from "@/constants/cities-and-states";
 import Link from "next/link";
+import cpMexico from "@/lib/cp-mexico.json";
 
 const MEXICO_STATES = Object.keys(ubicaciones) as (keyof typeof ubicaciones)[];
-const COPOMEX_TOKEN = process.env.NEXT_PUBLIC_COPOMEX_TOKEN;
 
 export default function EditProfilePage() {
   const { user, refreshUser } = useAuth();
@@ -22,7 +22,6 @@ export default function EditProfilePage() {
   const isNewAddress = searchParams.get("new") === "true";
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [loadingCP, setLoadingCP] = useState(false);
   const [cpError, setCpError] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [coloniasSugericdas, setColoniasSugeridas] = useState<string[]>([]);
@@ -68,77 +67,55 @@ export default function EditProfilePage() {
   }, [form, addressForm, originalData, isNewAddress]);
 
   useEffect(() => {
-    const fetchCP = async () => {
-      if (addressForm.postalCode.length !== 5) {
-        setColoniasSugeridas([]);
-        setCpError(false);
-        setShippingQuote(null);
-        return;
-      }
-
-      setLoadingCP(true);
+    if (addressForm.postalCode.length !== 5) {
+      setColoniasSugeridas([]);
       setCpError(false);
+      setShippingQuote(null);
+      return;
+    }
 
-      try {
-        const res = await fetch(
-          `https://api.copomex.com/query/info_cp/${addressForm.postalCode}?token=${COPOMEX_TOKEN}`,
-        );
+    const entry = (cpMexico as Record<string, { e: string; m: string; c: string[] }>)[addressForm.postalCode];
 
-        const data = await res.json();
+    if (!entry) {
+      setCpError(true);
+      setColoniasSugeridas([]);
+      setShippingQuote(null);
+      return;
+    }
 
-        if (res.ok && Array.isArray(data) && data.length > 0) {
-          const info = data[0].response;
-          const listaColonias = data.map(
-            (item: any) => item.response.asentamiento,
-          );
+    setCpError(false);
 
-          let nombreEstado = info.estado;
-          if (nombreEstado === "México") nombreEstado = "Estado de México";
-          if (nombreEstado === "Distrito Federal")
-            nombreEstado = "Ciudad de México";
+    let nombreEstado = entry.e;
+    if (nombreEstado === "México") nombreEstado = "Estado de México";
+    if (nombreEstado === "Distrito Federal") nombreEstado = "Ciudad de México";
 
-          let cost = 250;
-          let label = "Envío Estándar Nacional";
+    let cost = 0;
+    let label = "Entrega Local Gratis";
 
-          if (info.estado === "Nayarit") {
-            cost = 0;
-            label = "Entrega Local Gratis";
-          } else if (["Jalisco", "Sinaloa"].includes(info.estado)) {
-            cost = 180;
-            label = "Envío Regional Económico";
-          }
+    if (entry.e !== "Nayarit") {
+      cost = -1;
+      label = "Envío no disponible";
+    }
 
-          setShippingQuote({ cost, label });
-          setColoniasSugeridas(listaColonias);
+    setShippingQuote({ cost, label });
+    const listaColonias = entry.c || [];
+    setColoniasSugeridas(listaColonias);
 
-          if (listaColonias.length > 1) {
-            setShowColonias(true);
-          }
+    if (listaColonias.length > 1) {
+      setShowColonias(true);
+    }
 
-          setAddressForm((prev) => ({
-            ...prev,
-            state: nombreEstado,
-            city: info.municipio,
-            neighborhood:
-              listaColonias.length === 1
-                ? listaColonias[0]
-                : listaColonias.includes(prev.neighborhood)
-                  ? prev.neighborhood
-                  : "",
-          }));
-        } else {
-          throw new Error("CP no encontrado");
-        }
-      } catch (error) {
-        setCpError(true);
-        setColoniasSugeridas([]);
-        setShippingQuote(null);
-      } finally {
-        setLoadingCP(false);
-      }
-    };
-
-    fetchCP();
+    setAddressForm((prev) => ({
+      ...prev,
+      state: nombreEstado,
+      city: entry.m,
+      neighborhood:
+        listaColonias.length === 1
+          ? listaColonias[0]
+          : listaColonias.includes(prev.neighborhood)
+            ? prev.neighborhood
+            : "",
+    }));
   }, [addressForm.postalCode]);
 
   useEffect(() => {
@@ -289,7 +266,7 @@ export default function EditProfilePage() {
       return;
     }
 
-    if (!user || loadingCP) return;
+    if (!user) return;
     setSaving(true);
     setErrors({});
 
@@ -548,32 +525,22 @@ export default function EditProfilePage() {
                         cpError ? "border-red-500 focus:ring-red-500" : ""
                       } transition-colors`}
                     />
-                    {loadingCP && (
-                      <Loader2 className="absolute right-3 top-2.5 h-5 w-5 animate-spin text-gray-400" />
-                    )}
                   </div>
 
                   {/* Mensaje de estado de envío */}
-                  {shippingQuote && !loadingCP && (
-                    <div
-                      className={`flex items-center gap-1.5 mt-1 animate-in fade-in duration-300`}
-                    >
+                  {shippingQuote && (
+                    <div className="flex items-center gap-1.5 mt-1 animate-in fade-in duration-300">
                       <div
-                        className={`h-1.5 w-1.5 rounded-full ${shippingQuote.cost === 0 ? "bg-green-500" : "bg-blue-500"}`}
+                        className={`h-1.5 w-1.5 rounded-full ${shippingQuote.cost === 0 ? "bg-green-500" : "bg-amber-500"}`}
                       />
                       <p
                         className={`text-xs font-medium ${
-                          shippingQuote.cost === 0
-                            ? "text-green-600"
-                            : "text-blue-600"
+                          shippingQuote.cost === 0 ? "text-green-600" : "text-amber-600"
                         }`}
                       >
-                        {shippingQuote.label}:{" "}
-                        <span className="font-bold">
-                          {shippingQuote.cost === 0
-                            ? "¡Gratis!"
-                            : `$${shippingQuote.cost}`}
-                        </span>
+                        {shippingQuote.cost === 0
+                          ? "Entrega Local: ¡Gratis!"
+                          : "Envío no disponible — comunícate con nosotros"}
                       </p>
                     </div>
                   )}
@@ -594,9 +561,7 @@ export default function EditProfilePage() {
 
                   <div className="relative">
                     <Input
-                      placeholder={
-                        loadingCP ? "Buscando..." : "Selecciona tu colonia"
-                      }
+                      placeholder="Selecciona tu colonia"
                       value={addressForm.neighborhood}
                       readOnly={coloniasSugericdas.length > 0}
                       onClick={() => setShowColonias(!showColonias)}
@@ -762,12 +727,12 @@ export default function EditProfilePage() {
 
             <Button
               className={`w-full h-12 font-bold transition-all ${
-                !hasChanges || saving || loadingCP
+                !hasChanges || saving
                   ? "bg-gray-300 text-gray-500"
                   : "bg-[#0071b1] hover:bg-[#012849] text-white"
               }`}
               onClick={handleSave}
-              disabled={!hasChanges || saving || loadingCP}
+              disabled={!hasChanges || saving}
             >
               {saving ? (
                 <Loader2 className="animate-spin mr-2" />

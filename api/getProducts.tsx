@@ -11,11 +11,15 @@ export function useGetCategories() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await fetch(url);
-      const json = await res.json();
-
-      setResult(json.data ?? []);
-      setLoading(false);
+      try {
+        const res = await fetch(url);
+        const json = await res.json();
+        setResult(json.data ?? []);
+      } catch (err: any) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchCategories();

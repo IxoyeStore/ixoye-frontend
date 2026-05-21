@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { ShoppingBasket, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import router from "next/router";
+import cpMexico from "@/lib/cp-mexico.json";
 
 export default function Page() {
   const { items, removeAll } = useCart();
@@ -121,7 +122,7 @@ export default function Page() {
     fetchDefaultAddress();
   }, [user]);
 
-  const calculateShipping = async (cp: string) => {
+  const calculateShipping = (cp: string) => {
     if (cp.length !== 5) return;
 
     const cacheKey = "shipping_cache";
@@ -135,39 +136,27 @@ export default function Page() {
       }
     }
 
-    try {
-      const res = await fetch(
-        `https://api.copomex.com/query/info_cp/${cp}?token=${process.env.NEXT_PUBLIC_COPOMEX_TOKEN}`,
-      );
-      const data = await res.json();
-
-      if (res.ok && data[0]) {
-        const estado = data[0].response.estado;
-        let cost = 250;
-        let label = "Envío Estándar";
-
-        if (estado === "Nayarit") {
-          cost = 0;
-          label = "Entrega Local";
-        } else if (["Jalisco", "Sinaloa"].includes(estado)) {
-          cost = 180;
-          label = "Envío Regional";
-        }
-
-        const newQuote = { cost, label };
-        setShippingQuote(newQuote);
-
-        localStorage.setItem(
-          cacheKey,
-          JSON.stringify({
-            cp,
-            ...newQuote,
-          }),
-        );
-      }
-    } catch (e) {
+    const entry = (cpMexico as Record<string, { e: string; m: string }>)[cp];
+    if (!entry) {
       setShippingQuote({ cost: 250, label: "Envío Nacional" });
+      return;
     }
+
+    let cost = 0;
+    let label = "Entrega Local";
+
+    if (entry.e !== "Nayarit") {
+      cost = -1;
+      label = "No disponible";
+    }
+
+    const newQuote = { cost, label };
+    setShippingQuote(newQuote);
+
+    localStorage.setItem(
+      cacheKey,
+      JSON.stringify({ cp, ...newQuote }),
+    );
   };
 
   const finalTotal = totalPrice + (shippingQuote?.cost || 0);
@@ -254,14 +243,21 @@ export default function Page() {
                         Configura tu dirección en el perfil
                       </p>
                     )}
+                    {shippingQuote?.cost === -1 && (
+                      <p className="text-[9px] text-amber-600 font-black uppercase tracking-tight italic">
+                        Comunícate con nosotros
+                      </p>
+                    )}
                   </div>
                   <p
-                    className={`text-sm font-black ${shippingQuote?.cost === 0 ? "text-green-600" : "text-slate-600"}`}
+                    className={`text-sm font-black ${shippingQuote?.cost === 0 ? "text-green-600" : shippingQuote?.cost === -1 ? "text-amber-600" : "text-slate-600"}`}
                   >
                     {shippingQuote
                       ? shippingQuote.cost === 0
                         ? "¡GRATIS!"
-                        : formatPrice(shippingQuote.cost)
+                        : shippingQuote.cost === -1
+                          ? "No disponible"
+                          : formatPrice(shippingQuote.cost)
                       : "---"}
                   </p>
                 </div>

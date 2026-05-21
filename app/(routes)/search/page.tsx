@@ -24,6 +24,7 @@ function SearchContent() {
 
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -37,34 +38,38 @@ function SearchContent() {
         return;
       }
       setLoading(true);
+      setError(false);
       try {
         const cleanQuery = query.trim();
-        const keywords = cleanQuery
-          .split(/\s+/)
-          .filter((word) => word.length > 2);
+        // Split into keywords, keeping tokens >= 1 char so short codes like "AC" or "2H" match
+        const keywords = cleanQuery.split(/\s+/).filter((w) => w.length >= 1);
+
         const params = new URLSearchParams();
         let i = 0;
-        params.append(
-          `filters[$or][${i}][productName][$containsi]`,
-          cleanQuery,
-        );
-        i++;
+
+        // Full query against name, code, series and oemCode first
+        params.append(`filters[$or][${i}][productName][$containsi]`, cleanQuery); i++;
+        params.append(`filters[$or][${i}][code][$containsi]`, cleanQuery); i++;
+        params.append(`filters[$or][${i}][series][$containsi]`, cleanQuery); i++;
+        params.append(`filters[$or][${i}][oemCode][$containsi]`, cleanQuery); i++;
+
+        // Per-keyword against all searchable fields
         keywords.forEach((word) => {
-          params.append(`filters[$or][${i}][productName][$containsi]`, word);
-          i++;
-        });
-        keywords.forEach((word) => {
-          ["code", "brand", "productType"].forEach((field) => {
+          ["productName", "code", "brand", "productType", "series", "oemCode"].forEach((field) => {
             params.append(`filters[$or][${i}][${field}][$containsi]`, word);
             i++;
           });
         });
+
         params.append("populate", "category");
         params.append("pagination[pageSize]", "60");
 
         const response = await fetch(
           `https://ixoye-backend-production.up.railway.app/api/products?${params.toString()}`,
         );
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
         const json = await response.json();
 
         if (json.data) {
@@ -73,18 +78,26 @@ function SearchContent() {
             ...item,
             productName: item.productName || "PRODUCTO SIN ESPECIFICAR",
           }));
+
+          // Rank: exact OEM/code match > contains OEM/code > name match > rest
+          const q = cleanQuery.toLowerCase();
           const rankedProducts = normalizedData.sort((a: any, b: any) => {
-            const nameA = a.productName.toLowerCase();
-            const nameB = b.productName.toLowerCase();
-            const q = cleanQuery.toLowerCase();
-            const aExact = nameA.includes(q) ? 100 : 0;
-            const bExact = nameB.includes(q) ? 100 : 0;
-            return bExact - aExact;
+            const scoreOf = (p: any) => {
+              if (p.oemCode?.toLowerCase() === q) return 400;
+              if (p.code?.toLowerCase() === q) return 300;
+              if (p.oemCode?.toLowerCase().includes(q)) return 250;
+              if (p.code?.toLowerCase().includes(q)) return 200;
+              if (p.productName?.toLowerCase().includes(q)) return 100;
+              return 0;
+            };
+            return scoreOf(b) - scoreOf(a);
           });
+
           setProducts(rankedProducts);
         }
-      } catch (error) {
-        console.error("Search error:", error);
+      } catch (err) {
+        console.error("Search error:", err);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -107,21 +120,29 @@ function SearchContent() {
       {loading ? (
         <SearchSkeleton />
       ) : isQueryTooShort ? (
-        <div className="flex flex-col items-center justify-center py-24 border border-slate-100 rounded-xl bg-slate-50/30">
-          <Target size={32} className="text-slate-900 mb-6 stroke-[1.5]" />
-          <h2 className="text-xl font-bold text-slate-900 uppercase tracking-tight mb-2">
-            Criterio de búsqueda insuficiente
-          </h2>
-          <p className="text-slate-500 text-sm mb-10 max-w-sm text-center font-medium">
-            Ingrese al menos dos caracteres para realizar una consulta técnica.
+        <div className="flex flex-col items-center justify-center py-32 gap-3 text-center px-4">
+          <Target size={32} className="text-slate-200 stroke-[1.5]" />
+          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+            Ingresa al menos dos caracteres
           </p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-32 gap-4 text-center px-4">
+          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+            No se pudieron obtener resultados
+          </p>
+          <button
+            onClick={() => router.refresh()}
+            className="text-xs font-black uppercase tracking-widest text-[#0055a4] hover:text-[#003d7a] underline underline-offset-4 transition-colors"
+          >
+            Intentar de nuevo
+          </button>
         </div>
       ) : (
         <div className="flex flex-col md:flex-row gap-12">
           {products.length > 0 && (
             <aside className="w-full md:w-64 shrink-0">
               <div className="md:sticky md:top-32">
-                {/* Botón de control para móviles */}
                 <button
                   onClick={() => setShowMobileFilters(!showMobileFilters)}
                   className="flex md:hidden items-center justify-between w-full p-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 transition-all active:scale-[0.98]"
@@ -200,7 +221,6 @@ function SearchContent() {
           <main className="flex-1">
             <div className="flex flex-col gap-6 mb-10 border-b border-slate-100 pb-6">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                {/* Titulo y boton Limpiar */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">
@@ -221,7 +241,6 @@ function SearchContent() {
                   </h2>
                 </div>
 
-                {/* Contador y Ordenamiento */}
                 <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 pt-4 md:pt-0">
                   <div className="text-left md:text-right md:border-r md:border-slate-100 md:pr-8">
                     <span className="block text-xl md:text-2xl font-light text-slate-400 leading-none">
@@ -247,17 +266,14 @@ function SearchContent() {
                   <ProductCard key={product.id} product={product} />
                 ))
               ) : (
-                <div className="col-span-full text-center py-32 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-                  <Search
-                    size={40}
-                    className="mx-auto text-slate-200 mb-6 stroke-[1]"
-                  />
-                  <p className="text-slate-900 font-bold uppercase tracking-tight text-lg">
+                <div className="col-span-full flex flex-col items-center justify-center py-32 gap-4 text-center">
+                  <Search size={36} className="text-slate-200 stroke-[1]" />
+                  <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
                     No se encontraron coincidencias
                   </p>
                   <Button
                     onClick={() => router.push("/category")}
-                    className="mt-8 bg-sky-700 text-white px-8 py-6 font-bold rounded-xl uppercase text-xs tracking-widest"
+                    className="mt-2 bg-sky-700 text-white px-8 py-6 font-bold rounded-xl uppercase text-xs tracking-widest"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" /> Ver todo el catálogo
                   </Button>

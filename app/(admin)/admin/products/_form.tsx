@@ -17,6 +17,7 @@ type ProductFormData = {
   category: string;
   brand: string;
   series: string;
+  oemCode: string;
   price: string;
   wholesalePrice: string;
   stock: string;
@@ -28,7 +29,7 @@ type ProductFormData = {
 const EMPTY: ProductFormData = {
   productName: "", slug: "", description: "", code: "",
   department: "", subDepartment: "", productType: "", category: "",
-  brand: "", series: "",
+  brand: "", series: "", oemCode: "",
   price: "", wholesalePrice: "", stock: "",
   active: true, isFeatured: false, freeShipping: false,
 };
@@ -41,7 +42,7 @@ function slugify(str: string) {
 function Field({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
         {label}{required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       {children}
@@ -49,7 +50,7 @@ function Field({ label, children, required }: { label: string; children: React.R
   );
 }
 
-const inputCls = "w-full rounded-xl border border-slate-200 px-3 py-2.5 text-[12px] font-bold bg-white focus:outline-none focus:border-sky-400 transition-colors";
+const inputCls = "w-full rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2.5 text-[12px] font-bold bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-sky-400 dark:focus:border-sky-500 transition-colors";
 
 export default function ProductForm({
   documentId,
@@ -128,9 +129,10 @@ export default function ProductForm({
       productType: form.productType,
       brand: form.brand,
       series: form.series,
+      oemCode: form.oemCode || null,
       price: parseFloat(form.price) || 0,
       wholesalePrice: form.wholesalePrice ? parseFloat(form.wholesalePrice) : null,
-      stock: parseInt(form.stock) || 0,
+      stock: form.stock !== "" ? parseInt(form.stock) : 0,
       active: form.active,
       isFeatured: form.isFeatured,
       freeShipping: form.freeShipping,
@@ -161,18 +163,18 @@ export default function ProductForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full md:max-w-4xl">
+    <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full md:max-w-4xl mx-auto">
       <div className="flex flex-wrap items-center gap-2 md:gap-4">
-        <Link href="/admin/products" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 flex items-center gap-1 transition-colors">
+        <Link href="/admin/products" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors">
           <ChevronLeft size={14} /> Productos
         </Link>
-        <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase text-slate-900 italic">
+        <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase text-slate-900 dark:text-white italic">
           {documentId ? "Editar Producto" : "Nuevo Producto"}
         </h1>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-6">
-        <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Información General</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-6">
+        <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Información General</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <Field label="Nombre del Producto" required>
             <input type="text" value={form.productName} onChange={set("productName")} required className={inputCls} />
@@ -189,8 +191,8 @@ export default function ProductForm({
         </Field>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-6">
-        <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Clasificación</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-6">
+        <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Clasificación</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <Field label="Categoría">
             <select value={form.category} onChange={set("category")} className={inputCls}>
@@ -216,10 +218,13 @@ export default function ProductForm({
             <input type="text" value={form.series} onChange={set("series")} placeholder="Ej: 4D56, 4M40, 2KD" className={inputCls} />
           </Field>
         </div>
+        <Field label="Código OEM">
+          <input type="text" value={form.oemCode} onChange={set("oemCode")} placeholder="Ej: 16400-0L010" className={inputCls} />
+        </Field>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-6">
-        <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Precios y Stock</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-6">
+        <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Precios y Stock</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <Field label="Precio (MXN)" required>
             <input type="number" min="0" step="0.01" value={form.price} onChange={set("price")} required className={inputCls} />
@@ -233,8 +238,8 @@ export default function ProductForm({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4">
-        <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Opciones</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-4">
+        <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Opciones</h2>
         <div className="flex flex-wrap gap-6">
           {([
             { field: "active", label: "Activo (visible en tienda)" },
@@ -248,7 +253,7 @@ export default function ProductForm({
                 onChange={set(field)}
                 className="w-4 h-4 rounded border-slate-300 accent-sky-600"
               />
-              <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 group-hover:text-slate-900 transition-colors">
+              <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                 {label}
               </span>
             </label>
@@ -256,10 +261,10 @@ export default function ProductForm({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-5">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Imágenes del Producto</h2>
-          <label className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${uploading ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200"}`}>
+          <h2 className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Imágenes del Producto</h2>
+          <label className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${uploading ? "bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed" : "bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800"}`}>
             {uploading
               ? <Loader2 size={14} className="animate-spin" />
               : <Upload size={14} />}
@@ -276,14 +281,14 @@ export default function ProductForm({
         </div>
 
         {images.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed border-slate-200 rounded-xl text-slate-300 gap-3">
+          <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-slate-300 dark:text-slate-600 gap-3">
             <ImageIcon size={32} />
             <p className="text-[10px] font-black uppercase tracking-widest">Sin imágenes</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {images.map((url, i) => (
-              <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+              <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={url}
@@ -306,13 +311,13 @@ export default function ProductForm({
             ))}
           </div>
         )}
-        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+        <p className="text-[9px] text-slate-400 dark:text-slate-600 font-bold uppercase tracking-widest">
           Las imágenes se suben a Cloudinary vía Strapi. Hover sobre una imagen para eliminarla.
         </p>
       </div>
 
       <div className="flex justify-end gap-3">
-        <Link href="/admin/products" className="px-6 py-3 rounded-xl border border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:border-slate-400 transition-all">
+        <Link href="/admin/products" className="px-6 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 transition-all">
           Cancelar
         </Link>
         <button

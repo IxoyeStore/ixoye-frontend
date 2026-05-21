@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useGetFeaturedProducts } from "@/api/useGetFeturedProducts";
 import { ResponeType } from "@/types/response";
 import {
@@ -10,12 +11,14 @@ import {
   CarouselNext,
   CarouselPrevious,
   CarouselItem,
+  type CarouselApi,
 } from "./ui/carousel";
 import FeaturedSkeleton from "./featuredSkeleton";
 import { ProductType } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
-import { ShoppingCart, Heart, Tag } from "lucide-react";
+import { ShoppingCart, Heart, PackageX } from "lucide-react";
 import IconButton from "./ui/icon-button";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
@@ -23,12 +26,43 @@ import { ProductImage } from "@/components/product-image";
 import { useAuth } from "@/context/auth-context";
 import { formatPrice } from "@/lib/formatPrice";
 
+const AUTOPLAY_MS = 5000;
+
 const FeaturedProducts = () => {
-  const { result, loading }: ResponeType = useGetFeaturedProducts();
+  const { result, loading, error }: ResponeType = useGetFeaturedProducts();
   const router = useRouter();
   const { addItem } = useCart();
   const { lovedItems, addLovedItem, removeLovedItem } = useLovedProducts();
   const { user } = useAuth();
+  const [api, setApi] = useState<CarouselApi>();
+  const paused = useRef(false);
+
+  useEffect(() => {
+    if (!api) return;
+    const id = setInterval(() => {
+      if (paused.current) return;
+      api.scrollNext();
+    }, AUTOPLAY_MS);
+    return () => clearInterval(id);
+  }, [api]);
+
+  const hasFailed = !loading && (error || !result || (Array.isArray(result) && result.length === 0));
+
+  if (hasFailed) {
+    return (
+      <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
+        <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
+          Productos destacados
+        </h3>
+        <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 rounded-2xl bg-sky-50/40">
+          <PackageX className="w-10 h-10 text-sky-300" strokeWidth={1.5} />
+          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 text-center px-4">
+            No se pudieron cargar los productos
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
@@ -36,7 +70,13 @@ const FeaturedProducts = () => {
         Productos destacados
       </h3>
 
-      <Carousel className="w-full">
+      <Carousel
+        className="w-full"
+        setApi={setApi}
+        opts={{ loop: true, slidesToScroll: "auto" }}
+        onMouseEnter={() => { paused.current = true; }}
+        onMouseLeave={() => { paused.current = false; }}
+      >
         <CarouselContent className="-ml-2 md:-ml-4">
           {loading && <FeaturedSkeleton items={4} />}
 

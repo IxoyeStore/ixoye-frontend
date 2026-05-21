@@ -127,7 +127,7 @@ export default async function ProductPage({
             <div className="flex items-center gap-2">
               <Hash size={16} className="text-[#0055a4]" strokeWidth={3} />
               <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
-                Código de Parte
+                Numero de Parte
               </span>
             </div>
             <span className="text-lg font-mono font-black text-[#001e36] tracking-tighter">
@@ -140,6 +140,13 @@ export default async function ProductPage({
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Marca</span>
               <p className="text-sm font-black text-slate-700 uppercase">{product.brand || "Estandarizado"}</p>
             </div>
+
+            {product.oemCode && (
+              <div className="flex justify-between items-baseline border-b border-slate-50 pb-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">OEM</span>
+                <p className="text-sm font-mono font-black text-slate-700 uppercase tracking-tight">{product.oemCode}</p>
+              </div>
+            )}
 
             <div className="flex justify-between items-baseline border-b border-slate-50 pb-2">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipo</span>

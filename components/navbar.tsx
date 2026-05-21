@@ -26,19 +26,21 @@ import SupportMenu from "./support-menu";
 import TechnicalFilterModal from "./technical-filter-modal";
 
 const STATIC_BRANDS = [
-  "EMMARK",
-  "DAI",
-  "FERSA",
-  "EDTPART",
-  "KANADIAN",
-  "BALDWIN",
-  "PFI",
-  "RYCO",
-  "KOMAN",
-  "GABRIEL",
-  "BEZARES",
-  "SAKURA",
-  "WEGA",
+  { name: "EMMARK",    logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/EMMARK.png" },
+  { name: "WEGA",      logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323342/WEGA.png" },
+  { name: "SAKURA",    logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323340/SAKURA.png" },
+  { name: "DAI",       logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/DAI.png" },
+  { name: "EDTPART",   logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/EDTP.png" },
+  { name: "GABRIEL",   logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323339/GABRIEL.png" },
+  { name: "FERSA",     logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/fersa_logo.png" },
+  { name: "KANADIAN",  logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323339/knadian_logo.jpg" },
+  { name: "ZSG",       logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323342/ZSG.png" },
+  { name: "PFI",       logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323340/PFI.png" },
+  { name: "RYCO",      logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323339/RYCO.png" },
+  { name: "KOMAN",     logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323339/KOMAN.png" },
+  { name: "BEZARES",   logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779325108/BEZARES.png" },
+  { name: "TOYOPOWER", logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323340/TOYOPOWER.webp" },
+  { name: "BALDWIN",   logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/BALDWIN.png" },
 ];
 
 const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
@@ -46,21 +48,13 @@ const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
     <div className="relative group">
       <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white hover:border-sky-400 hover:bg-white/10 transition-all active:scale-95">
         <Icon size={14} className={color} />
-        <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">
-          {label}
-        </span>
-        <ChevronDown
-          size={12}
-          className="opacity-40 group-hover:rotate-180 transition-transform"
-        />
+        <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">{label}</span>
+        <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
       </button>
-
       <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
         <div className="p-2 max-h-[400px] overflow-y-auto">
           {items.length === 0 ? (
-            <div className="p-4 text-[10px] font-bold text-slate-400 uppercase italic">
-              Cargando...
-            </div>
+            <div className="p-4 text-[10px] font-bold text-slate-400 uppercase italic">Cargando...</div>
           ) : (
             items.map((item: string) => (
               <button
@@ -72,6 +66,36 @@ const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
               </button>
             ))
           )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
+  return (
+    <div className="relative group">
+      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white hover:border-sky-400 hover:bg-white/10 transition-all active:scale-95">
+        <ShieldCheck size={14} className="text-sky-300" />
+        <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">Marcas</span>
+        <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
+      </button>
+      <div className="absolute top-full left-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+        <div className="p-3 grid grid-cols-2 gap-1.5 max-h-[480px] overflow-y-auto">
+          {STATIC_BRANDS.map(({ name, logo }) => (
+            <button
+              key={name}
+              onClick={() => onSelect(name)}
+              className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-sky-50 hover:border-sky-200 border border-transparent transition-all group/brand"
+            >
+              <div className="w-14 h-9 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50">
+                <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
+              </div>
+              <span className="text-xs font-bold text-slate-700 group-hover/brand:text-sky-700 uppercase tracking-wide leading-tight">
+                {name}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
     </div>
@@ -233,13 +257,7 @@ export default function Header() {
             onSelect={(val: string) => handleStaticSelect(val, "category")}
           />
 
-          <NavDropdown
-            label="Marcas"
-            items={STATIC_BRANDS}
-            icon={ShieldCheck}
-            color="text-sky-300"
-            onSelect={(val: string) => handleStaticSelect(val, "brand")}
-          />
+          <BrandDropdown onSelect={(val) => handleStaticSelect(val, "brand")} />
         </div>
       </div>
 
@@ -368,14 +386,17 @@ export default function Header() {
                       className="group-open:rotate-180 transition-transform"
                     />
                   </summary>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2 pl-4 border-l-2 border-rose-100">
-                    {STATIC_BRANDS.map((brand) => (
+                  <div className="grid grid-cols-2 gap-1.5 mt-2 pl-4 border-l-2 border-rose-100">
+                    {STATIC_BRANDS.map(({ name, logo }) => (
                       <button
-                        key={brand}
-                        onClick={() => handleStaticSelect(brand, "brand")}
-                        className="text-left py-3.5 text-[10px] font-bold text-slate-600 uppercase italic border-b border-slate-100"
+                        key={name}
+                        onClick={() => { handleStaticSelect(name, "brand"); setOpen(false); }}
+                        className="flex items-center gap-3 px-3 py-3 rounded-xl border border-transparent hover:bg-sky-50 hover:border-sky-200 transition-all"
                       >
-                        {brand}
+                        <div className="w-12 h-8 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50">
+                          <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
+                        </div>
+                        <span className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-tight">{name}</span>
                       </button>
                     ))}
                   </div>

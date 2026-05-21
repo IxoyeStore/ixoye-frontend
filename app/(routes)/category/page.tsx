@@ -78,7 +78,20 @@ function CategoryContent() {
     }
   };
 
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (error)
+    return (
+      <div className="flex flex-col items-center justify-center py-32 gap-4 text-center px-4">
+        <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+          No se pudieron cargar los productos
+        </p>
+        <button
+          onClick={() => fetchProducts(1, true)}
+          className="text-xs font-black uppercase tracking-widest text-[#0055a4] hover:text-[#003d7a] underline underline-offset-4 transition-colors"
+        >
+          Intentar de nuevo
+        </button>
+      </div>
+    );
 
   return (
     <div className="w-full max-w-[1440px] py-4 mx-auto sm:py-16 px-4 md:px-8">
@@ -115,14 +128,14 @@ function CategoryContent() {
         <div className="grid w-full grid-cols-2 gap-4 mt-8 lg:grid-cols-4 md:gap-6">
           {loading && <SkeletonSchema grid={16} />}
           {!loading && result.length === 0 && (
-            <div className="col-span-full text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-              <p className="text-sky-800/60 font-black uppercase italic tracking-widest">
+            <div className="col-span-full flex flex-col items-center justify-center py-24 gap-4 text-center">
+              <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
                 No se encontraron productos
               </p>
               <Button
                 variant="link"
                 onClick={() => (window.location.href = "/category")}
-                className="text-sky-500 text-xs uppercase font-bold mt-2"
+                className="text-xs font-black uppercase tracking-widest text-[#0055a4] hover:text-[#003d7a]"
               >
                 Limpiar filtros
               </Button>

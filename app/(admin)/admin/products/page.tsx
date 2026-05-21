@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/formatPrice";
-import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
 import { toast } from "sonner";
 
@@ -25,6 +25,10 @@ export default function AdminProductsPage() {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [active, setActive] = useState("");
+  const [sort, setSort] = useState("productName:asc");
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
 
@@ -49,13 +53,16 @@ export default function AdminProductsPage() {
     const params = new URLSearchParams({ page: String(page) });
     if (query) params.set("search", query);
     if (active !== "") params.set("active", active);
+    if (sort) params.set("sort", sort);
+    if (priceMin) params.set("priceMin", priceMin);
+    if (priceMax) params.set("priceMax", priceMax);
     const res = await fetch(`/api/admin/products?${params}`);
     const data = await res.json();
     setProducts(data.data || []);
     setTotal(data.meta?.pagination?.total || 0);
     setSelected(new Set());
     setLoading(false);
-  }, [page, query, active]);
+  }, [page, query, active, sort, priceMin, priceMax]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
@@ -68,6 +75,13 @@ export default function AdminProductsPage() {
     setQuery(search);
     setPage(1);
   };
+
+  const clearFilters = () => {
+    setSearch(""); setQuery(""); setActive(""); setSort("productName:asc");
+    setPriceMin(""); setPriceMax(""); setPage(1);
+  };
+
+  const hasActiveFilters = query || active || sort !== "productName:asc" || priceMin || priceMax;
 
   // --- Selection ---
   const allDocIds = products.map((p) => p.documentId || String(p.id));
@@ -288,31 +302,114 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Search + Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <form onSubmit={handleSearch} className="flex gap-2 flex-1">
-          <div className="relative flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Nombre o código..."
-              className="pl-8 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] font-bold focus:outline-none focus:border-sky-400 w-full bg-white dark:bg-slate-800 dark:text-white dark:placeholder-slate-500"
-            />
+      <div className="space-y-3">
+        {/* Row 1: search + sort + toggle */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <form onSubmit={handleSearch} className="flex gap-2 flex-1">
+            <div className="relative flex-1">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Nombre, código, marca..."
+                className="pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-sky-400 w-full bg-white dark:bg-slate-800 dark:text-white dark:placeholder-slate-500"
+              />
+            </div>
+            <button type="submit" className="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 text-white rounded-xl text-sm font-semibold hover:bg-slate-700 dark:hover:bg-slate-600 transition-all shrink-0">
+              Buscar
+            </button>
+          </form>
+
+          {/* Sort */}
+          <div className="relative shrink-0">
+            <ArrowUpDown size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <select
+              value={sort}
+              onChange={(e) => { setSort(e.target.value); setPage(1); }}
+              className="pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:border-sky-400 appearance-none sm:w-52"
+            >
+              <option value="productName:asc">Nombre A → Z</option>
+              <option value="productName:desc">Nombre Z → A</option>
+              <option value="price:asc">Precio menor primero</option>
+              <option value="price:desc">Precio mayor primero</option>
+              <option value="stock:asc">Stock menor primero</option>
+              <option value="stock:desc">Stock mayor primero</option>
+              <option value="createdAt:desc">Más recientes</option>
+              <option value="createdAt:asc">Más antiguos</option>
+            </select>
           </div>
-          <button type="submit" className="px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 dark:hover:bg-slate-600 transition-all shrink-0">
-            Buscar
+
+          {/* Filtros toggle */}
+          <button
+            type="button"
+            onClick={() => setShowFilters((v) => !v)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all shrink-0 ${showFilters ? "bg-sky-600 border-sky-600 text-white" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 hover:border-sky-400"}`}
+          >
+            <SlidersHorizontal size={15} />
+            Filtros
+            {hasActiveFilters && <span className="bg-sky-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-black">!</span>}
           </button>
-        </form>
-        <select
-          value={active}
-          onChange={(e) => { setActive(e.target.value); setPage(1); }}
-          className="rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2 text-[11px] font-black bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:border-sky-400 sm:w-auto"
-        >
-          <option value="">Todos</option>
-          <option value="true">Activos</option>
-          <option value="false">Inactivos</option>
-        </select>
+        </div>
+
+        {/* Row 2: expanded filters */}
+        {showFilters && (
+          <div className="flex flex-wrap gap-4 p-5 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-top-2 duration-200">
+            {/* Estado */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Estado</label>
+              <div className="flex gap-2">
+                {[["", "Todos"], ["true", "Activos"], ["false", "Inactivos"]].map(([val, lbl]) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => { setActive(val); setPage(1); }}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${active === val ? "bg-sky-600 text-white shadow-sm" : "border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-sky-400 hover:text-sky-600"}`}
+                  >
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Precio */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Precio (MXN)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Mínimo"
+                  value={priceMin}
+                  onChange={(e) => { setPriceMin(e.target.value); setPage(1); }}
+                  className="w-28 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-sky-400 bg-white dark:bg-slate-700 dark:text-white"
+                />
+                <span className="text-slate-400 font-medium">—</span>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Máximo"
+                  value={priceMax}
+                  onChange={(e) => { setPriceMax(e.target.value); setPage(1); }}
+                  className="w-28 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-sky-400 bg-white dark:bg-slate-700 dark:text-white"
+                />
+              </div>
+            </div>
+
+            {/* Limpiar */}
+            {hasActiveFilters && (
+              <div className="flex flex-col justify-end ml-auto">
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-200 dark:border-red-800 text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                >
+                  <X size={14} /> Limpiar filtros
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Bulk action toolbar */}

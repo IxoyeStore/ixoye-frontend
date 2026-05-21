@@ -29,9 +29,9 @@ export default function Page() {
 
   if (error)
     return (
-      <div className="max-w-6xl py-20 mx-auto text-center">
-        <p className="text-red-500 font-semibold bg-red-50 inline-block px-4 py-2 rounded-lg border border-red-100">
-          {error}
+      <div className="max-w-6xl py-32 mx-auto text-center px-4">
+        <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+          No se pudieron cargar los productos
         </p>
       </div>
     );

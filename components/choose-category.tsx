@@ -5,6 +5,7 @@ import { useGetCategories } from "@/api/getProducts";
 import Link from "next/link";
 import { ResponeType } from "@/types/response";
 import { CategoryType } from "@/types/category";
+import { LayoutGrid } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -14,7 +15,25 @@ import {
 } from "./ui/carousel";
 
 const ChooseCategory = () => {
-  const { result, loading }: ResponeType = useGetCategories();
+  const { result, loading, error }: ResponeType = useGetCategories();
+
+  const hasFailed = !loading && (error || !result || (Array.isArray(result) && result.length === 0));
+
+  if (hasFailed) {
+    return (
+      <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24">
+        <h3 className="px-6 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
+          Categorías destacadas
+        </h3>
+        <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 rounded-2xl bg-sky-50/40">
+          <LayoutGrid className="w-10 h-10 text-sky-300" strokeWidth={1.5} />
+          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 text-center px-4">
+            No se pudieron cargar las categorías
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24">

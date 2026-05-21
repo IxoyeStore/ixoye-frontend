@@ -15,8 +15,9 @@ export async function GET(request: NextRequest) {
   const active = searchParams.get("active");
   const priceMin = searchParams.get("priceMin") || "";
   const priceMax = searchParams.get("priceMax") || "";
+  const sort     = searchParams.get("sort") || "productName:asc";
 
-  let url = `${API}/api/products?populate[category][fields][0]=categoryName&populate[category][fields][1]=slug&sort=productName:asc&pagination[page]=${page}&pagination[pageSize]=${pageSize}`;
+  let url = `${API}/api/products?populate[category][fields][0]=categoryName&populate[category][fields][1]=slug&sort=${sort}&pagination[page]=${page}&pagination[pageSize]=${pageSize}`;
   if (search) url += `&filters[$or][0][productName][$containsi]=${encodeURIComponent(search)}&filters[$or][1][code][$containsi]=${encodeURIComponent(search)}`;
   if (category) url += `&filters[category][slug][$eq]=${category}`;
   if (active !== null && active !== "") url += `&filters[active][$eq]=${active}`;

@@ -139,7 +139,9 @@ export default function Footer() {
                   href="tel:+520000000000"
                   className="hover:text-sky-200 transition-colors"
                 >
-                  +52 (311) 237 7582
+                  +52 (311) 237 7582 <br/>
+                  +52 (311) 847 7877
+
                 </a>
               </li>
               <li className="flex items-start gap-3">
