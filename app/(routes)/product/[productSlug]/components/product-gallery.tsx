@@ -54,7 +54,7 @@ export default function ProductGallery({ images, productName }: Props) {
       }`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={images[idx]} alt={`Miniatura ${idx + 1}`} className="w-full h-full object-contain" />
+      <img src={images[idx]} alt={`Miniatura ${idx + 1}`} draggable={false} className="w-full h-full object-contain" />
     </button>
   );
 
@@ -91,17 +91,19 @@ export default function ProductGallery({ images, productName }: Props) {
 
           <div
             ref={zoomRef}
-            className="relative flex-1 aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-white cursor-crosshair"
+            className="relative flex-1 aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-white cursor-crosshair select-none"
             onMouseEnter={() => images.length > 0 && setZoomed(true)}
             onMouseLeave={() => setZoomed(false)}
             onMouseMove={handleMouseMove}
             onClick={() => images.length > 0 && setLightboxOpen(true)}
+            onContextMenu={(e) => e.preventDefault()}
           >
             {images.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={images[safeIdx]}
                 alt={productName}
+                draggable={false}
                 className="w-full h-full object-contain"
               />
             ) : (
@@ -141,12 +143,13 @@ export default function ProductGallery({ images, productName }: Props) {
       {/* ── Mobile: main image + nav arrows + horizontal thumbs ───────────── */}
       <div className="flex flex-col gap-3 sm:hidden px-3">
         <div
-          className="relative aspect-square w-full rounded-2xl overflow-hidden border border-slate-100 bg-white"
+          className="relative aspect-square w-full rounded-2xl overflow-hidden border border-slate-100 bg-white select-none"
           onClick={() => images.length > 0 && setLightboxOpen(true)}
+          onContextMenu={(e) => e.preventDefault()}
         >
           {images.length > 0 ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={images[safeIdx]} alt={productName} className="w-full h-full object-contain" />
+            <img src={images[safeIdx]} alt={productName} draggable={false} className="w-full h-full object-contain" />
           ) : (
             <ProductImage className="w-full h-full" />
           )}

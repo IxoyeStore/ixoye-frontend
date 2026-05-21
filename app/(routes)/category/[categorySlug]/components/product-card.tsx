@@ -71,26 +71,43 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         )}
 
-        <Link href={`/product/${product.slug}`}>
+        <Link href={`/product/${product.slug}`} onContextMenu={(e) => e.preventDefault()}>
           {hasImages && !imageError ? (
-            <Carousel opts={{ align: "start" }} className="w-full">
-              <CarouselContent>
-                {product.images.map((imageUrl, index) => (
-                  <CarouselItem key={index}>
-                    <div className="relative aspect-square">
-                      <Image
-                        src={imageUrl}
-                        alt={product.productName}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        onError={() => setImageError(true)}
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
+            product.images.length > 1 ? (
+              <Carousel opts={{ align: "start" }} className="w-full">
+                <CarouselContent>
+                  {product.images.map((imageUrl, index) => (
+                    <CarouselItem key={index}>
+                      <div className="relative aspect-square select-none">
+                        <Image
+                          src={imageUrl}
+                          alt={product.productName}
+                          fill
+                          draggable={false}
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          onError={() => setImageError(true)}
+                        />
+                        <div className="absolute inset-0 pointer-events-none" />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+            ) : (
+              <div className="relative aspect-square select-none">
+                <Image
+                  src={product.images[0]}
+                  alt={product.productName}
+                  fill
+                  draggable={false}
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  onError={() => setImageError(true)}
+                />
+                <div className="absolute inset-0 pointer-events-none" />
+              </div>
+            )
           ) : (
             <ProductImage url={undefined} className="aspect-square w-full" />
           )}

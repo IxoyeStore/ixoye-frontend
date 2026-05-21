@@ -205,11 +205,9 @@ export default function BulkProductsPage() {
       }
 
       const res: ImportResult = { total: products.length, success: 0, failed: 0, errors: [] };
+      const CONCURRENCY = 10;
 
-      for (let i = 0; i < products.length; i++) {
-        const { documentId, ...fields } = products[i];
-        setProgressLabel(`${i + 1} / ${products.length} — ${fields.productName ?? ""}`);
-
+      const buildPayload = (fields: Record<string, any>) => {
         const payload: Record<string, any> = {};
         if (fields.productName    !== undefined) payload.productName    = String(fields.productName);
         if (fields.code           !== undefined) payload.code           = String(fields.code);
@@ -227,26 +225,39 @@ export default function BulkProductsPage() {
         if (fields.isFeatured     !== undefined) payload.isFeatured     = String(fields.isFeatured).toUpperCase() === "TRUE";
         if (fields.freeShipping   !== undefined) payload.freeShipping   = String(fields.freeShipping).toUpperCase() === "TRUE";
         if (fields.description    !== undefined) payload.description    = String(fields.description);
+        return payload;
+      };
 
-        try {
-          const upd = await fetch(`/api/admin/products/${documentId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          if (upd.ok) {
-            res.success++;
-          } else {
-            const err = await upd.json().catch(() => ({}));
+      let completed = 0;
+
+      for (let i = 0; i < products.length; i += CONCURRENCY) {
+        const batch = products.slice(i, i + CONCURRENCY);
+
+        await Promise.all(batch.map(async (product) => {
+          const { documentId, ...fields } = product;
+          const payload = buildPayload(fields);
+          try {
+            const upd = await fetch(`/api/admin/products/${documentId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            if (upd.ok) {
+              res.success++;
+            } else {
+              const err = await upd.json().catch(() => ({}));
+              res.failed++;
+              res.errors.push({ name: String(fields.productName ?? documentId), error: err?.error?.message || `HTTP ${upd.status}` });
+            }
+          } catch {
             res.failed++;
-            res.errors.push({ name: String(fields.productName ?? documentId), error: err?.error?.message || `HTTP ${upd.status}` });
+            res.errors.push({ name: String(fields.productName ?? documentId), error: "Error de red" });
           }
-        } catch {
-          res.failed++;
-          res.errors.push({ name: String(fields.productName ?? documentId), error: "Error de red" });
-        }
+          completed++;
+          setProgress(Math.round((completed / products.length) * 100));
+        }));
 
-        setProgress(Math.round(((i + 1) / products.length) * 100));
+        setProgressLabel(`${Math.min(i + CONCURRENCY, products.length)} / ${products.length}`);
       }
 
       setResult(res);

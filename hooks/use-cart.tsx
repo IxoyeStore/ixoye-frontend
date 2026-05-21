@@ -49,6 +49,12 @@ export const useCart = create(
           items: [...currentItems, { ...data, quantity: 1 }],
         });
 
+        fetch("/api/metrics/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: data.id, event: "cart" }),
+        }).catch(() => {});
+
         toast.success("Producto agregado al carrito.");
       },
 

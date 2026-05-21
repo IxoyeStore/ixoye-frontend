@@ -23,6 +23,28 @@ import { AdminThemeToggle } from "@/components/admin-theme-toggle";
 
 const THEME_KEY = "admin-theme";
 
+const DOTS = ["·", "··", "···"];
+
+function AdminLoadingScreen() {
+  const [frame, setFrame] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setFrame((f) => (f + 1) % DOTS.length), 400);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="flex h-screen flex-col items-center justify-center gap-6 bg-slate-950">
+      <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
+        Verificando acceso
+      </p>
+      <p className="text-2xl font-black tracking-[0.5em] text-sky-400 w-20 text-center tabular-nums">
+        {DOTS[frame]}
+      </p>
+    </div>
+  );
+}
+
 const navItems = [
   { href: "/admin",               label: "Dashboard",     icon: LayoutDashboard, exact: true },
   { href: "/admin/orders",        label: "Pedidos",        icon: ShoppingCart,    exact: false },
@@ -63,11 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [user, loading, router]);
 
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-slate-950 text-white text-[20px] uppercase tracking-widest font-black animate-pulse">
-        Verificando acceso...
-      </div>
-    );
+    return <AdminLoadingScreen />;
   }
 
   if (!user || user.role?.name !== "Admin") return null;

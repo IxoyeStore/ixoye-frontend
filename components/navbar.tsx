@@ -192,6 +192,13 @@ export default function Header() {
         });
         setPreview(items);
         setShowPreview(items.length > 0);
+        if (items.length > 0) {
+          fetch("/api/metrics/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ events: items.map((p) => ({ productId: p.id, event: "searchImpression" })) }),
+          }).catch(() => {});
+        }
       } catch {
         setPreview([]);
         setShowPreview(false);

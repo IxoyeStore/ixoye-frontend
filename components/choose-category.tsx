@@ -41,7 +41,7 @@ const ChooseCategory = () => {
         Categorías destacadas
       </h3>
 
-      <Carousel className="w-full">
+      <Carousel opts={{ align: "start", slidesToScroll: "auto" }} className="w-full">
         <CarouselContent className="-ml-2 md:-ml-4">
           {loading &&
             [1, 2, 3, 4].map((i) => (

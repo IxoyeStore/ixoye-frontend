@@ -5,6 +5,7 @@ import { ProductType } from "@/types/product";
 import ProductGallery from "./components/product-gallery";
 import InfoProduct from "./components/info-product";
 import ProductDescription from "./components/product-description";
+import TrackView from "./components/track-view";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -77,6 +78,7 @@ export default async function ProductPage({
 
   return (
     <div className="max-w-6xl py-6 mx-auto sm:py-12 sm:px-16 space-y-8">
+      <TrackView productId={product.id} />
 
       {/* ── Breadcrumb (desktop) ─────────────────────────────────────────── */}
       <nav className="hidden sm:flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-wider">

@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/formatPrice";
-import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown, Eye, ShoppingCart, TrendingUp, SearchIcon, LayoutList } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
 import { toast } from "sonner";
 
@@ -21,6 +21,7 @@ const BULK_ACTIONS = [
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
+  const [metrics, setMetrics] = useState<Record<number, { views: number; cartAdds: number; purchases: number; searchImpressions: number; categoryImpressions: number }>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
@@ -61,6 +62,12 @@ export default function AdminProductsPage() {
     setProducts(data.data || []);
     setTotal(data.meta?.pagination?.total || 0);
     setSelected(new Set());
+
+    fetch("/api/metrics")
+      .then((r) => r.json())
+      .then((m) => setMetrics(m))
+      .catch(() => {});
+
     setLoading(false);
   }, [page, query, active, sort, priceMin, priceMax]);
 
@@ -567,6 +574,7 @@ export default function AdminProductsPage() {
                 <th className="text-right px-4 py-4 hidden lg:table-cell">Mayoreo</th>
                 <th className="text-right px-4 py-4">Stock</th>
                 <th className="text-center px-4 py-4">Estado</th>
+                <th className="text-center px-4 py-4 hidden lg:table-cell">Métricas</th>
                 <th className="px-4 py-4" />
               </tr>
             </thead>
@@ -632,6 +640,35 @@ export default function AdminProductsPage() {
                           {togglingActive === docId ? <Loader2 size={11} className="animate-spin" /> : null}
                           {p.active ? "Activo" : "Inactivo"}
                         </button>
+                      </td>
+                      <td className="px-4 py-3 hidden lg:table-cell">
+                        {(() => {
+                          const m = metrics[p.id] ?? { views: 0, cartAdds: 0, purchases: 0, searchImpressions: 0, categoryImpressions: 0 };
+                          return (
+                            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+                              <span title="Impresiones en búsqueda" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                                <SearchIcon size={11} className="text-violet-400" />
+                                {m.searchImpressions}
+                              </span>
+                              <span title="Impresiones en categoría" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                                <LayoutList size={11} className="text-cyan-400" />
+                                {m.categoryImpressions}
+                              </span>
+                              <span title="Vistas de producto" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                                <Eye size={11} className="text-sky-400" />
+                                {m.views}
+                              </span>
+                              <span title="Al carrito" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                                <ShoppingCart size={11} className="text-amber-400" />
+                                {m.cartAdds}
+                              </span>
+                              <span title="Compras" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                                <TrendingUp size={11} className="text-emerald-400" />
+                                {m.purchases}
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">

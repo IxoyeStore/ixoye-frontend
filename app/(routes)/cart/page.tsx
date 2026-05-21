@@ -85,6 +85,14 @@ export default function Page() {
       if (res.data?.data?.url) {
         toast.success("Redirigiendo al procesador de pago...");
 
+        validItems.forEach((item) => {
+          fetch("/api/metrics/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId: item.id, event: "purchase" }),
+          }).catch(() => {});
+        });
+
         window.location.href = res.data.data.url;
       } else {
         throw new Error("No se recibió la URL de pago.");
