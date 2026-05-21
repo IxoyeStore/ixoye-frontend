@@ -53,20 +53,22 @@ const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
         <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">{label}</span>
         <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
       </button>
-      <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+      <div className="absolute top-full left-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
         <div className="p-2 max-h-[400px] overflow-y-auto">
           {items.length === 0 ? (
             <div className="p-4 text-[10px] font-bold text-slate-400 uppercase italic">Cargando...</div>
           ) : (
-            items.map((item: string) => (
-              <button
-                key={item}
-                onClick={() => onSelect(item)}
-                className="w-full text-left px-4 py-2.5 text-[10px] font-bold text-slate-600 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors uppercase italic"
-              >
-                {item}
-              </button>
-            ))
+            <div className="grid grid-cols-2 gap-0.5">
+              {items.map((item: string) => (
+                <button
+                  key={item}
+                  onClick={() => onSelect(item)}
+                  className="w-full text-left px-4 py-2.5 text-[10px] font-bold text-slate-600 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors uppercase italic"
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
           )}
         </div>
       </div>
@@ -141,12 +143,9 @@ export default function Header() {
   // Click outside → close preview
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (
-        desktopRef.current && !desktopRef.current.contains(e.target as Node) &&
-        mobileRef.current  && !mobileRef.current.contains(e.target as Node)
-      ) {
-        setShowPreview(false);
-      }
+      const inDesktop = desktopRef.current?.contains(e.target as Node) ?? false;
+      const inMobile  = mobileRef.current?.contains(e.target as Node) ?? false;
+      if (!inDesktop && !inMobile) setShowPreview(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -263,23 +262,30 @@ export default function Header() {
           <button
             key={p.id}
             onMouseDown={(e) => { e.preventDefault(); handlePreviewSelect(p.slug); }}
-            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-sky-50 transition-colors group text-left"
+            className="w-full flex items-center gap-5 px-6 py-5 hover:bg-sky-50 transition-colors border-b border-slate-50 last:border-0 text-left"
           >
-            <div className="w-10 h-10 shrink-0 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center">
+            <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center">
               {p.images[0] ? (
                 <img src={p.images[0]} alt={p.productName} className="w-full h-full object-cover" />
               ) : (
-                <Package size={16} className="text-slate-300" />
+                <Package size={32} className="text-slate-300" />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-black text-slate-900 truncate uppercase">{p.productName}</p>
+              <p className="text-lg font-semibold text-slate-800 truncate leading-snug">{p.productName}</p>
               {p.code && (
-                <p className="text-[10px] font-bold text-sky-600 uppercase tracking-widest">{p.code}</p>
+                <p className="text-base font-medium text-slate-400 mt-1">{p.code}</p>
               )}
             </div>
           </button>
         ))}
+        <button
+          onMouseDown={(e) => { e.preventDefault(); router.push(`/search?query=${encodeURIComponent(searchQuery)}`); clearSearch(); setOpen(false); }}
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-slate-50 hover:bg-sky-600 hover:text-white text-slate-500 transition-colors text-xs font-black uppercase tracking-widest"
+        >
+          <Search size={13} />
+          Ver todos los resultados
+        </button>
       </div>
     ) : null;
 
@@ -289,6 +295,13 @@ export default function Header() {
     "text-[9px] font-black uppercase italic tracking-wider text-center";
 
   return (
+    <>
+    {showPreview && (
+      <div
+        className="fixed inset-0 bg-white/30 backdrop-blur-sm z-40"
+        onMouseDown={() => setShowPreview(false)}
+      />
+    )}
     <header className="w-full sticky top-0 z-50 shadow-lg">
       {/* FRANJA SUPERIOR */}
       <div className="w-full bg-[#003366] bg-gradient-to-t from-[#0055a4] to-[#003366] text-white">
@@ -587,5 +600,6 @@ export default function Header() {
         </div>
       )}
     </header>
+    </>
   );
 }
