@@ -10,22 +10,22 @@ import * as XLSX from "xlsx";
 
 // ── Column map (must match export route) ────────────────────────────────────
 const COLUMNS = [
-  { key: "documentId",     label: "ID (no editar)"            },
-  { key: "productName",    label: "Nombre"                    },
-  { key: "code",           label: "Código"                    },
-  { key: "slug",           label: "Slug"                      },
-  { key: "department",     label: "Departamento"              },
-  { key: "subDepartment",  label: "Sub-Departamento"          },
-  { key: "productType",    label: "Tipo"                      },
-  { key: "brand",          label: "Marca"                     },
-  { key: "series",         label: "Series"                    },
-  { key: "price",          label: "Precio Público"            },
-  { key: "wholesalePrice", label: "Precio Mayoreo"            },
-  { key: "stock",          label: "Stock"                     },
-  { key: "active",         label: "Activo (TRUE/FALSE)"       },
-  { key: "isFeatured",     label: "Destacado (TRUE/FALSE)"    },
-  { key: "freeShipping",   label: "Envio Gratis (TRUE/FALSE)" },
-  { key: "description",    label: "Descripción"               },
+  { key: "documentId",     label: "documentId"       },
+  { key: "productName",    label: "descripcion"      },
+  { key: "code",           label: "codigo"           },
+  { key: "slug",           label: "slug"             },
+  { key: "department",     label: "departamento"     },
+  { key: "subDepartment",  label: "subDepartamento"  },
+  { key: "productType",    label: "tipoProducto"     },
+  { key: "brand",          label: "marca"            },
+  { key: "series",         label: "series"           },
+  { key: "price",          label: "precio"           },
+  { key: "wholesalePrice", label: "precioMayoreo"    },
+  { key: "stock",          label: "stock"            },
+  { key: "active",         label: "activo"           },
+  { key: "isFeatured",     label: "destacado"        },
+  { key: "freeShipping",   label: "envioGratis"      },
+  { key: "description",    label: "descripcionLarga" },
 ];
 
 type Filters = {

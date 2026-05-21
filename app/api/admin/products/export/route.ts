@@ -5,22 +5,22 @@ import ExcelJS from "exceljs";
 const API = process.env.NEXT_PUBLIC_API_URL;
 
 const COLUMNS = [
-  { key: "documentId",     label: "ID (no editar)",            width: 34 },
-  { key: "productName",    label: "Nombre",                    width: 30 },
-  { key: "code",           label: "Código",                    width: 16 },
-  { key: "slug",           label: "Slug",                      width: 30 },
-  { key: "department",     label: "Departamento",              width: 20 },
-  { key: "subDepartment",  label: "Sub-Departamento",          width: 20 },
-  { key: "productType",    label: "Tipo",                      width: 20 },
-  { key: "brand",          label: "Marca",                     width: 16 },
-  { key: "series",         label: "Series",                    width: 20 },
-  { key: "price",          label: "Precio Público",            width: 14 },
-  { key: "wholesalePrice", label: "Precio Mayoreo",            width: 14 },
-  { key: "stock",          label: "Stock",                     width: 10 },
-  { key: "active",         label: "Activo (TRUE/FALSE)",       width: 18 },
-  { key: "isFeatured",     label: "Destacado (TRUE/FALSE)",    width: 20 },
-  { key: "freeShipping",   label: "Envio Gratis (TRUE/FALSE)", width: 22 },
-  { key: "description",    label: "Descripción",               width: 50 },
+  { key: "documentId",     label: "documentId",       width: 34 },
+  { key: "productName",    label: "descripcion",      width: 30 },
+  { key: "code",           label: "codigo",           width: 16 },
+  { key: "slug",           label: "slug",             width: 30 },
+  { key: "department",     label: "departamento",     width: 20 },
+  { key: "subDepartment",  label: "subDepartamento",  width: 20 },
+  { key: "productType",    label: "tipoProducto",     width: 20 },
+  { key: "brand",          label: "marca",            width: 16 },
+  { key: "series",         label: "series",           width: 20 },
+  { key: "price",          label: "precio",           width: 14 },
+  { key: "wholesalePrice", label: "precioMayoreo",    width: 14 },
+  { key: "stock",          label: "stock",            width: 10 },
+  { key: "active",         label: "activo",           width: 18 },
+  { key: "isFeatured",     label: "destacado",        width: 20 },
+  { key: "freeShipping",   label: "envioGratis",      width: 22 },
+  { key: "description",    label: "descripcionLarga", width: 50 },
 ];
 
 export async function GET(request: NextRequest) {
