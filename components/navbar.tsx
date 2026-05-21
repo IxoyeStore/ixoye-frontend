@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   ShoppingCart,
   Store,
@@ -24,6 +24,8 @@ import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
 import SupportMenu from "./support-menu";
 import TechnicalFilterModal from "./technical-filter-modal";
+
+const API = "https://ixoye-backend-production.up.railway.app";
 
 const STATIC_BRANDS = [
   { name: "EMMARK",    logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/EMMARK.png" },
@@ -102,9 +104,19 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
   );
 };
 
+type PreviewProduct = {
+  id: number;
+  slug: string;
+  productName: string;
+  code: string;
+  images: string[];
+};
+
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [preview, setPreview] = useState<PreviewProduct[]>([]);
+  const [showPreview, setShowPreview] = useState(false);
   const [dynamicProductTypes, setDynamicProductTypes] = useState<string[]>([]);
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
@@ -112,14 +124,115 @@ export default function Header() {
   }>({ isOpen: false, type: null });
 
   const router = useRouter();
+  const pathname = usePathname();
   const cart = useCart();
   const { lovedItems } = useLovedProducts();
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const desktopRef  = useRef<HTMLDivElement>(null);
+  const mobileRef   = useRef<HTMLDivElement>(null);
+
+  // Close preview on navigation
+  useEffect(() => {
+    setShowPreview(false);
+    setSearchQuery("");
+  }, [pathname]);
+
+  // Click outside → close preview
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        desktopRef.current && !desktopRef.current.contains(e.target as Node) &&
+        mobileRef.current  && !mobileRef.current.contains(e.target as Node)
+      ) {
+        setShowPreview(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Escape → close preview
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowPreview(false);
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
+  // Debounced preview fetch
+  const fetchPreview = useCallback((q: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (q.trim().length < 2) { setPreview([]); setShowPreview(false); return; }
+
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams();
+        params.append("filters[$or][0][productName][$containsi]", q);
+        params.append("filters[$or][1][code][$containsi]", q);
+        params.append("filters[$or][2][series][$containsi]", q);
+        params.append("filters[active][$eq]", "true");
+        params.append("fields[0]", "productName");
+        params.append("fields[1]", "code");
+        params.append("fields[2]", "images");
+        params.append("fields[3]", "slug");
+        params.append("pagination[pageSize]", "5");
+
+        const res  = await fetch(`${API}/api/products?${params}`);
+        const json = await res.json();
+        const items: PreviewProduct[] = (json.data || []).map((item: any) => {
+          const d = item.attributes ?? item;
+          return {
+            id:          item.id,
+            slug:        d.slug        ?? "",
+            productName: d.productName ?? "",
+            code:        d.code        ?? "",
+            images:      Array.isArray(d.images) ? d.images : [],
+          };
+        });
+        setPreview(items);
+        setShowPreview(items.length > 0);
+      } catch {
+        setPreview([]);
+        setShowPreview(false);
+      }
+    }, 280);
+  }, []);
+
+  const handleQueryChange = (val: string) => {
+    setSearchQuery(val);
+    fetchPreview(val);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setPreview([]);
+    setShowPreview(false);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?query=${encodeURIComponent(searchQuery)}`);
+      clearSearch();
+      setOpen(false);
+      (document.activeElement as HTMLElement)?.blur();
+    }
+  };
+
+  const handlePreviewSelect = (slug: string) => {
+    router.push(`/product/${slug}`);
+    clearSearch();
+    setOpen(false);
+    (document.activeElement as HTMLElement)?.blur();
+  };
 
   useEffect(() => {
     const fetchProductTypes = async () => {
       try {
         const res = await fetch(
-          `https://ixoye-backend-production.up.railway.app/api/products?fields[0]=productType&pagination[pageSize]=100`,
+          `${API}/api/products?fields[0]=productType&pagination[pageSize]=100`,
         );
         const json = await res.json();
         if (json.data) {
@@ -138,27 +251,46 @@ export default function Header() {
     fetchProductTypes();
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?query=${encodeURIComponent(searchQuery)}`);
-      setOpen(false);
-    }
-  };
-
   const handleStaticSelect = (val: string, param: string) => {
     router.push(`/category?${param}=${encodeURIComponent(val.toLowerCase())}`);
     setOpen(false);
   };
 
+  const PreviewDropdown = () =>
+    showPreview ? (
+      <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[70]">
+        {preview.map((p) => (
+          <button
+            key={p.id}
+            onMouseDown={(e) => { e.preventDefault(); handlePreviewSelect(p.slug); }}
+            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-sky-50 transition-colors group text-left"
+          >
+            <div className="w-10 h-10 shrink-0 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center">
+              {p.images[0] ? (
+                <img src={p.images[0]} alt={p.productName} className="w-full h-full object-cover" />
+              ) : (
+                <Package size={16} className="text-slate-300" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-black text-slate-900 truncate uppercase">{p.productName}</p>
+              {p.code && (
+                <p className="text-[10px] font-bold text-sky-600 uppercase tracking-widest">{p.code}</p>
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+    ) : null;
+
   const iconClass =
     "flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/10 text-white/90 min-w-[70px]";
   const navTextClass =
     "text-[9px] font-black uppercase italic tracking-wider text-center";
+
   return (
     <header className="w-full sticky top-0 z-50 shadow-lg">
       {/* FRANJA SUPERIOR */}
-
       <div className="w-full bg-[#003366] bg-gradient-to-t from-[#0055a4] to-[#003366] text-white">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 md:h-24 gap-8">
           <Link href="/" className="flex items-center gap-4 group shrink-0">
@@ -177,24 +309,26 @@ export default function Header() {
             </div>
           </Link>
 
-          <form
-            onSubmit={handleSearch}
-            className="hidden md:flex flex-1 max-w-xl relative group"
-          >
-            <input
-              type="text"
-              placeholder="Nombre, OEM, Serie o Marca..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/10 border border-white/20 rounded-2xl py-2.5 px-6 text-white placeholder:text-white/50 focus:bg-white focus:text-slate-900 transition-all shadow-inner"
-            />
-            <button
-              type="submit"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-sky-500 text-white rounded-xl hover:bg-sky-400 transition-colors"
-            >
-              <Search size={18} />
-            </button>
-          </form>
+          {/* Desktop search */}
+          <div ref={desktopRef} className="hidden md:flex flex-1 max-w-xl relative">
+            <form onSubmit={handleSearch} className="w-full relative group">
+              <input
+                type="text"
+                placeholder="Nombre, OEM, Serie o Marca..."
+                value={searchQuery}
+                onChange={(e) => handleQueryChange(e.target.value)}
+                className="w-full bg-white/10 border border-white/20 rounded-2xl py-2.5 px-6 text-white placeholder:text-white/50 focus:bg-white focus:text-slate-900 transition-all shadow-inner"
+                autoComplete="off"
+              />
+              <button
+                type="submit"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-sky-500 text-white rounded-xl hover:bg-sky-400 transition-colors"
+              >
+                <Search size={18} />
+              </button>
+            </form>
+            <PreviewDropdown />
+          </div>
 
           <nav className="hidden md:flex gap-1 items-center">
             <Link href="/category" className={iconClass}>
@@ -256,7 +390,6 @@ export default function Header() {
             color="text-sky-300"
             onSelect={(val: string) => handleStaticSelect(val, "category")}
           />
-
           <BrandDropdown onSelect={(val) => handleStaticSelect(val, "brand")} />
         </div>
       </div>
@@ -272,19 +405,23 @@ export default function Header() {
         <div className="md:hidden fixed inset-0 top-20 bg-white z-[100] overflow-y-auto animate-in slide-in-from-right duration-300">
           <div className="p-6 space-y-8 pb-24">
             {/* BUSQUEDA MOBILE */}
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder="¿Qué refacción necesitas?"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-2xl py-4 px-5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-              />
-              <Search
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-sky-900"
-                size={20}
-              />
-            </form>
+            <div ref={mobileRef} className="relative">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  placeholder="¿Qué refacción necesitas?"
+                  value={searchQuery}
+                  onChange={(e) => handleQueryChange(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-2xl py-4 px-5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  autoComplete="off"
+                />
+                <Search
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-sky-900"
+                  size={20}
+                />
+              </form>
+              <PreviewDropdown />
+            </div>
 
             {/* NAVEGACIÓN PRINCIPAL MOBILE */}
             <div className="grid grid-cols-2 gap-4">
