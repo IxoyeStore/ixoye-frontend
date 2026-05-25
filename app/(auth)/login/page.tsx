@@ -10,6 +10,7 @@ import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Correo inválido"),
@@ -24,6 +25,8 @@ function LoginFormContent() {
   const { setUser, refreshUser } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [resendStatus, setResendStatus] = useState<{
     type: "success" | "error";
@@ -133,6 +136,7 @@ function LoginFormContent() {
         body: JSON.stringify({
           jwt: result.jwt,
           user: result.user,
+          rememberMe,
         }),
       });
 
@@ -205,18 +209,47 @@ function LoginFormContent() {
                 ¿Olvidaste tu contraseña?
               </Link>
             </div>
-            <Input
-              type="password"
-              {...register("password")}
-              placeholder="••••••••"
-              className="border-gray-200 focus-visible:ring-[#0071b1] h-11 bg-gray-50/30"
-            />
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                {...register("password")}
+                placeholder="••••••••"
+                className="border-gray-200 focus-visible:ring-[#0071b1] h-11 bg-gray-50/30 pr-11"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0071b1] transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
             {errors.password && (
               <p className="text-[11px] text-red-500 font-medium">
                 {errors.password.message}
               </p>
             )}
           </div>
+
+          {/* Recordarme */}
+          <label className="flex items-center gap-2.5 cursor-pointer select-none w-fit">
+            <div
+              onClick={() => setRememberMe((v) => !v)}
+              className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors shrink-0 ${
+                rememberMe
+                  ? "bg-[#0071b1] border-[#0071b1]"
+                  : "border-gray-300 bg-white"
+              }`}
+            >
+              {rememberMe && (
+                <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 12 12">
+                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </div>
+            <span className="text-sm text-gray-600">Recordarme</span>
+          </label>
 
           {/* Sección de Errores y Reenvío */}
           {loginError && (

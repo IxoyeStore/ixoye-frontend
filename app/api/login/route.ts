@@ -40,12 +40,13 @@ export async function POST(request: Request) {
     const meData = meRes.ok ? await meRes.json() : null;
     const roleName: string = meData?.role?.name ?? "Authenticated";
 
+    const { rememberMe } = body;
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax" as const,
       path: "/",
-      maxAge: 60 * 60 * 24 * 7,
+      ...(rememberMe ? { maxAge: 60 * 60 * 24 * 30 } : {}),
     };
 
     const sessionToken = await createSignedSession(roleName);
