@@ -216,7 +216,7 @@ function CategoryContent() {
           No se pudieron cargar los productos
         </p>
         <button
-          onClick={() => fetchProducts(1, true)}
+          onClick={() => fetchProducts(1)}
           className="text-xs font-black uppercase tracking-widest text-[#0055a4] hover:text-[#003d7a] underline underline-offset-4 transition-colors"
         >
           Intentar de nuevo
