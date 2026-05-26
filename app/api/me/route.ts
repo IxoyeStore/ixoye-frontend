@@ -19,28 +19,25 @@ export async function GET() {
     if (!userRes.ok) return NextResponse.json({ user: null }, { status: 401 });
     const userData = await userRes.json();
 
-    const profileUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/profiles?filters[users_permissions_user][id][$eq]=${userData.id}`;
+    const profileRes = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/profiles?filters[users_permissions_user][id][$eq]=${userData.id}`,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+        cache: "no-store",
+      },
+    );
 
-    const profileRes = await fetch(profileUrl, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    });
-
-    const profileData = await profileRes.json();
-
-    const userProfile =
-      profileData.data && profileData.data.length > 0
-        ? profileData.data[0]
-        : null;
-
-    const profileContent = userProfile?.attributes
-      ? { id: userProfile.id, ...userProfile.attributes }
-      : userProfile;
+    let profile = null;
+    if (profileRes.ok) {
+      const profileData = await profileRes.json();
+      profile = profileData.data?.[0] ?? null;
+    }
 
     return NextResponse.json({
       user: {
         ...userData,
-        profile: profileContent,
+        jwt,
+        profile,
       },
     });
   } catch (error) {

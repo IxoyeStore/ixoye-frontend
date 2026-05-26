@@ -14,17 +14,25 @@ const statusMap: Record<string, { label: string; class: string }> = {
     label: "Pendiente",
     class: "border-amber-200 text-amber-700 bg-amber-50",
   },
+  paid: {
+    label: "Pagado",
+    class: "border-emerald-200 text-emerald-700 bg-emerald-50",
+  },
   processing: {
     label: "En Preparación",
     class: "border-sky-200 text-sky-700 bg-sky-50",
   },
-  completed: {
-    label: "Entregado",
-    class: "border-emerald-200 text-emerald-700 bg-emerald-50",
-  },
   shipped: {
     label: "En Camino",
     class: "border-violet-200 text-violet-700 bg-violet-50",
+  },
+  delivered: {
+    label: "Entregado",
+    class: "border-emerald-200 text-emerald-700 bg-emerald-50",
+  },
+  completed: {
+    label: "Entregado",
+    class: "border-emerald-200 text-emerald-700 bg-emerald-50",
   },
   cancelled: {
     label: "Cancelado",
@@ -45,7 +53,7 @@ export default function OrderDetailPage() {
       setLoading(true);
 
       try {
-        const baseUrl = `https://ixoye-backend-production.up.railway.app/api/orders`;
+        const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/orders`;
         const filters = `?filters[documentId][$eq]=${id}&filters[user][id][$eq]=${user.id}`;
 
         const response = await fetch(`${baseUrl}${filters}`, {

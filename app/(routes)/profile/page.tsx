@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/context/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   UserCircle,
   LogOut,
   Settings2,
+  LayoutDashboard,
   Package,
   AlertCircle,
   Loader2,
@@ -60,7 +61,7 @@ export default function ProfilePage() {
     setLoadingAddresses(true);
     try {
       const response = await fetch(
-        `https://ixoye-backend-production.up.railway.app/api/addresses?filters[users_permissions_user][id][$eq]=${user.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${user.id}`,
         { headers: { Authorization: `Bearer ${user.jwt}` } },
       );
       const { data } = await response.json();
@@ -78,7 +79,7 @@ export default function ProfilePage() {
       setLoadingOrders(true);
       try {
         const response = await fetch(
-          `https://ixoye-backend-production.up.railway.app/api/orders?filters[user][id][$eq]=${user.id}&sort[0]=createdAt:desc&pagination[limit]=10`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/orders?filters[user][id][$eq]=${user.id}&sort[0]=createdAt:desc&pagination[limit]=100`,
           { headers: { Authorization: `Bearer ${user.jwt}` } },
         );
         const { data } = await response.json();
@@ -117,7 +118,7 @@ export default function ProfilePage() {
     if (!user || !confirm("¿Estás seguro de eliminar esta dirección?")) return;
     try {
       const res = await fetch(
-        `https://ixoye-backend-production.up.railway.app/api/addresses/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/addresses/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${user.jwt}` },
@@ -161,14 +162,25 @@ export default function ProfilePage() {
           </p>
         </div>
         <div className="flex justify-center md:justify-end gap-3">
+          {user?.role?.name === "Admin" && (
+            <Link href="/admin">
+              <Button
+                className="rounded-full bg-white border border-sky-200 text-[#0071b1] font-black uppercase text-[10px] tracking-wider px-6 shadow-md hover:bg-sky-200 transition-colors"
+              >
+                <LayoutDashboard className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:inline">Dashboard</span>
+                <span className="md:hidden">Dashboard</span>
+              </Button>
+            </Link>
+          )}
           <Link href="/profile/edit">
             <Button
               variant="outline"
-              className="rounded-full border-sky-200 text-sky-800 font-black uppercase text-[10px] tracking-wider px-6 shadow-sm hover:bg-sky-50"
+              className="rounded-full bg-white border border-sky-200 text-[#0071b1] font-black uppercase text-[10px] tracking-wider px-6 shadow-md hover:bg-sky-200 transition-colors"
             >
               <Settings2 className="w-4 h-4 md:mr-2" />
-              <span className="hidden md:inline">Configuración</span>
-              <span className="md:hidden">Editar</span>
+              <span className="hidden md:inline">Editar Perfil</span>
+              <span className="md:hidden">Editar Perfil</span>
             </Button>
           </Link>
           <Button
@@ -252,21 +264,16 @@ export default function ProfilePage() {
               {!isProfileComplete ? (
                 <NoProfileBox />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <InfoBlock
-                    label="Nombre Completo"
-                    value={`${profileData.firstName} ${profileData.lastName}`}
-                    icon={<User size={18} />}
-                  />
-                  <InfoBlock
-                    label="Teléfono de Contacto"
-                    value={profileData.phone || "No asignado"}
-                    icon={<Phone size={18} />}
-                  />
-                  <InfoBlock
-                    label="Fecha Nacimiento"
-                    value={profileData.birthDate || "No asignada"}
-                    icon={<Calendar size={18} />}
+                <div className="divide-y divide-slate-300">
+                  <InfoRow label="Nombre(s)" value={profileData.firstName} />
+                  <InfoRow label="Apellido Paterno" value={profileData.lastName} />
+                  <InfoRow label="Apellido Materno" value={profileData.motherLastName} />
+                  <InfoRow label="Teléfono" value={profileData.phone} />
+                  <InfoRow
+                    label="Fecha de nacimiento"
+                    value={profileData.birthDate
+                      ? new Date(profileData.birthDate).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })
+                      : null}
                   />
                 </div>
               )}
@@ -595,28 +602,15 @@ function AddressCard({
   );
 }
 
-function InfoBlock({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: string;
-  icon: any;
-}) {
+function InfoRow({ label, value }: { label: string; value: string | null | undefined }) {
   return (
-    <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 flex items-center gap-5 hover:bg-white hover:shadow-xl hover:shadow-sky-500/5 transition-all group">
-      <div className="bg-white p-4 rounded-2xl text-sky-500 shadow-sm shrink-0 group-hover:scale-110 transition-transform">
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.15em] mb-0.5">
-          {label}
-        </p>
-        <p className="text-sm font-black text-sky-950 uppercase truncate">
-          {value || "---"}
-        </p>
-      </div>
+    <div className="flex items-center justify-between py-4 gap-4">
+      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest shrink-0">
+        {label}
+      </span>
+      <span className={`text-sm font-semibold text-right ${value ? "text-slate-800" : "text-slate-300 italic"}`}>
+        {value || "—"}
+      </span>
     </div>
   );
 }

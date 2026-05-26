@@ -7,9 +7,10 @@ import { useLovedProducts } from "@/hooks/use-loved-products";
 import { formatPrice } from "@/lib/formatPrice";
 import { cn } from "@/lib/utils";
 import { ProductType } from "@/types/product";
-import { X, ShoppingCart } from "lucide-react";
+import { X, ShoppingCart, PackageX } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
 import Link from "next/link";
+import { useAuth } from "@/context/auth-context";
 
 interface LovedItemProductProps {
   product: ProductType;
@@ -18,6 +19,12 @@ interface LovedItemProductProps {
 const LovedItemProduct = ({ product }: LovedItemProductProps) => {
   const { removeLovedItem } = useLovedProducts();
   const { addItem } = useCart();
+  const { user } = useAuth();
+
+  const isB2B = user?.profile?.type === "b2b";
+  const hasWholesalePrice = isB2B && product.wholesalePrice && product.wholesalePrice > 0;
+  const displayPrice = hasWholesalePrice ? product.wholesalePrice : product.price;
+  const outOfStock = !product.stock || product.stock <= 0;
 
   const addToCheckout = () => {
     addItem(product);
@@ -43,20 +50,32 @@ const LovedItemProduct = ({ product }: LovedItemProductProps) => {
               {product.productName}
             </h2>
           </Link>
-          <p className="font-bold text-green-700 mt-1 text-base">
-            {formatPrice(product.price)}
+          {hasWholesalePrice && (
+            <p className="text-xs text-slate-400 line-through">
+              {formatPrice(product.price)}
+            </p>
+          )}
+          <p className={`font-bold mt-1 text-base ${outOfStock ? "text-slate-400" : "text-green-700"}`}>
+            {formatPrice(displayPrice!)}
           </p>
         </div>
 
-        <Button
-          className="mt-2 rounded-lg bg-[#0055a4] hover:bg-[#003d7a] text-white transition-all w-full md:w-fit flex gap-2 h-8 px-3 shadow-sm"
-          onClick={addToCheckout}
-        >
-          <ShoppingCart size={14} />
-          <span className="text-[11px] font-bold uppercase tracking-wider">
-            Mover al carrito
-          </span>
-        </Button>
+        {outOfStock ? (
+          <div className="mt-2 flex items-center gap-2 text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 h-8 w-full md:w-fit">
+            <PackageX size={14} />
+            <span className="text-[11px] font-bold uppercase tracking-wider">Agotado</span>
+          </div>
+        ) : (
+          <Button
+            className="mt-2 rounded-lg bg-[#0055a4] hover:bg-[#003d7a] text-white transition-all w-full md:w-fit flex gap-2 h-8 px-3 shadow-sm"
+            onClick={addToCheckout}
+          >
+            <ShoppingCart size={14} />
+            <span className="text-[11px] font-bold uppercase tracking-wider">
+              Mover al carrito
+            </span>
+          </Button>
+        )}
       </div>
 
       <button

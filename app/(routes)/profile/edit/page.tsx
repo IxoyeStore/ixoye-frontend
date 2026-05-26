@@ -101,7 +101,7 @@ export default function EditProfilePage() {
     const listaColonias = entry.c || [];
     setColoniasSugeridas(listaColonias);
 
-    if (listaColonias.length > 1) {
+    if (listaColonias.length > 1 && !listaColonias.includes(addressForm.neighborhood)) {
       setShowColonias(true);
     }
 
@@ -155,7 +155,7 @@ export default function EditProfilePage() {
 
           if (addressId) {
             const res = await fetch(
-              `https://ixoye-backend-production.up.railway.app/api/addresses/${addressId}`,
+              `${process.env.NEXT_PUBLIC_API_URL}/api/addresses/${addressId}`,
               { headers: { Authorization: `Bearer ${user.jwt}` } },
             );
             const json = await res.json();
@@ -163,7 +163,7 @@ export default function EditProfilePage() {
           } else {
             const userId = user.id;
             const res = await fetch(
-              `https://ixoye-backend-production.up.railway.app/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
+              `${process.env.NEXT_PUBLIC_API_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
               { headers: { Authorization: `Bearer ${user.jwt}` } },
             );
             const json = await res.json();
@@ -232,40 +232,6 @@ export default function EditProfilePage() {
   };
 
   const handleSave = async () => {
-    const requiredFields = {
-      street: "Calle y Número",
-      postalCode: "Código Postal",
-      neighborhood: "Colonia",
-      state: "Estado",
-      city: "Ciudad",
-    };
-
-    for (const [key, label] of Object.entries(requiredFields)) {
-      const value = addressForm[key as keyof typeof addressForm];
-      if (
-        value === undefined ||
-        value === null ||
-        value.toString().trim() === ""
-      ) {
-        setErrors({ general: `El campo ${label} es obligatorio.` });
-        return;
-      }
-    }
-
-    if (
-      addressForm.street.trim() === "" ||
-      addressForm.postalCode.length < 5 ||
-      addressForm.neighborhood.trim() === "" ||
-      addressForm.state.trim() === "" ||
-      addressForm.city.trim() === ""
-    ) {
-      setErrors({
-        general:
-          "Por favor completa todos los campos obligatorios (*) de la dirección.",
-      });
-      return;
-    }
-
     if (!user) return;
     setSaving(true);
     setErrors({});
@@ -274,38 +240,13 @@ export default function EditProfilePage() {
       const jwt = user.jwt;
       const userId = user.id;
 
-      if (addressForm.isDefault) {
-        const addrRes = await fetch(
-          `https://ixoye-backend-production.up.railway.app/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
-          { headers: { Authorization: `Bearer ${jwt}` } },
-        );
-        const { data: defaultAddresses } = await addrRes.json();
-
-        if (defaultAddresses && Array.isArray(defaultAddresses)) {
-          for (const addr of defaultAddresses) {
-            const docId = addr.documentId;
-            if (docId && docId !== addressId) {
-              await fetch(
-                `https://ixoye-backend-production.up.railway.app/api/addresses/${docId}`,
-                {
-                  method: "PUT",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${jwt}`,
-                  },
-                  body: JSON.stringify({ data: { isDefault: false } }),
-                },
-              );
-            }
-          }
-        }
-      }
-
+      // --- Guardar perfil ---
       const profileDocId =
         user.profile?.documentId ||
         user.users_permissions_user?.profile?.documentId;
 
-      const profileData: any = {
+      const profilePayload: any = {
+        documentId: profileDocId ?? undefined,
         firstName: form.firstName,
         lastName: form.lastName,
         motherLastName: form.motherLastName,
@@ -315,43 +256,73 @@ export default function EditProfilePage() {
         companyName: form.type === "b2b" ? form.companyName : "",
       };
 
-      if (profileDocId) {
-        await fetch(
-          `https://ixoye-backend-production.up.railway.app/api/profiles/${profileDocId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
-            },
-            body: JSON.stringify({ data: profileData }),
-          },
-        );
-      }
-
-      const isUpdatingAddress = addressId && !isNewAddress;
-      const addrUrl = isUpdatingAddress
-        ? `https://ixoye-backend-production.up.railway.app/api/addresses/${addressId}`
-        : `https://ixoye-backend-production.up.railway.app/api/addresses`;
-
-      const addrRes = await fetch(addrUrl, {
-        method: isUpdatingAddress ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({
-          data: { ...addressForm, users_permissions_user: userId },
-        }),
+      const profileRes = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profilePayload),
       });
 
-      if (!addrRes.ok) throw new Error("Error al guardar la dirección.");
+      if (!profileRes.ok) {
+        const err = await profileRes.json();
+        throw new Error(err.error || "Error al guardar el perfil.");
+      }
+
+      // --- Guardar dirección (solo si hay datos suficientes) ---
+      const hasAddress =
+        addressForm.street.trim() &&
+        addressForm.postalCode.length >= 5 &&
+        addressForm.neighborhood.trim() &&
+        addressForm.state.trim() &&
+        addressForm.city.trim();
+
+      if (hasAddress) {
+        if (addressForm.isDefault) {
+          const addrRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${userId}&filters[isDefault][$eq]=true`,
+            { headers: { Authorization: `Bearer ${jwt}` } },
+          );
+          const { data: defaultAddresses } = await addrRes.json();
+          if (defaultAddresses && Array.isArray(defaultAddresses)) {
+            for (const addr of defaultAddresses) {
+              const docId = addr.documentId;
+              if (docId && docId !== addressId) {
+                await fetch(
+                  `${process.env.NEXT_PUBLIC_API_URL}/api/addresses/${docId}`,
+                  {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${jwt}`,
+                    },
+                    body: JSON.stringify({ data: { isDefault: false } }),
+                  },
+                );
+              }
+            }
+          }
+        }
+
+        const isUpdatingAddress = addressId && !isNewAddress;
+        const addrUrl = isUpdatingAddress
+          ? `${process.env.NEXT_PUBLIC_API_URL}/api/addresses/${addressId}`
+          : `${process.env.NEXT_PUBLIC_API_URL}/api/addresses`;
+
+        const addrSaveRes = await fetch(addrUrl, {
+          method: isUpdatingAddress ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify({
+            data: { ...addressForm, users_permissions_user: userId },
+          }),
+        });
+
+        if (!addrSaveRes.ok) throw new Error("Error al guardar la dirección.");
+      }
 
       await refreshUser?.();
-      router.push(
-        "/profile?tab=" +
-          (isUpdatingAddress || isNewAddress ? "addresses" : "info"),
-      );
+      router.push("/profile?tab=info");
     } catch (error: any) {
       setErrors({ general: error.message });
     } finally {
@@ -389,49 +360,8 @@ export default function EditProfilePage() {
           </CardHeader>
 
           <CardContent className="px-8 py-8 space-y-8">
-            {/* TIPO DE CUENTA */}
-            <div className="space-y-3">
-              <Label className="text-sm font-bold text-[#012849]">
-                Tipo de Cuenta
-              </Label>
-              <div className="grid grid-cols-2 gap-4">
-                <div
-                  className={`flex items-center justify-center p-4 rounded-xl border-2 transition-all ${
-                    form.type === "b2c"
-                      ? "border-[#0071b1] bg-blue-50 text-[#0071b1]"
-                      : "border-gray-100 text-gray-400 bg-gray-50/50 cursor-not-allowed"
-                  }`}
-                >
-                  <User className="w-5 h-5 mr-2" />{" "}
-                  <span className="font-bold text-sm">Persona</span>
-                </div>
-                <div
-                  className={`flex items-center justify-center p-4 rounded-xl border-2 transition-all ${
-                    form.type === "b2b"
-                      ? "border-[#0071b1] bg-blue-50 text-[#0071b1]"
-                      : "border-gray-100 text-gray-400 bg-gray-50/50 cursor-not-allowed"
-                  }`}
-                >
-                  <Building2 className="w-5 h-5 mr-2" />{" "}
-                  <span className="font-bold text-sm">Empresa</span>
-                </div>
-              </div>
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {form.type === "b2b" && (
-                <div className="md:col-span-2 space-y-1.5">
-                  <Label className="text-sm font-bold text-[#012849]">
-                    Nombre de la Empresa
-                  </Label>
-                  <Input
-                    value={form.companyName}
-                    onChange={(e) =>
-                      handleChange("companyName", e.target.value)
-                    }
-                  />
-                </div>
-              )}
               <div className="space-y-1.5">
                 <Label className="text-sm font-bold text-[#012849]">
                   Nombre(s) *
@@ -461,7 +391,7 @@ export default function EditProfilePage() {
                   }
                 />
               </div>
-              <div className="space-y-1.5">
+                            <div className="space-y-1.5">
                 <Label className="text-sm font-bold text-[#012849]">
                   Teléfono *
                 </Label>
@@ -471,6 +401,19 @@ export default function EditProfilePage() {
                   maxLength={10}
                 />
               </div>
+                {form.type === "b2b" && (
+                <div className="md:col-span-2 space-y-1.5">
+                  <Label className="text-sm font-bold text-[#012849]">
+                    Nombre Comercial
+                  </Label>
+                  <Input
+                    value={form.companyName}
+                    onChange={(e) =>
+                      handleChange("companyName", e.target.value)
+                    }
+                  />
+                </div>
+              )}
 
               <div className="space-y-1.5">
                 <Label className="text-sm font-bold text-[#012849] flex items-center">
@@ -490,6 +433,19 @@ export default function EditProfilePage() {
                 <h3 className="md:col-span-2 font-bold text-[#012849]">
                   Información de Entrega
                 </h3>
+
+                <div className="md:col-span-2 space-y-1.5">
+                  <Label className="text-sm font-bold text-[#012849]">
+                    Nombre de la dirección (alias)
+                  </Label>
+                  <Input
+                    placeholder="Ej. Casa, Trabajo, ..."
+                    value={addressForm.alias}
+                    onChange={(e) =>
+                      handleAddressChange("alias", e.target.value)
+                    }
+                  />
+                </div>
 
                 <div className="md:col-span-2 space-y-1.5">
                   <Label className="text-sm font-bold text-[#012849]">
@@ -742,6 +698,15 @@ export default function EditProfilePage() {
                 "Guardar Cambios"
               )}
             </Button>
+
+            <div className="pt-2 border-t border-gray-100 text-center">
+              <Link
+                href="/profile/security"
+                className="text-sm font-semibold text-[#0071b1] hover:text-[#012849] hover:underline"
+              >
+                Cambiar contraseña
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>

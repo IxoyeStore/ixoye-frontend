@@ -63,7 +63,7 @@ const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
                 <button
                   key={item}
                   onClick={() => onSelect(item)}
-                  className="w-full text-left px-4 py-2.5 text-[10px] font-bold text-slate-600 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors uppercase italic"
+                  className="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors"
                 >
                   {item}
                 </button>

@@ -4,11 +4,94 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/formatPrice";
-import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown, Eye, ShoppingCart, TrendingUp, SearchIcon, LayoutList } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown, Eye, ShoppingCart, TrendingUp, SearchIcon, LayoutList, Copy, Check } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
 import { toast } from "sonner";
 
-type EditingCell = { docId: string; field: "price" | "wholesalePrice" | "stock" };
+const CopyButton = ({ text }: { text: string }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      title="Copiar código"
+      className="shrink-0 p-0.5 rounded text-slate-400 dark:text-slate-500 hover:text-sky-500 dark:hover:text-sky-400 transition-colors"
+    >
+      {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+    </button>
+  );
+};
+
+type EditingCellField = "price" | "wholesalePrice" | "stock";
+type EditingCell = { docId: string; field: EditingCellField };
+
+const EditableCell = ({
+  docId, field, value, format, onSave,
+}: {
+  docId: string;
+  field: EditingCellField;
+  value: number | null;
+  format?: (v: number) => string;
+  onSave: (docId: string, field: EditingCellField, value: number) => Promise<void>;
+}) => {
+  const [editing, setEditing] = useState(false);
+  const [localValue, setLocalValue] = useState("");
+  const [saving, setSaving] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const startEdit = () => {
+    setLocalValue(String(value ?? ""));
+    setEditing(true);
+  };
+
+  const save = async () => {
+    const parsed = field === "stock" ? parseInt(localValue) : parseFloat(localValue);
+    if (isNaN(parsed)) { setEditing(false); return; }
+    setSaving(true);
+    await onSave(docId, field, parsed);
+    setSaving(false);
+    setEditing(false);
+  };
+
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") { e.preventDefault(); save(); }
+    if (e.key === "Escape") setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        autoFocus
+        type="number"
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        onBlur={save}
+        onKeyDown={handleKey}
+        className="w-24 text-right border border-sky-400 rounded-lg px-2 py-1 text-[11px] font-black focus:outline-none bg-sky-50 dark:bg-sky-900/30 dark:text-white"
+        step={field === "stock" ? "1" : "0.01"}
+        min="0"
+      />
+    );
+  }
+
+  return (
+    <button
+      onClick={startEdit}
+      disabled={saving}
+      title="Clic para editar"
+      className={`text-right font-black rounded px-1 py-0.5 transition-all hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:text-sky-700 dark:hover:text-sky-400 cursor-pointer group ${saving ? "opacity-50" : ""} ${value == null ? "text-slate-300 dark:text-slate-600" : field === "stock" ? (Number(value) <= 0 ? "text-red-500" : Number(value) <= 5 ? "text-amber-500" : "text-slate-900 dark:text-white") : field === "wholesalePrice" ? "text-blue-700 dark:text-blue-400" : "text-slate-900 dark:text-white"}`}
+    >
+      {value == null ? "—" : (format ? format(Number(value)) : String(value))}
+      <span className="ml-1 opacity-0 group-hover:opacity-100 text-[8px] text-sky-400 transition-opacity">✎</span>
+    </button>
+  );
+};
 
 const BULK_ACTIONS = [
   { value: "activate", label: "Activar seleccionados", needsValue: false },
@@ -39,10 +122,6 @@ export default function AdminProductsPage() {
   const [togglingActive, setTogglingActive] = useState<string | null>(null);
 
   // Inline editing
-  const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
-  const [cellValue, setCellValue] = useState("");
-  const [savingCell, setSavingCell] = useState<string | null>(null);
-  const cellInputRef = useRef<HTMLInputElement>(null);
 
   // Bulk action
   const [bulkAction, setBulkAction] = useState("");
@@ -73,9 +152,6 @@ export default function AdminProductsPage() {
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
-  useEffect(() => {
-    if (editingCell) cellInputRef.current?.focus();
-  }, [editingCell]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,26 +187,12 @@ export default function AdminProductsPage() {
   };
 
   // --- Inline editing ---
-  const startEdit = (docId: string, field: EditingCell["field"], currentValue: any) => {
-    setEditingCell({ docId, field });
-    setCellValue(String(currentValue ?? ""));
-  };
-
-  const cancelEdit = () => { setEditingCell(null); setCellValue(""); };
-
-  const saveCell = async () => {
-    if (!editingCell) return;
-    const { docId, field } = editingCell;
-    const parsed = field === "stock" ? parseInt(cellValue) : parseFloat(cellValue);
-    if (isNaN(parsed)) { cancelEdit(); return; }
-
-    setSavingCell(docId + field);
+  const handleCellSave = useCallback(async (docId: string, field: EditingCellField, parsed: number) => {
     const res = await fetch(`/api/admin/products/${docId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ [field]: parsed }),
     });
-
     if (res.ok) {
       setProducts((prev) =>
         prev.map((p) => (p.documentId === docId || String(p.id) === docId) ? { ...p, [field]: parsed } : p)
@@ -139,14 +201,7 @@ export default function AdminProductsPage() {
     } else {
       toast.error("Error al guardar");
     }
-    setSavingCell(null);
-    cancelEdit();
-  };
-
-  const handleCellKey = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") saveCell();
-    if (e.key === "Escape") cancelEdit();
-  };
+  }, []);
 
   const toggleActive = async (docId: string, current: boolean) => {
     setTogglingActive(docId);
@@ -232,40 +287,6 @@ export default function AdminProductsPage() {
   const totalPages = Math.ceil(total / 20);
   const selectedAction = BULK_ACTIONS.find((a) => a.value === bulkAction);
 
-  const EditableCell = ({
-    docId, field, value, format,
-  }: { docId: string; field: EditingCell["field"]; value: number | null; format?: (v: number) => string }) => {
-    const isEditing = editingCell?.docId === docId && editingCell?.field === field;
-    const isSaving = savingCell === docId + field;
-
-    if (isEditing) {
-      return (
-        <input
-          ref={cellInputRef}
-          type="number"
-          value={cellValue}
-          onChange={(e) => setCellValue(e.target.value)}
-          onBlur={saveCell}
-          onKeyDown={handleCellKey}
-          className="w-24 text-right border border-sky-400 rounded-lg px-2 py-1 text-[11px] font-black focus:outline-none bg-sky-50 dark:bg-sky-900/30 dark:text-white"
-          step={field === "stock" ? "1" : "0.01"}
-          min="0"
-        />
-      );
-    }
-
-    return (
-      <button
-        onClick={() => startEdit(docId, field, value ?? "")}
-        disabled={isSaving}
-        title="Clic para editar"
-        className={`text-right font-black rounded px-1 py-0.5 transition-all hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:text-sky-700 dark:hover:text-sky-400 cursor-pointer group ${isSaving ? "opacity-50" : ""} ${value == null ? "text-slate-300 dark:text-slate-600" : field === "stock" ? (Number(value) <= 0 ? "text-red-500" : Number(value) <= 5 ? "text-amber-500" : "text-slate-900 dark:text-white") : field === "wholesalePrice" ? "text-blue-700 dark:text-blue-400" : "text-slate-900 dark:text-white"}`}
-      >
-        {value == null ? "—" : (format ? format(Number(value)) : String(value))}
-        <span className="ml-1 opacity-0 group-hover:opacity-100 text-[8px] text-sky-400 transition-opacity">✎</span>
-      </button>
-    );
-  };
 
   const Pagination = () =>
     totalPages > 1 ? (
@@ -314,14 +335,23 @@ export default function AdminProductsPage() {
         <div className="flex flex-col sm:flex-row gap-3">
           <form onSubmit={handleSearch} className="flex gap-2 flex-1">
             <div className="relative flex-1">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Nombre, código, marca..."
-                className="pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-sky-400 w-full bg-white dark:bg-slate-800 dark:text-white dark:placeholder-slate-500"
+                className="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-sky-400 w-full bg-white dark:bg-slate-800 dark:text-white dark:placeholder-slate-500"
               />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => { setSearch(""); setQuery(""); setPage(1); }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                >
+                  <X size={15} />
+                </button>
+              )}
             </div>
             <button type="submit" className="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 text-white rounded-xl text-sm font-semibold hover:bg-slate-700 dark:hover:bg-slate-600 transition-all shrink-0">
               Buscar
@@ -520,13 +550,16 @@ export default function AdminProductsPage() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-mono font-black text-slate-900 dark:text-white text-sm shrink-0">{p.code || "—"}</span>
-                      <span className="text-slate-500 dark:text-slate-400 text-[11px] font-bold truncate">{p.productName}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono font-semibold text-slate-700 dark:text-slate-300 text-sm shrink-0">{p.code || "—"}</span>
+                      {p.code && <CopyButton text={p.code} />}
+                    </div>
+                    <div className="flex items-baseline gap-2 mt-0.5">
+                      <span className="text-slate-700 dark:text-slate-300 text-xs font-semibold truncate">{p.productName}</span>
                     </div>
                     <div className="flex items-center gap-3 mt-1">
-                      <span className="text-[12px] font-black text-slate-900 dark:text-white">{formatPrice(p.price)}</span>
-                      <span className={`text-[11px] font-black ${p.stock <= 0 ? "text-red-500" : p.stock <= 5 ? "text-amber-500" : "text-slate-500 dark:text-slate-400"}`}>
+                      <span className="text-sm font-bold text-slate-900 dark:text-white">{formatPrice(p.price)}</span>
+                      <span className={`text-xs font-semibold ${p.stock <= 0 ? "text-red-500" : p.stock <= 5 ? "text-amber-500" : "text-slate-500 dark:text-slate-400"}`}>
                         Stock: {p.stock ?? "—"}
                       </span>
                     </div>
@@ -556,7 +589,7 @@ export default function AdminProductsPage() {
       {/* ── Desktop table ────────────────────────────────────────────────── */}
       <div className="hidden sm:block bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-[11px]">
+          <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 uppercase font-black tracking-widest bg-slate-200 dark:bg-slate-700/50">
                 <th className="px-4 py-4 w-10">
@@ -616,19 +649,24 @@ export default function AdminProductsPage() {
                               className="w-full h-full"
                             />
                           </div>
-                          <span className="font-black text-slate-900 dark:text-white max-w-[160px] leading-snug">{p.productName}</span>
+                          <span className="font-bold text-sm text-slate-800 dark:text-white max-w-[200px] leading-snug">{p.productName}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400 hidden md:table-cell">{p.code}</td>
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400 hidden lg:table-cell">{p.category?.categoryName || "—"}</td>
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <div className="flex items-center gap-1">
+                          <span className="font-mono text-sm font-semibold text-slate-700 dark:text-slate-300">{p.code || "—"}</span>
+                          {p.code && <CopyButton text={p.code} />}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 hidden lg:table-cell">{p.category?.categoryName || "—"}</td>
                       <td className="px-4 py-3 text-right">
-                        <EditableCell docId={docId} field="price" value={p.price} format={formatPrice} />
+                        <EditableCell docId={docId} field="price" value={p.price} format={formatPrice} onSave={handleCellSave} />
                       </td>
                       <td className="px-4 py-3 text-right hidden lg:table-cell">
-                        <EditableCell docId={docId} field="wholesalePrice" value={p.wholesalePrice ?? null} format={formatPrice} />
+                        <EditableCell docId={docId} field="wholesalePrice" value={p.wholesalePrice ?? null} format={formatPrice} onSave={handleCellSave} />
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <EditableCell docId={docId} field="stock" value={p.stock} />
+                        <EditableCell docId={docId} field="stock" value={p.stock} onSave={handleCellSave} />
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button
@@ -646,23 +684,23 @@ export default function AdminProductsPage() {
                           const m = metrics[p.id] ?? { views: 0, cartAdds: 0, purchases: 0, searchImpressions: 0, categoryImpressions: 0 };
                           return (
                             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-                              <span title="Impresiones en búsqueda" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                              <span title="Impresiones en búsqueda" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
                                 <SearchIcon size={11} className="text-violet-400" />
                                 {m.searchImpressions}
                               </span>
-                              <span title="Impresiones en categoría" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                              <span title="Impresiones en categoría" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
                                 <LayoutList size={11} className="text-cyan-400" />
                                 {m.categoryImpressions}
                               </span>
-                              <span title="Vistas de producto" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                              <span title="Vistas de producto" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
                                 <Eye size={11} className="text-sky-400" />
                                 {m.views}
                               </span>
-                              <span title="Al carrito" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                              <span title="Al carrito" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
                                 <ShoppingCart size={11} className="text-amber-400" />
                                 {m.cartAdds}
                               </span>
-                              <span title="Compras" className="flex items-center gap-1 text-[10px] font-black text-slate-500 dark:text-slate-400">
+                              <span title="Compras" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
                                 <TrendingUp size={11} className="text-emerald-400" />
                                 {m.purchases}
                               </span>
