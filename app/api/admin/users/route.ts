@@ -21,8 +21,30 @@ export async function GET(request: NextRequest) {
     fetch(`${API}/api/users/count`, { headers: { Authorization: `Bearer ${jwt}` }, cache: "no-store" }),
   ]);
 
-  const users = await usersRes.json();
+  const users: any[] = await usersRes.json();
   const count = await countRes.json();
 
-  return NextResponse.json({ data: users, meta: { total: count, page, pageSize } });
+  // Fetch profiles for this page of users in one call
+  let profileMap: Record<number, string> = {};
+  if (Array.isArray(users) && users.length > 0) {
+    const ids = users.map((u) => u.id);
+    const profileFilter = ids.map((id, i) => `filters[users_permissions_user][id][$in][${i}]=${id}`).join("&");
+    const profilesRes = await fetch(
+      `${API}/api/profiles?${profileFilter}&fields[0]=type&populate[users_permissions_user][fields][0]=id&pagination[pageSize]=${ids.length}`,
+      { headers: { Authorization: `Bearer ${jwt}` }, cache: "no-store" }
+    );
+    if (profilesRes.ok) {
+      const profilesJson = await profilesRes.json();
+      for (const p of profilesJson.data ?? []) {
+        const uid = p.users_permissions_user?.id ?? p.users_permissions_user?.data?.id;
+        if (uid) profileMap[uid] = p.type;
+      }
+    }
+  }
+
+  const enriched = Array.isArray(users)
+    ? users.map((u) => ({ ...u, profileType: profileMap[u.id] ?? null }))
+    : users;
+
+  return NextResponse.json({ data: enriched, meta: { total: count, page, pageSize } });
 }

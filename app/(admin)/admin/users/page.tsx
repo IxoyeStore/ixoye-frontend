@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Search, Trash2, ShieldCheck, ShieldOff } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth-context";
 
@@ -93,9 +94,8 @@ export default function AdminUsersPage() {
               <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 uppercase font-black tracking-widest bg-slate-200 dark:bg-slate-700/50">
                 <th className="text-left px-4 md:px-6 py-5">Usuario</th>
                 <th className="text-left px-4 md:px-6 py-5 hidden sm:table-cell">Correo</th>
-                <th className="text-left px-4 md:px-6 py-5">Rol</th>
+                <th className="text-left px-4 md:px-6 py-5 hidden sm:table-cell">Perfil</th>
                 <th className="text-left px-4 md:px-6 py-5 hidden md:table-cell">Registro</th>
-                <th className="text-center px-4 md:px-6 py-5">Estado</th>
                 <th className="px-4 md:px-6 py-5" />
               </tr>
             </thead>
@@ -103,14 +103,14 @@ export default function AdminUsersPage() {
               {loading ? (
                 Array.from({ length: 8 }).map((_, i) => (
                   <tr key={i}>
-                    <td colSpan={6} className="px-6 py-5">
+                    <td colSpan={5} className="px-6 py-5">
                       <div className="h-5 bg-slate-100 dark:bg-slate-700 rounded animate-pulse" />
                     </td>
                   </tr>
                 ))
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-20 text-slate-400 dark:text-slate-500 font-black uppercase text-[11px] tracking-widest">
+                  <td colSpan={5} className="text-center py-20 text-slate-400 dark:text-slate-500 font-black uppercase text-[11px] tracking-widest">
                     Sin resultados
                   </td>
                 </tr>
@@ -131,19 +131,28 @@ export default function AdminUsersPage() {
                         </div>
                       </td>
                       <td className="px-4 md:px-6 py-5 text-slate-500 dark:text-slate-400 hidden sm:table-cell">{u.email}</td>
-                      <td className="px-4 md:px-6 py-5">
-                        <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase ${u.role?.name === "Admin" ? "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400" : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400"}`}>
-                          {u.role?.name || "—"}
-                        </span>
+                      <td className="px-4 md:px-6 py-5 hidden sm:table-cell">
+                        {u.profileType === "b2b" ? (
+                          <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400">
+                            Mayoreo
+                          </span>
+                        ) : u.profileType === "b2c" ? (
+                          <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                            Público
+                          </span>
+                        ) : (
+                          <span className="text-slate-300 dark:text-slate-600 text-[11px] font-bold">—</span>
+                        )}
                       </td>
                       <td className="px-4 md:px-6 py-5 text-slate-500 dark:text-slate-400 hidden md:table-cell">{date}</td>
-                      <td className="px-4 md:px-6 py-5 text-center">
-                        <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase ${u.blocked ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"}`}>
-                          {u.blocked ? "Bloqueado" : "Activo"}
-                        </span>
-                      </td>
                       <td className="px-4 md:px-6 py-5">
                         <div className="flex items-center gap-1">
+                          <Link
+                            href={`/admin/users/${u.id}`}
+                            className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300 transition-colors px-2 py-1.5 rounded-lg hover:bg-sky-50 dark:hover:bg-sky-900/20 whitespace-nowrap"
+                          >
+                            Ver →
+                          </Link>
                           {!isMe && (
                             <>
                               <button
