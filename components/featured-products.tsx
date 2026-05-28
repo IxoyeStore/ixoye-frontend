@@ -40,7 +40,7 @@ const FeaturedProducts = () => {
   useEffect(() => {
     if (!api) return;
     const id = setInterval(() => {
-      if (paused.current) return;
+      if (paused.current || document.hidden) return;
       api.scrollNext();
     }, AUTOPLAY_MS);
     return () => clearInterval(id);
@@ -51,7 +51,7 @@ const FeaturedProducts = () => {
   if (hasFailed) {
     return (
       <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
-        <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
+        <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 uppercase tracking-tighter text-center">
           Productos destacados
         </h3>
         <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 rounded-2xl bg-sky-50/40">
@@ -106,7 +106,7 @@ const FeaturedProducts = () => {
                           <ProductImage
                             url={images?.[0]}
                             alt={productName}
-                            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                            className="w-full h-full object-contain transition-transform duration-500"
                           />
                         </div>
 

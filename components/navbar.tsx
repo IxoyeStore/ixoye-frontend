@@ -50,7 +50,7 @@ const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
     <div className="relative group">
       <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white hover:border-sky-400 hover:bg-white/10 transition-all active:scale-95">
         <Icon size={14} className={color} />
-        <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">{label}</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.15em]">{label}</span>
         <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
       </button>
       <div className="absolute top-full left-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
@@ -63,7 +63,7 @@ const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
                 <button
                   key={item}
                   onClick={() => onSelect(item)}
-                  className="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors"
+                  className="w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors"
                 >
                   {item}
                 </button>
@@ -81,7 +81,7 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
     <div className="relative group">
       <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white hover:border-sky-400 hover:bg-white/10 transition-all active:scale-95">
         <ShieldCheck size={14} className="text-sky-300" />
-        <span className="text-[10px] font-black uppercase tracking-[0.15em] italic">Marcas</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.15em]">Marcas</span>
         <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
       </button>
       <div className="absolute top-full left-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
@@ -95,7 +95,7 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
               <div className="w-14 h-9 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50">
                 <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
               </div>
-              <span className="text-xs font-bold text-slate-700 group-hover/brand:text-sky-700 uppercase tracking-wide leading-tight">
+              <span className="text-sm font-semibold text-slate-800 group-hover/brand:text-sky-700 leading-tight">
                 {name}
               </span>
             </button>
@@ -313,17 +313,17 @@ export default function Header() {
       {/* FRANJA SUPERIOR */}
       <div className="w-full bg-[#003366] bg-gradient-to-t from-[#0055a4] to-[#003366] text-white">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 md:h-24 gap-8">
-          <Link href="/" className="flex items-center gap-4 group shrink-0">
+          <Link href="/" className="flex items-center gap-0 group shrink-0">
             <img
               src="/logo-ixoye.png"
               className="h-10 md:h-14 w-auto object-contain brightness-0 invert"
               alt="logo"
             />
-            <div className="hidden lg:flex flex-col justify-center border-l border-white/20 pl-4">
-              <h1 className="text-white font-black text-lg uppercase italic">
+            <div className="hidden lg:flex flex-col justify-center pl-2">
+              <h1 className="text-white font-black text-[21px] uppercase italic">
                 Refacciones
               </h1>
-              <span className="text-sky-300 font-bold text-[9px] uppercase tracking-[0.3em]">
+              <span className="text-sky-300 font-bold text-[12px] uppercase tracking-[0.25em]">
                 Diesel y Agrícola
               </span>
             </div>
@@ -342,9 +342,9 @@ export default function Header() {
               />
               <button
                 type="submit"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-sky-500 text-white rounded-xl hover:bg-sky-400 transition-colors"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-sky-600 rounded-xl text-white hover:opacity-100 transition-opacity active:scale-95 opacity-90"
               >
-                <Search size={18} />
+                <Search size={20} className="text-white hover:text-sky-300" />
               </button>
             </form>
             <PreviewDropdown />
@@ -361,7 +361,7 @@ export default function Header() {
             </Link>
             <Link href="/loved-product" className={iconClass}>
               <Heart
-                className={`w-6 h-6 ${lovedItems.length > 0 ? "fill-sky-400 text-sky-400" : ""}`}
+                className={`w-6 h-6 ${lovedItems.length > 0 ? "fill-red-400 text-red-400" : ""}`}
               />
               <span className={navTextClass}>Favoritos</span>
             </Link>
@@ -397,7 +397,7 @@ export default function Header() {
       <div className="hidden md:flex w-full bg-[#004a99] border-b border-white/10 py-3 justify-center items-center gap-8 shadow-md">
         <div className="flex items-center gap-2 mr-4">
           <div className="h-2 w-2 bg-[#00a3e0] rounded-full shadow-[0_0_10px_rgba(0,163,224,0.4)]" />
-          <span className="text-[11px] font-bold text-white uppercase italic tracking-widest antialiased">
+          <span className="text-[11px] font-bold text-white uppercase tracking-widest antialiased">
             Búsqueda por:
           </span>
         </div>
@@ -522,7 +522,7 @@ export default function Header() {
                       <button
                         key={type}
                         onClick={() => handleStaticSelect(type, "category")}
-                        className="text-left py-3.5 text-[10px] font-bold text-slate-600 uppercase italic border-b border-slate-100 last:border-0"
+                        className="text-left py-3.5 text-sm font-semibold text-slate-700 border-b border-slate-100 last:border-0"
                       >
                         {type}
                       </button>
@@ -553,7 +553,7 @@ export default function Header() {
                         <div className="w-12 h-8 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50">
                           <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
                         </div>
-                        <span className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-tight">{name}</span>
+                        <span className="text-sm font-semibold text-slate-800 leading-tight">{name}</span>
                       </button>
                     ))}
                   </div>

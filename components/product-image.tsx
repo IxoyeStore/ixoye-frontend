@@ -37,7 +37,6 @@ export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
   return (
     <div
       className={`relative overflow-hidden rounded-xl select-none ${className}`}
-      onContextMenu={(e) => e.preventDefault()}
     >
       <Image
         src={url}
@@ -48,7 +47,7 @@ export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         onError={() => setHasError(true)}
       />
-      <div className="absolute inset-0 pointer-events-none" />
+      <div className="absolute inset-0" />
     </div>
   );
 }

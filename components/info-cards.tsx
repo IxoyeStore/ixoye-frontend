@@ -61,7 +61,14 @@ const InfoCards = () => {
           <div>
             <h3 className="text-lg font-bold text-sky-900">Tiendas físicas</h3>
             <p className="text-sm text-sky-600">
-              Visítanos en nuestras sucursales y recibe atención personalizada.
+              Visítanos en nuestras{" "}
+              <Link
+                href="/sucursales"
+                className="font-bold underline text-sky-800 hover:text-sky-500 transition-colors"
+              >
+                sucursales
+              </Link>{" "}
+              y recibe atención personalizada.
             </p>
           </div>
         </div>

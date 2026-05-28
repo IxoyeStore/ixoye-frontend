@@ -96,7 +96,6 @@ export default function ProductGallery({ images, productName }: Props) {
             onMouseLeave={() => setZoomed(false)}
             onMouseMove={handleMouseMove}
             onClick={() => images.length > 0 && setLightboxOpen(true)}
-            onContextMenu={(e) => e.preventDefault()}
           >
             {images.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -109,6 +108,8 @@ export default function ProductGallery({ images, productName }: Props) {
             ) : (
               <ProductImage className="w-full h-full" />
             )}
+            {/* Overlay prevents "Save image as" while allowing link-navigation context menu */}
+            <div className="absolute inset-0" />
 
             {/* Lens indicator */}
             {zoomed && (
@@ -145,7 +146,6 @@ export default function ProductGallery({ images, productName }: Props) {
         <div
           className="relative aspect-square w-full rounded-2xl overflow-hidden border border-slate-100 bg-white select-none"
           onClick={() => images.length > 0 && setLightboxOpen(true)}
-          onContextMenu={(e) => e.preventDefault()}
         >
           {images.length > 0 ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -153,6 +153,7 @@ export default function ProductGallery({ images, productName }: Props) {
           ) : (
             <ProductImage className="w-full h-full" />
           )}
+          <div className="absolute inset-0 pointer-events-none" />
           {images.length > 1 && (
             <>
               <button

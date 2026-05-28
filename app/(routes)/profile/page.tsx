@@ -272,7 +272,7 @@ export default function ProfilePage() {
                   <InfoRow
                     label="Fecha de nacimiento"
                     value={profileData.birthDate
-                      ? new Date(profileData.birthDate).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })
+                      ? (() => { const [y, m, d] = profileData.birthDate.split("T")[0].split("-"); return new Date(+y, +m - 1, +d).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" }); })()
                       : null}
                   />
                 </div>

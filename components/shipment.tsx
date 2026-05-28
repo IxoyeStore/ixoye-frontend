@@ -27,7 +27,7 @@ const ShipmentSection = () => {
 
   useEffect(() => {
     fetch(
-      `https://ixoye-backend-production.up.railway.app/api/shipments?populate=*`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/shipments?populate=*`,
     )
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -58,7 +58,7 @@ const ShipmentSection = () => {
       return (
         <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
           <div className="text-center mb-8 sm:mb-10">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#003366] tracking-tight px-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#003366] tracking-tight px-2">
               Nuestros Clientes respaldan nuestro trabajo
             </h2>
           </div>
@@ -77,10 +77,10 @@ const ShipmentSection = () => {
   return (
     <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16 bg-white">
       <div className="text-center mb-8 sm:mb-10">
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#003366] tracking-tight px-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#003366] tracking-tight px-2">
           Nuestros Clientes respaldan nuestro trabajo
         </h2>
-        <p className="text-slate-500 mt-3 text-sm sm:text-base px-4">
+        <p className="text-slate-600 mt-3 text-sm sm:text-base px-4">
           Transparencia en cada entrega, satisfacción y calidad en cada
           producto.
         </p>

@@ -6,6 +6,9 @@ import ProductGallery from "./components/product-gallery";
 import InfoProduct from "./components/info-product";
 import ProductDescription from "./components/product-description";
 import TrackView from "./components/track-view";
+import TrackRecentlyViewed from "@/components/recently-viewed/track";
+import RecentlyViewedSection from "@/components/recently-viewed/section";
+import RelatedProductsSection from "@/components/related-products/section";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -77,8 +80,18 @@ export default async function ProductPage({
     : [];
 
   return (
+    <>
     <div className="max-w-6xl py-6 mx-auto sm:py-12 sm:px-16 space-y-8">
       <TrackView productId={product.id} />
+      <TrackRecentlyViewed product={{
+        id: product.id,
+        slug: product.slug,
+        productName: product.productName,
+        code: product.code,
+        image: product.images?.[0] ?? "",
+        price: product.price,
+        wholesalePrice: product.wholesalePrice ?? null,
+      }} />
 
       {/* ── Breadcrumb (desktop) ─────────────────────────────────────────── */}
       <nav className="hidden sm:flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-wider">
@@ -188,5 +201,12 @@ export default async function ProductPage({
       </div>
 
     </div>
+
+    <RelatedProductsSection
+      productName={product.productName}
+      currentProductId={product.id}
+    />
+    <RecentlyViewedSection excludeId={product.id} />
+    </>
   );
 }
