@@ -4,22 +4,50 @@ import { Truck, BadgePercent, Store, Search, X } from "lucide-react";
 import Link from "next/link";
 import cpMexico from "@/lib/cp-mexico.json";
 
+const MUNICIPIOS_CON_ENVIO = new Set([
+  "Tepic",
+  "Xalisco",
+  "Bahía de Banderas",
+  "Compostela",
+  "Ixtlán del Río",
+  "Jala",
+  "San Pedro Lagunillas",
+  "Santa María del Oro",
+  "Ahuacatlán",
+  "Santiago Ixcuintla",
+  "San Blas",
+  "Tecuala",
+  "Acaponeta",
+  "Rosamorada",
+  "Ruíz",
+  "Tuxpan",
+]);
+
 const InfoCards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cp, setCp] = useState("");
   const [resultado, setResultado] = useState<string | null>(null);
+  const [disponible, setDisponible] = useState<boolean | null>(null);
 
   const consultarEnvio = () => {
     if (cp.length < 5) return;
     const entry = (cpMexico as Record<string, { e: string; m: string }>)[cp];
     if (!entry) {
       setResultado("Código postal no encontrado.");
+      setDisponible(false);
       return;
     }
     if (entry.e === "Nayarit") {
-      setResultado(`¡Envío GRATIS a ${entry.m}, Nayarit!`);
+      if (MUNICIPIOS_CON_ENVIO.has(entry.m)) {
+        setResultado(`¡Envío GRATIS a ${entry.m}, Nayarit!`);
+        setDisponible(true);
+      } else {
+        setResultado(`Lo sentimos, no contamos con servicio de envío a ${entry.m}. Contáctanos para más información.`);
+        setDisponible(false);
+      }
     } else {
       setResultado(`Envío no disponible a ${entry.m}, ${entry.e}. Comunícate con nosotros.`);
+      setDisponible(false);
     }
   };
 
@@ -100,7 +128,7 @@ const InfoCards = () => {
                 value={cp}
                 placeholder="Ej: 63000"
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all text-center text-lg font-semibold"
-                onChange={(e) => { setCp(e.target.value.replace(/\D/g, "")); setResultado(null); }}
+                onChange={(e) => { setCp(e.target.value.replace(/\D/g, "")); setResultado(null); setDisponible(null); }}
                 onKeyDown={(e) => e.key === "Enter" && consultarEnvio()}
               />
 
@@ -114,7 +142,11 @@ const InfoCards = () => {
               </button>
 
               {resultado && (
-                <div className="p-3 rounded-lg bg-sky-50 text-sky-800 text-sm font-medium animate-in slide-in-from-top-1">
+                <div className={`p-3 rounded-lg text-sm font-medium animate-in slide-in-from-top-1 ${
+                  disponible
+                    ? "bg-green-50 text-green-800"
+                    : "bg-red-50 text-red-700"
+                }`}>
                   {resultado}
                 </div>
               )}

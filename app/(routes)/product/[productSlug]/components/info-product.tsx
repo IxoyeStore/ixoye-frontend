@@ -174,7 +174,7 @@ const InfoProduct = ({ product }: InfoProductProps) => {
               {formatPrice(product.price)}
             </p>
           )}
-          <p className={`text-3xl sm:text-4xl font-black tracking-tighter ${isB2B ? "text-blue-700" : "text-green-700"}`}>
+          <p className="text-3xl sm:text-4xl font-black tracking-tighter text-green-700">
             {formatPrice(finalPrice)}
           </p>
           {product.freeShipping && (
