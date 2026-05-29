@@ -33,8 +33,8 @@ const SUCURSALES = [
   },
   {
     name: "Sucursal Compostela",
-    address: "Adolfo López Mateos 140, Agua Azul, Tepeyac, 63715 Las Varas, Nay.",
-    maps: "https://maps.app.goo.gl/pMT4Wz1nF9g4qs1NA",
+    address: "Hidalgo 347, Sta Ana, 63700 Compostela, Nay.",
+    maps: "https://maps.app.goo.gl/QcLpdPbJbojjfEXP7",
   },
 ];
 

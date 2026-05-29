@@ -23,7 +23,7 @@ const ChooseCategory = () => {
     return (
       <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24">
         <h3 className="px-6 text-2xl sm:text-3xl font-bold tex
-        t-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
+        t-[#003366] mb-4 sm:pb-8 uppercase tracking-tighter text-center">
           Categorías destacadas
         </h3>
         <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 rounded-2xl bg-sky-50/40">
