@@ -571,7 +571,7 @@ export default function Header() {
               </div>
               <div className="grid grid-cols-1 gap-3">
                 <a
-                  href="https://wa.me/3111234567"
+                  href="https://wa.me/3112377582"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-between px-6 py-5 rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-100 active:scale-95 transition-all"

@@ -7,7 +7,7 @@ const SupportMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const whatsappNumber = "523112377582";
+  const whatsappNumber = "3112377582";
   const supportEmail = "soporte@refaccionesixoye.mx";
 
   useEffect(() => {
