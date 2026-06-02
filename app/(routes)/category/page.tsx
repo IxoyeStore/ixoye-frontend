@@ -10,10 +10,11 @@ import { ResponeType } from "@/types/response";
 import { useEffect, useState } from "react";
 import ProductCard from "./[categorySlug]/components/product-card";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ArrowUpDown, SlidersHorizontal, X, ChevronDown, ChevronLeft, ChevronRight, LayoutGrid, List, ShoppingCart } from "lucide-react";
+import { SlidersHorizontal, X, ChevronLeft, ChevronRight, LayoutGrid, List, ShoppingCart, Heart } from "lucide-react";
 import { useGetCategories } from "@/api/getProducts";
 import { formatPrice } from "@/lib/formatPrice";
 import { useCart } from "@/hooks/use-cart";
+import { useLovedProducts } from "@/hooks/use-loved-products";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -33,6 +34,8 @@ const SORT_OPTIONS = [
 
 function ProductListItem({ product }: { product: ProductType }) {
   const { addItem } = useCart();
+  const { lovedItems, addLovedItem, removeLovedItem } = useLovedProducts();
+  const isLoved = lovedItems.some((item) => item.id === product.id);
 
   return (
     <div className="flex items-center gap-4 p-3 bg-white border border-slate-100 hover:border-sky-200 hover:shadow-sm transition-all rounded-xl">
@@ -77,14 +80,26 @@ function ProductListItem({ product }: { product: ProductType }) {
       </div>
 
       <div className="flex flex-col items-end gap-2 shrink-0">
-        <p className="font-black text-green-600 text-lg leading-none">{formatPrice(product.price)}</p>
-        <button
-          onClick={() => addItem(product)}
-          className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[11px] font-bold transition-colors"
-        >
-          <ShoppingCart size={13} />
-          Agregar
-        </button>
+        <p className="font-bold text-green-600 text-base">{formatPrice(product.price)}</p>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => addItem(product)}
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[11px] font-bold transition-colors"
+          >
+            <ShoppingCart size={13} />
+            Agregar
+          </button>
+          <button
+            onClick={() => isLoved ? removeLovedItem(product.id) : addLovedItem(product)}
+            className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-all ${
+              isLoved
+                ? "bg-red-50 border-red-200 text-red-500"
+                : "border-slate-200 text-slate-400 hover:bg-red-50 hover:border-red-200 hover:text-red-400"
+            }`}
+          >
+            <Heart size={14} strokeWidth={2.5} fill={isLoved ? "currentColor" : "none"} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -101,7 +116,6 @@ function CategoryContent() {
   const [totalPages, setTotalPages]   = useState(1);
   const [totalCount, setTotalCount]   = useState(0);
   const [showFilters, setShowFilters] = useState(false);
-  const [showSort, setShowSort]       = useState(false);
   const [viewMode, setViewMode]       = useState<"grid" | "list">("grid");
   const [priceMinInput, setPriceMinInput] = useState("");
   const [priceMaxInput, setPriceMaxInput] = useState("");
@@ -261,43 +275,7 @@ function CategoryContent() {
             </button>
           </div>
 
-          {/* Sort dropdown */}
-          {showSort && (
-            <div className="fixed inset-0 z-40" onClick={() => setShowSort(false)} />
-          )}
-          <div className="relative">
-            <button
-              onClick={() => setShowSort(o => !o)}
-              className={`flex items-center gap-2 h-9 px-3 border rounded-xl text-xs font-bold transition-all ${
-                showSort
-                  ? "border-sky-400 text-sky-700 bg-sky-50"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-sky-300 hover:text-sky-700"
-              }`}
-            >
-              <ArrowUpDown size={13} className="text-sky-500" />
-              <span className="hidden sm:inline">{currentSortLabel}</span>
-              <ChevronDown size={12} className={`transition-transform ${showSort ? "rotate-180" : ""}`} />
-            </button>
-            {showSort && (
-              <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
-                {SORT_OPTIONS.map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => { setParam("sort", opt.value); setShowSort(false); }}
-                    className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-colors ${
-                      currentSort === opt.value
-                        ? "bg-sky-50 text-sky-700"
-                        : "text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Filters toggle */}
+          {/* Filters + Sort toggle */}
           <button
             onClick={() => setShowFilters(o => !o)}
             className={`flex items-center gap-2 h-9 px-3 rounded-xl border text-xs font-bold transition-all ${
@@ -341,8 +319,24 @@ function CategoryContent() {
 
       {/* ── Filter panel ─────────────────────────────────────────────────── */}
       {showFilters && (
-        <div className="mb-4 p-4 bg-white border border-slate-200 shadow-sm">
+        <div className="mb-4 p-4 bg-white border border-slate-200 shadow-sm rounded-xl">
           <div className="flex flex-wrap items-end gap-3">
+
+            {/* Sort */}
+            <div className="flex flex-col gap-1 min-w-[180px]">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ordenar por</label>
+              <select
+                value={currentSort}
+                onChange={e => setParam("sort", e.target.value)}
+                className="h-9 px-3 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:border-sky-400 cursor-pointer"
+              >
+                {SORT_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="w-full border-t border-slate-100 sm:hidden" />
 
             {/* Brand */}
             <div className="flex flex-col gap-1 min-w-[160px]">
