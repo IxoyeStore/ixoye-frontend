@@ -14,6 +14,7 @@ const COLUMNS = [
   { key: "productType",    label: "tipoProducto",     width: 20 },
   { key: "brand",          label: "marca",            width: 16 },
   { key: "series",         label: "series",           width: 20 },
+  { key: "motors",         label: "motores",          width: 20 },
   { key: "price",          label: "precio",           width: 14 },
   { key: "wholesalePrice", label: "precioMayoreo",    width: 14 },
   { key: "stock",          label: "stock",            width: 10 },
