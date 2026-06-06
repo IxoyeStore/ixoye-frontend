@@ -17,6 +17,7 @@ type ProductFormData = {
   category: string;
   brand: string;
   series: string;
+  motors: string;
   oemCode: string;
   price: string;
   wholesalePrice: string;
@@ -29,7 +30,7 @@ type ProductFormData = {
 const EMPTY: ProductFormData = {
   productName: "", slug: "", description: "", code: "",
   department: "", subDepartment: "", productType: "", category: "",
-  brand: "", series: "", oemCode: "",
+  brand: "", series: "", motors: "", oemCode: "",
   price: "", wholesalePrice: "", stock: "",
   active: true, isFeatured: false, freeShipping: false,
 };
@@ -129,6 +130,7 @@ export default function ProductForm({
       productType: form.productType,
       brand: form.brand,
       series: form.series,
+      motors: form.motors || null,
       oemCode: form.oemCode || null,
       price: parseFloat(form.price) || 0,
       wholesalePrice: form.wholesalePrice ? parseFloat(form.wholesalePrice) : null,
@@ -214,8 +216,11 @@ export default function ProductForm({
           <Field label="Marca" required>
             <input type="text" value={form.brand} onChange={set("brand")} required className={inputCls} />
           </Field>
-          <Field label="Series Compatibles">
-            <input type="text" value={form.series} onChange={set("series")} placeholder="Ej: 4D56, 4M40, 2KD" className={inputCls} />
+          <Field label="Serie / Modelo">
+            <input type="text" value={form.series} onChange={set("series")} placeholder="Ej: Hilux, NPR, F-350" className={inputCls} />
+          </Field>
+          <Field label="Motores Compatibles">
+            <input type="text" value={form.motors} onChange={set("motors")} placeholder="Ej: 4JJ1, 6BT Cummins, Perkins 1006" className={inputCls} />
           </Field>
         </div>
         <Field label="Código OEM">

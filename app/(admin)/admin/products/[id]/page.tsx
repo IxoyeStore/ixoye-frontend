@@ -209,6 +209,7 @@ export default function EditProductPage() {
         productType: p.productType || "",
         brand: p.brand || "",
         series: p.series || "",
+        motors: p.motors || "",
         oemCode: p.oemCode || "",
         price: String(p.price || ""),
         wholesalePrice: p.wholesalePrice ? String(p.wholesalePrice) : "",

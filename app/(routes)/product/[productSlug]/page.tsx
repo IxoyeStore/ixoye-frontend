@@ -79,6 +79,10 @@ export default async function ProductPage({
     ? product.series.split(",").map((s) => s.trim())
     : [];
 
+  const motorsList = product.motors
+    ? product.motors.split(",").map((m) => m.trim())
+    : [];
+
   return (
     <>
     <div className="max-w-6xl py-6 mx-auto sm:py-12 sm:px-16 space-y-8">
@@ -179,7 +183,7 @@ export default async function ProductPage({
             </div>
 
             <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Series Compatibles</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Serie / Modelo</span>
               <div className="flex flex-wrap gap-2">
                 {seriesList.length > 0 ? (
                   seriesList.map((serie, idx) => (
@@ -195,6 +199,22 @@ export default async function ProductPage({
                 )}
               </div>
             </div>
+
+            {motorsList.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Motores Compatibles</span>
+                <div className="flex flex-wrap gap-2">
+                  {motorsList.map((motor, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex whitespace-nowrap bg-sky-50 text-sky-700 text-[10px] font-black uppercase px-2 py-1 rounded-md border border-sky-200 italic shadow-sm"
+                    >
+                      {motor}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

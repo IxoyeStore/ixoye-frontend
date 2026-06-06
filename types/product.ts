@@ -27,6 +27,7 @@ export type ProductType = {
   // Especificaciones
   brand: string;
   series: string;
+  motors?: string;
   oemCode?: string;
 
   // Valores y Estados
