@@ -250,7 +250,7 @@ export default function Footer() {
               ¿Necesitas Factura?
             </strong>
             Envía tu Constancia de Situación Fiscal y número de pedido a nuestro
-            correo o WhatsApp dentro del mes de tu compra.
+            correo o WhatsApp dentro del mes de tu compra para.
           </p>
         </div>
 
