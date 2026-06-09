@@ -19,6 +19,7 @@ const COLUMNS = [
   { key: "productType",    label: "tipoProducto"     },
   { key: "brand",          label: "marca"            },
   { key: "series",         label: "series"           },
+  { key: "motors",         label: "motores"          },
   { key: "price",          label: "precio"           },
   { key: "wholesalePrice", label: "precioMayoreo"    },
   { key: "stock",          label: "stock"            },
@@ -217,6 +218,7 @@ export default function BulkProductsPage() {
         if (fields.productType    !== undefined) payload.productType    = String(fields.productType);
         if (fields.brand          !== undefined) payload.brand          = String(fields.brand);
         if (fields.series         !== undefined) payload.series         = String(fields.series);
+        if (fields.motors         !== undefined) payload.motors         = fields.motors ? String(fields.motors) : null;
         if (fields.price          !== undefined) payload.price          = parseFloat(fields.price) || 0;
         if (fields.wholesalePrice !== undefined)
           payload.wholesalePrice = fields.wholesalePrice !== "" ? parseFloat(fields.wholesalePrice) : null;
