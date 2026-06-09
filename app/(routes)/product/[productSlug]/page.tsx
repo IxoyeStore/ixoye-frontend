@@ -76,11 +76,11 @@ export default async function ProductPage({
     Array.isArray(product.images) && product.images.length > 0 ? product.images : [];
 
   const seriesList = product.series
-    ? product.series.split(",").map((s) => s.trim())
+    ? product.series.split(",").map((s) => s.trim()).filter(Boolean)
     : [];
 
   const motorsList = product.motors
-    ? product.motors.split(",").map((m) => m.trim())
+    ? product.motors.split(",").map((m) => m.trim()).filter(Boolean)
     : [];
 
   return (
@@ -182,37 +182,19 @@ export default async function ProductPage({
               </p>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Serie / Modelo</span>
-              <div className="flex flex-wrap gap-2">
-                {seriesList.length > 0 ? (
-                  seriesList.map((serie, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex whitespace-nowrap bg-slate-100 text-slate-700 text-[10px] font-black uppercase px-2 py-1 rounded-md border border-slate-200 italic shadow-sm"
-                    >
-                      {serie}
-                    </span>
-                  ))
-                ) : (
-                  <p className="text-sm font-black text-slate-300 uppercase">N/A</p>
-                )}
-              </div>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                {seriesList.length > 0 ? seriesList.join(", ") : <span className="text-slate-300 font-black uppercase">N/A</span>}
+              </p>
             </div>
 
             {motorsList.length > 0 && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Motores Compatibles</span>
-                <div className="flex flex-wrap gap-2">
-                  {motorsList.map((motor, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex whitespace-nowrap bg-sky-50 text-sky-700 text-[10px] font-black uppercase px-2 py-1 rounded-md border border-sky-200 italic shadow-sm"
-                    >
-                      {motor}
-                    </span>
-                  ))}
-                </div>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {motorsList.join(", ")}
+                </p>
               </div>
             )}
           </div>
