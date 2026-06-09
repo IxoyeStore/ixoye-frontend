@@ -75,14 +75,6 @@ export default async function ProductPage({
   const images: string[] =
     Array.isArray(product.images) && product.images.length > 0 ? product.images : [];
 
-  const seriesList = product.series
-    ? product.series.split(",").map((s) => s.trim()).filter(Boolean)
-    : [];
-
-  const motorsList = product.motors
-    ? product.motors.split(",").map((m) => m.trim()).filter(Boolean)
-    : [];
-
   return (
     <>
     <div className="max-w-6xl py-6 mx-auto sm:py-12 sm:px-16 space-y-8">
@@ -184,17 +176,17 @@ export default async function ProductPage({
 
             <div className="flex flex-col gap-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Serie / Modelo</span>
-              <p className="text-sm text-slate-700 leading-relaxed">
-                {seriesList.length > 0 ? seriesList.join(", ") : <span className="text-slate-300 font-black uppercase">N/A</span>}
-              </p>
+              {product.series ? (
+                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{product.series}</p>
+              ) : (
+                <p className="text-sm font-black text-slate-300 uppercase">N/A</p>
+              )}
             </div>
 
-            {motorsList.length > 0 && (
+            {product.motors && (
               <div className="flex flex-col gap-1">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Motores Compatibles</span>
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  {motorsList.join(", ")}
-                </p>
+                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{product.motors}</p>
               </div>
             )}
           </div>
