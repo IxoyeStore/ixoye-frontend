@@ -217,10 +217,10 @@ export default function ProductForm({
             <input type="text" value={form.brand} onChange={set("brand")} required className={inputCls} />
           </Field>
           <Field label="Serie / Modelo">
-            <input type="text" value={form.series} onChange={set("series")} placeholder="Ej: Hilux, NPR, F-350" className={inputCls} />
+            <textarea value={form.series} onChange={set("series")} placeholder="Ej: Hilux, NPR, F-350" rows={3} className={`${inputCls} resize-none overflow-y-auto`} />
           </Field>
           <Field label="Motores Compatibles">
-            <input type="text" value={form.motors} onChange={set("motors")} placeholder="Ej: 4JJ1, 6BT Cummins, Perkins 1006" className={inputCls} />
+            <textarea value={form.motors} onChange={set("motors")} placeholder="Ej: 4JJ1, 6BT Cummins, Perkins 1006" rows={3} className={`${inputCls} resize-none overflow-y-auto`} />
           </Field>
         </div>
         <Field label="Código OEM">
