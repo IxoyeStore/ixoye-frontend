@@ -213,19 +213,23 @@ export default function ProductForm({
           <Field label="Tipo de Producto" required>
             <input type="text" value={form.productType} onChange={set("productType")} required className={inputCls} />
           </Field>
-          <Field label="Marca" required>
-            <input type="text" value={form.brand} onChange={set("brand")} required className={inputCls} />
-          </Field>
+          <div className="grid grid-cols-2 gap-5 md:col-span-2">
+            <Field label="Marca" required>
+              <input type="text" value={form.brand} onChange={set("brand")} required className={inputCls} />
+            </Field>
+            <Field label="Código OEM">
+              <input type="text" value={form.oemCode} onChange={set("oemCode")} placeholder="Ej: 16400-0L010" className={inputCls} />
+            </Field>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Field label="Serie / Modelo">
-            <textarea value={form.series} onChange={set("series")} placeholder="Ej: Hilux, NPR, F-350" rows={3} className={`${inputCls} resize-none overflow-y-auto`} />
+            <textarea value={form.series} onChange={set("series")} placeholder="Ej: Hilux, NPR, F-350" rows={5} className={`${inputCls} resize-none overflow-y-auto`} />
           </Field>
           <Field label="Motores Compatibles">
-            <textarea value={form.motors} onChange={set("motors")} placeholder="Ej: 4JJ1, 6BT Cummins, Perkins 1006" rows={3} className={`${inputCls} resize-none overflow-y-auto`} />
+            <textarea value={form.motors} onChange={set("motors")} placeholder="Ej: 4JJ1, 6BT Cummins, Perkins 1006" rows={5} className={`${inputCls} resize-none overflow-y-auto`} />
           </Field>
         </div>
-        <Field label="Código OEM">
-          <input type="text" value={form.oemCode} onChange={set("oemCode")} placeholder="Ej: 16400-0L010" className={inputCls} />
-        </Field>
       </div>
 
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-6">
