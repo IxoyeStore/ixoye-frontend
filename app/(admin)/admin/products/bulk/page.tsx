@@ -27,7 +27,39 @@ const COLUMNS = [
   { key: "isFeatured",     label: "destacado"        },
   { key: "freeShipping",   label: "envioGratis"      },
   { key: "description",    label: "descripcionLarga" },
+  { key: "hasImages",      label: "tieneImagenes"    },
 ];
+
+// ── Cloudinary auto-match (busca imágenes ya subidas por código de producto) ─
+const CLOUDINARY_CLOUD = "ddiafp5c0";
+const IMAGE_SUFFIXES = ["", "B", "C", "D", "E"]; // hasta 5 imágenes por producto
+const IMAGE_EXTENSIONS = ["jpg", "png", "jpeg"];
+
+function cloudinaryCandidateUrl(code: string, suffix: string, ext: string) {
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD}/image/upload/${encodeURIComponent(code + suffix)}.${ext}`;
+}
+
+function imageExists(url: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
+}
+
+async function findCloudinaryImages(code: string): Promise<string[]> {
+  const found: string[] = [];
+  for (const suffix of IMAGE_SUFFIXES) {
+    let hit: string | null = null;
+    for (const ext of IMAGE_EXTENSIONS) {
+      const url = cloudinaryCandidateUrl(code, suffix, ext);
+      if (await imageExists(url)) { hit = url; break; }
+    }
+    if (hit) found.push(hit);
+  }
+  return found;
+}
 
 type Filters = {
   search: string;
@@ -62,6 +94,7 @@ export default function BulkProductsPage() {
   const [progressLabel, setProgressLabel] = useState("");
   const [result, setResult]         = useState<ImportResult | null>(null);
   const [dragOver, setDragOver]     = useState(false);
+  const [autoAssignImages, setAutoAssignImages] = useState(false);
 
   const fileInputRef  = useRef<HTMLInputElement>(null);
   const countDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -208,7 +241,7 @@ export default function BulkProductsPage() {
       const res: ImportResult = { total: products.length, success: 0, failed: 0, errors: [] };
       const CONCURRENCY = 10;
 
-      const buildPayload = (fields: Record<string, any>) => {
+      const buildPayload = async (fields: Record<string, any>) => {
         const payload: Record<string, any> = {};
         if (fields.productName    !== undefined) payload.productName    = String(fields.productName);
         if (fields.code           !== undefined) payload.code           = String(fields.code);
@@ -227,6 +260,13 @@ export default function BulkProductsPage() {
         if (fields.isFeatured     !== undefined) payload.isFeatured     = String(fields.isFeatured).toUpperCase() === "TRUE";
         if (fields.freeShipping   !== undefined) payload.freeShipping   = String(fields.freeShipping).toUpperCase() === "TRUE";
         if (fields.description    !== undefined) payload.description    = String(fields.description);
+
+        const alreadyHasImages = String(fields.hasImages).toUpperCase() === "TRUE";
+        if (autoAssignImages && fields.code && !alreadyHasImages) {
+          const images = await findCloudinaryImages(String(fields.code));
+          if (images.length > 0) payload.images = images;
+        }
+
         return payload;
       };
 
@@ -237,7 +277,7 @@ export default function BulkProductsPage() {
 
         await Promise.all(batch.map(async (product) => {
           const { documentId, ...fields } = product;
-          const payload = buildPayload(fields);
+          const payload = await buildPayload(fields);
           try {
             const upd = await fetch(`/api/admin/products/${documentId}`, {
               method: "PUT",
@@ -426,8 +466,9 @@ export default function BulkProductsPage() {
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 rounded-2xl p-4 flex items-start gap-3">
         <AlertCircle size={15} className="text-amber-500 mt-0.5 shrink-0" />
         <p className="text-[11px] text-amber-700 dark:text-amber-400 font-bold">
-          No modifiques ni elimines la columna <strong>ID (no editar)</strong> del Excel — se usa para
-          identificar cada producto al importar. El resto de columnas son editables.
+          No modifiques ni elimines las columnas <strong>documentId</strong> y <strong>tieneImagenes</strong> del
+          Excel — se usan para identificar cada producto y detectar si ya tiene imágenes al importar.
+          El resto de columnas son editables.
         </p>
       </div>
 
@@ -522,6 +563,25 @@ export default function BulkProductsPage() {
                     onChange={handleFileInput}
                     className="hidden"
                   />
+
+                  <label className="flex items-start gap-3 rounded-xl border border-slate-200 dark:border-slate-600 p-3 cursor-pointer hover:border-sky-300 dark:hover:border-sky-600 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={autoAssignImages}
+                      onChange={(e) => setAutoAssignImages(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 accent-sky-600"
+                    />
+                    <span>
+                      <span className="block text-[11px] font-black text-slate-700 dark:text-slate-200">
+                        Auto-asignar imágenes desde Cloudinary
+                      </span>
+                      <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-0.5">
+                        Busca imágenes ya subidas por código de producto (hasta 5 por producto) y las
+                        asigna solo a los productos con <strong>tieneImagenes = FALSE</strong>. No sube
+                        archivos nuevos, no sobrescribe productos que ya tienen imágenes.
+                      </span>
+                    </span>
+                  </label>
                 </>
               )}
 

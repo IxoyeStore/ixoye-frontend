@@ -22,6 +22,7 @@ const COLUMNS = [
   { key: "isFeatured",     label: "destacado",        width: 20 },
   { key: "freeShipping",   label: "envioGratis",      width: 22 },
   { key: "description",    label: "descripcionLarga", width: 50 },
+  { key: "hasImages",      label: "tieneImagenes",    width: 16 },
 ];
 
 export async function GET(request: NextRequest) {
@@ -59,6 +60,10 @@ export async function GET(request: NextRequest) {
   if (all.length === 0) {
     return NextResponse.json({ error: "Sin productos con los filtros seleccionados" }, { status: 404 });
   }
+
+  all.forEach((p) => {
+    p.hasImages = Array.isArray(p.images) && p.images.length > 0;
+  });
 
   // ── Build Excel ──────────────────────────────────────────────────────────
   const wb = new ExcelJS.Workbook();
