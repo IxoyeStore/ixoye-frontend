@@ -51,7 +51,7 @@ export default function Page() {
       <Separator className="my-4 bg-sky-100 dark:bg-slate-700" />
 
       <div className="w-full">
-        <div className="grid w-full gap-3 mt-8 grid-cols-2 md:grid-cols-3 md:gap-10">
+        <div className="grid w-full gap-3 mt-8 grid-cols-2 lg:grid-cols-5 md:gap-10">
           {" "}
           {loading && (
             <>
