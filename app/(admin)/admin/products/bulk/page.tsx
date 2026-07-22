@@ -40,13 +40,26 @@ function cloudinaryCandidateUrl(code: string, suffix: string, ext: string) {
   return `https://res.cloudinary.com/${CLOUDINARY_CLOUD}/image/upload/${encodeURIComponent(code + suffix)}.${ext}`;
 }
 
-function imageExists(url: string): Promise<boolean> {
+function loadImageOnce(url: string): Promise<boolean> {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(true);
     img.onerror = () => resolve(false);
     img.src = url;
   });
+}
+
+const IMAGE_CHECK_RETRIES = 3;
+const IMAGE_CHECK_RETRY_DELAY_MS = 400;
+
+async function imageExists(url: string): Promise<boolean> {
+  for (let attempt = 1; attempt <= IMAGE_CHECK_RETRIES; attempt++) {
+    if (await loadImageOnce(url)) return true;
+    if (attempt < IMAGE_CHECK_RETRIES) {
+      await new Promise((r) => setTimeout(r, IMAGE_CHECK_RETRY_DELAY_MS));
+    }
+  }
+  return false;
 }
 
 async function findCloudinaryImages(rawCode: string): Promise<string[]> {
