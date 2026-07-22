@@ -19,6 +19,8 @@ import {
   Headset,
   Mail,
   MessageCircle,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
@@ -53,17 +55,17 @@ const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
         <span className="text-[10px] font-black uppercase tracking-[0.15em]">{label}</span>
         <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
       </button>
-      <div className="absolute top-full left-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+      <div className="absolute top-full left-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
         <div className="p-2 max-h-[400px] overflow-y-auto">
           {items.length === 0 ? (
-            <div className="p-4 text-[10px] font-bold text-slate-400 uppercase italic">Cargando...</div>
+            <div className="p-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase italic">Cargando...</div>
           ) : (
             <div className="grid grid-cols-2 gap-0.5">
               {items.map((item: string) => (
                 <button
                   key={item}
                   onClick={() => onSelect(item)}
-                  className="w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors"
+                  className="w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-700 dark:hover:text-sky-400 rounded-xl transition-colors"
                 >
                   {item}
                 </button>
@@ -84,18 +86,18 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
         <span className="text-[10px] font-black uppercase tracking-[0.15em]">Marcas</span>
         <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
       </button>
-      <div className="absolute top-full left-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+      <div className="absolute top-full left-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
         <div className="p-3 grid grid-cols-2 gap-1.5 max-h-[480px] overflow-y-auto">
           {STATIC_BRANDS.map(({ name, logo }) => (
             <button
               key={name}
               onClick={() => onSelect(name)}
-              className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-sky-50 hover:border-sky-200 border border-transparent transition-all group/brand"
+              className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:border-sky-200 dark:hover:border-sky-800 border border-transparent transition-all group/brand"
             >
-              <div className="w-14 h-9 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50">
+              <div className="w-14 h-9 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50 dark:bg-slate-700">
                 <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
               </div>
-              <span className="text-sm font-semibold text-slate-800 group-hover/brand:text-sky-700 leading-tight">
+              <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover/brand:text-sky-700 dark:group-hover/brand:text-sky-400 leading-tight">
                 {name}
               </span>
             </button>
@@ -114,7 +116,13 @@ type PreviewProduct = {
   images: string[];
 };
 
-export default function Header() {
+export default function Header({
+  isDark,
+  onToggleTheme,
+}: {
+  isDark: boolean;
+  onToggleTheme: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [preview, setPreview] = useState<PreviewProduct[]>([]);
@@ -264,31 +272,31 @@ export default function Header() {
 
   const PreviewDropdown = () =>
     showPreview ? (
-      <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[70]">
+      <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-[70]">
         {preview.map((p) => (
           <button
             key={p.id}
             onMouseDown={(e) => { e.preventDefault(); handlePreviewSelect(p.slug); }}
-            className="w-full flex items-center gap-5 px-6 py-5 hover:bg-sky-50 transition-colors border-b border-slate-50 last:border-0 text-left"
+            className="w-full flex items-center gap-5 px-6 py-5 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition-colors border-b border-slate-50 dark:border-slate-700 last:border-0 text-left"
           >
-            <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center">
+            <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 flex items-center justify-center">
               {p.images[0] ? (
                 <img src={p.images[0]} alt={p.productName} className="w-full h-full object-cover" />
               ) : (
-                <Package size={32} className="text-slate-300" />
+                <Package size={32} className="text-slate-300 dark:text-slate-500" />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-lg font-semibold text-slate-800 truncate leading-snug">{p.productName}</p>
+              <p className="text-lg font-semibold text-slate-800 dark:text-slate-200 truncate leading-snug">{p.productName}</p>
               {p.code && (
-                <p className="text-base font-medium text-slate-400 mt-1">{p.code}</p>
+                <p className="text-base font-medium text-slate-400 dark:text-slate-500 mt-1">{p.code}</p>
               )}
             </div>
           </button>
         ))}
         <button
           onMouseDown={(e) => { e.preventDefault(); router.push(`/search?query=${encodeURIComponent(searchQuery)}`); clearSearch(); setOpen(false); }}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-slate-50 hover:bg-sky-600 hover:text-white text-slate-500 transition-colors text-xs font-black uppercase tracking-widest"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-slate-50 dark:bg-slate-700 hover:bg-sky-600 hover:text-white text-slate-500 dark:text-slate-400 transition-colors text-xs font-black uppercase tracking-widest"
         >
           <Search size={13} />
           Ver todos los resultados
@@ -305,7 +313,7 @@ export default function Header() {
     <>
     {showPreview && (
       <div
-        className="fixed inset-0 bg-white/30 backdrop-blur-sm z-40"
+        className="fixed inset-0 bg-white/30 dark:bg-black/50 backdrop-blur-sm z-40"
         onMouseDown={() => setShowPreview(false)}
       />
     )}
@@ -382,6 +390,10 @@ export default function Header() {
               <SupportMenu />
               <span className={navTextClass}>Soporte</span>
             </div>
+            <button onClick={onToggleTheme} className={iconClass}>
+              {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+              <span className={navTextClass}>{isDark ? "Claro" : "Oscuro"}</span>
+            </button>
           </nav>
 
           <button
@@ -422,7 +434,7 @@ export default function Header() {
 
       {/* MENU MOBILE */}
       {open && (
-        <div className="md:hidden fixed inset-0 top-20 bg-white z-[100] overflow-y-auto animate-in slide-in-from-right duration-300">
+        <div className="md:hidden fixed inset-0 top-20 bg-white dark:bg-slate-900 z-[100] overflow-y-auto animate-in slide-in-from-right duration-300">
           <div className="p-6 space-y-8 pb-24">
             {/* BUSQUEDA MOBILE */}
             <div ref={mobileRef} className="relative">
@@ -432,11 +444,11 @@ export default function Header() {
                   placeholder="¿Qué refacción necesitas?"
                   value={searchQuery}
                   onChange={(e) => handleQueryChange(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-2xl py-4 px-5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 dark:text-white rounded-2xl py-4 px-5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                   autoComplete="off"
                 />
                 <Search
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-sky-900"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-sky-900 dark:text-sky-400"
                   size={20}
                 />
               </form>
@@ -448,32 +460,32 @@ export default function Header() {
               <Link
                 href="/category"
                 onClick={() => setOpen(false)}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm"
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm"
               >
-                <Store className="w-6 h-6 text-sky-950" />
-                <span className="text-[10px] font-black uppercase italic">
+                <Store className="w-6 h-6 text-sky-950 dark:text-sky-400" />
+                <span className="text-[10px] font-black uppercase italic dark:text-white">
                   Tienda
                 </span>
               </Link>
               <Link
                 href="/profile"
                 onClick={() => setOpen(false)}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm"
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm"
               >
-                <UserRound className="w-6 h-6 text-sky-950" />
-                <span className="text-[10px] font-black uppercase italic">
+                <UserRound className="w-6 h-6 text-sky-950 dark:text-sky-400" />
+                <span className="text-[10px] font-black uppercase italic dark:text-white">
                   Mi Perfil
                 </span>
               </Link>
               <Link
                 href="/loved-product"
                 onClick={() => setOpen(false)}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm relative"
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm relative"
               >
                 <Heart
-                  className={`w-6 h-6 ${lovedItems.length > 0 ? "fill-sky-950 text-sky-950" : "text-sky-950"}`}
+                  className={`w-6 h-6 ${lovedItems.length > 0 ? "fill-sky-950 text-sky-950 dark:fill-sky-400 dark:text-sky-400" : "text-sky-950 dark:text-sky-400"}`}
                 />
-                <span className="text-[10px] font-black uppercase italic">
+                <span className="text-[10px] font-black uppercase italic dark:text-white">
                   Favoritos
                 </span>
                 {lovedItems.length > 0 && (
@@ -483,10 +495,10 @@ export default function Header() {
               <Link
                 href="/cart"
                 onClick={() => setOpen(false)}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm relative"
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm relative"
               >
-                <ShoppingCart className="w-6 h-6 text-sky-950" />
-                <span className="text-[10px] font-black uppercase italic">
+                <ShoppingCart className="w-6 h-6 text-sky-950 dark:text-sky-400" />
+                <span className="text-[10px] font-black uppercase italic dark:text-white">
                   Carrito
                 </span>
                 {cart.items.length > 0 && (
@@ -495,17 +507,28 @@ export default function Header() {
                   </span>
                 )}
               </Link>
+              <button
+                onClick={() => { onToggleTheme(); setOpen(false); }}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm"
+              >
+                {isDark
+                  ? <Sun className="w-6 h-6 text-sky-950 dark:text-sky-400" />
+                  : <Moon className="w-6 h-6 text-sky-950 dark:text-sky-400" />}
+                <span className="text-[10px] font-black uppercase italic dark:text-white">
+                  {isDark ? "Modo Claro" : "Modo Oscuro"}
+                </span>
+              </button>
             </div>
 
             {/* FILTROS MOBILE */}
-            <div className="space-y-4 pt-4 border-t border-slate-200">
-              <p className="text-[10px] font-black text-sky-950 uppercase tracking-[0.2em] italic">
+            <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <p className="text-[10px] font-black text-sky-950 dark:text-sky-400 uppercase tracking-[0.2em] italic">
                 Explorar por
               </p>
 
               <div className="space-y-3">
                 <details className="group">
-                  <summary className="flex items-center justify-between p-4 rounded-2xl bg-emerald-50 text-emerald-700 list-none cursor-pointer">
+                  <summary className="flex items-center justify-between p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 list-none cursor-pointer">
                     <div className="flex items-center gap-3">
                       <Package size={18} />
                       <span className="text-[11px] font-black uppercase italic">
@@ -517,12 +540,12 @@ export default function Header() {
                       className="group-open:rotate-180 transition-transform"
                     />
                   </summary>
-                  <div className="grid grid-cols-1 gap-1 mt-2 pl-4 border-l-2 border-emerald-100">
+                  <div className="grid grid-cols-1 gap-1 mt-2 pl-4 border-l-2 border-emerald-100 dark:border-emerald-800">
                     {dynamicProductTypes.map((type) => (
                       <button
                         key={type}
                         onClick={() => handleStaticSelect(type, "category")}
-                        className="text-left py-3.5 text-sm font-semibold text-slate-700 border-b border-slate-100 last:border-0"
+                        className="text-left py-3.5 text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 last:border-0"
                       >
                         {type}
                       </button>
@@ -531,7 +554,7 @@ export default function Header() {
                 </details>
 
                 <details className="group">
-                  <summary className="flex items-center justify-between p-4 rounded-2xl bg-rose-50 text-rose-700 list-none cursor-pointer">
+                  <summary className="flex items-center justify-between p-4 rounded-2xl bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 list-none cursor-pointer">
                     <div className="flex items-center gap-3">
                       <ShieldCheck size={18} />
                       <span className="text-[11px] font-black uppercase italic">
@@ -543,17 +566,17 @@ export default function Header() {
                       className="group-open:rotate-180 transition-transform"
                     />
                   </summary>
-                  <div className="grid grid-cols-2 gap-1.5 mt-2 pl-4 border-l-2 border-rose-100">
+                  <div className="grid grid-cols-2 gap-1.5 mt-2 pl-4 border-l-2 border-rose-100 dark:border-rose-800">
                     {STATIC_BRANDS.map(({ name, logo }) => (
                       <button
                         key={name}
                         onClick={() => { handleStaticSelect(name, "brand"); setOpen(false); }}
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl border border-transparent hover:bg-sky-50 hover:border-sky-200 transition-all"
+                        className="flex items-center gap-3 px-3 py-3 rounded-xl border border-transparent hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:border-sky-200 dark:hover:border-sky-800 transition-all"
                       >
-                        <div className="w-12 h-8 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50">
+                        <div className="w-12 h-8 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50 dark:bg-slate-700">
                           <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
                         </div>
-                        <span className="text-sm font-semibold text-slate-800 leading-tight">{name}</span>
+                        <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-tight">{name}</span>
                       </button>
                     ))}
                   </div>
@@ -562,10 +585,10 @@ export default function Header() {
             </div>
 
             {/* SOPORTE MOBILE */}
-            <div className="pt-6 border-t border-slate-200">
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Headset size={16} className="text-sky-600" />
-                <p className="text-[10px] font-black text-sky-950 uppercase tracking-[0.2em] italic">
+                <Headset size={16} className="text-sky-600 dark:text-sky-400" />
+                <p className="text-[10px] font-black text-sky-950 dark:text-sky-400 uppercase tracking-[0.2em] italic">
                   Atención al Cliente
                 </p>
               </div>
@@ -598,7 +621,7 @@ export default function Header() {
                   <ChevronDown size={16} className="-rotate-90 opacity-50" />
                 </a>
               </div>
-              <p className="text-[9px] text-center text-slate-400 font-bold uppercase italic mt-6">
+              <p className="text-[9px] text-center text-slate-400 dark:text-slate-500 font-bold uppercase italic mt-6">
                 Horario de Atención: Lun - Vie / 9:00 - 18:00, Sab / 9:00 -
                 15:00
               </p>

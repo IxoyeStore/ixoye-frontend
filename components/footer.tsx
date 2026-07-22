@@ -263,29 +263,29 @@ export default function Footer() {
 
       {/* MODAL LEGAL */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] flex flex-col p-0 overflow-hidden text-slate-900">
+        <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] flex flex-col p-0 overflow-hidden text-slate-900 dark:text-slate-100 dark:bg-slate-800">
           <DialogHeader className="p-6 pb-2">
-            <DialogTitle className="text-2xl font-bold text-[#012849]">
+            <DialogTitle className="text-2xl font-bold text-[#012849] dark:text-sky-300">
               {modalTitle}
             </DialogTitle>
           </DialogHeader>
 
           <div className="flex-1 overflow-hidden px-6">
-            <ScrollArea className="h-[400px] sm:h-[500px] w-full rounded-md border p-4 bg-white shadow-inner">
+            <ScrollArea className="h-[400px] sm:h-[500px] w-full rounded-md border dark:border-slate-700 p-4 bg-white dark:bg-slate-900 shadow-inner">
               {isLoadingLegal ? (
                 <div className="flex flex-col items-center justify-center h-full space-y-2">
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0071b1] border-t-transparent"></div>
-                  <span className="text-sm text-gray-500">Cargando...</span>
+                  <span className="text-sm text-gray-500 dark:text-slate-400">Cargando...</span>
                 </div>
               ) : (
-                <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line pr-4">
+                <div className="text-sm text-gray-700 dark:text-slate-300 leading-relaxed whitespace-pre-line pr-4">
                   {modalContent}
                 </div>
               )}
             </ScrollArea>
           </div>
 
-          <DialogFooter className="p-6 pt-2 border-t bg-gray-50/50">
+          <DialogFooter className="p-6 pt-2 border-t dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800">
             <Button
               className="bg-[#0071b1] hover:bg-[#005a8e] text-white"
               onClick={() => setIsModalOpen(false)}
