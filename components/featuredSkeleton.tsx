@@ -14,7 +14,7 @@ const FeaturedSkeleton = ({ items = 4 }: FeaturedSkeletonProps) => {
           className="basis-1/2 md:basis-1/3 lg:basis-1/4 pl-2 md:pl-4 group"
         >
           <div className="h-full">
-            <div className="flex h-full flex-col py-3 sm:py-4 border border-sky-100 shadow-sm rounded-2xl bg-white">
+            <div className="flex h-full flex-col py-3 sm:py-4 border border-sky-100 dark:border-slate-700 shadow-sm rounded-2xl bg-white dark:bg-slate-800">
               {/* Image area */}
               <div className="relative flex items-center justify-center px-2 sm:px-6 py-2">
                 <div className="w-full aspect-square overflow-hidden rounded-lg">

@@ -20,12 +20,12 @@ export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
   if (!url || hasError) {
     return (
       <div
-        className={`flex flex-col items-center justify-center bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 rounded-xl ${className}`}
+        className={`flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 rounded-xl ${className}`}
       >
         <PackageSearch
           size={32}
           strokeWidth={1}
-          className="text-[#0055a4] opacity-40"
+          className="text-[#0055a4] dark:text-sky-400 opacity-40"
         />
         <span className="text-[8px] font-black uppercase mt-1 tracking-tighter">
           Sin Imagen

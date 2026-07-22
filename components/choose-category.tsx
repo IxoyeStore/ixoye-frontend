@@ -22,13 +22,12 @@ const ChooseCategory = () => {
   if (hasFailed) {
     return (
       <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24">
-        <h3 className="px-6 text-2xl sm:text-3xl font-bold tex
-        t-[#003366] mb-4 sm:pb-8 uppercase tracking-tighter text-center">
+        <h3 className="px-6 text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 mb-4 sm:pb-8 uppercase tracking-tighter text-center">
           Categorías destacadas
         </h3>
-        <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 rounded-2xl bg-sky-50/40">
-          <LayoutGrid className="w-10 h-10 text-sky-300" strokeWidth={1.5} />
-          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 text-center px-4">
+        <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 dark:border-sky-900/50 rounded-2xl bg-sky-50/40 dark:bg-sky-950/20">
+          <LayoutGrid className="w-10 h-10 text-sky-300 dark:text-sky-700" strokeWidth={1.5} />
+          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600 text-center px-4">
             No se pudieron cargar las categorías
           </p>
         </div>
@@ -38,7 +37,7 @@ const ChooseCategory = () => {
 
   return (
     <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24">
-      <h3 className="px-6 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
+      <h3 className="px-6 text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
         Categorías destacadas
       </h3>
 
@@ -51,7 +50,7 @@ const ChooseCategory = () => {
                 className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4"
               >
                 <div className="p-1">
-                  <div className="w-full aspect-[4/5] bg-gray-100 animate-pulse rounded-xl" />
+                  <div className="w-full aspect-[4/5] bg-gray-100 dark:bg-slate-700 animate-pulse rounded-xl" />
                 </div>
               </CarouselItem>
             ))}
@@ -98,8 +97,8 @@ const ChooseCategory = () => {
             ))}
         </CarouselContent>
 
-        <CarouselPrevious className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 -left-12" />
-        <CarouselNext className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 -right-12" />
+        <CarouselPrevious className="hidden md:flex text-sky-700 dark:text-sky-400 border-sky-200 dark:border-slate-600 hover:bg-sky-50 dark:hover:bg-slate-700 -left-12" />
+        <CarouselNext className="hidden md:flex text-sky-700 dark:text-sky-400 border-sky-200 dark:border-slate-600 hover:bg-sky-50 dark:hover:bg-slate-700 -right-12" />
       </Carousel>
     </div>
   );

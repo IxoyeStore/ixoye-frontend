@@ -48,7 +48,7 @@ const ShipmentSection = () => {
 
   if (loading)
     return (
-      <div className="py-20 text-center text-slate-400 uppercase text-xs font-black tracking-widest">
+      <div className="py-20 text-center text-slate-400 dark:text-slate-500 uppercase text-xs font-black tracking-widest">
         Cargando Evidencias...
       </div>
     );
@@ -58,13 +58,13 @@ const ShipmentSection = () => {
       return (
         <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
           <div className="text-center mb-8 sm:mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#003366] tracking-tight px-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 tracking-tight px-2">
               Nuestros Clientes respaldan nuestro trabajo
             </h2>
           </div>
-          <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 rounded-2xl bg-sky-50/40">
-            <MessageSquareOff className="w-10 h-10 text-sky-200" strokeWidth={1.5} />
-            <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 text-center px-4">
+          <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 dark:border-sky-900/50 rounded-2xl bg-sky-50/40 dark:bg-sky-950/20">
+            <MessageSquareOff className="w-10 h-10 text-sky-200 dark:text-sky-800" strokeWidth={1.5} />
+            <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600 text-center px-4">
               No se pudieron cargar las reseñas
             </p>
           </div>
@@ -75,12 +75,12 @@ const ShipmentSection = () => {
   }
 
   return (
-    <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16 bg-white">
+    <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16 bg-white dark:bg-slate-900">
       <div className="text-center mb-8 sm:mb-10">
-        <h2 className="text-2xl sm:text-3xl font-bold text-[#003366] tracking-tight px-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 tracking-tight px-2">
           Nuestros Clientes respaldan nuestro trabajo
         </h2>
-        <p className="text-slate-600 mt-3 text-sm sm:text-base px-4">
+        <p className="text-slate-600 dark:text-slate-400 mt-3 text-sm sm:text-base px-4">
           Transparencia en cada entrega, satisfacción y calidad en cada
           producto.
         </p>
@@ -94,9 +94,9 @@ const ShipmentSection = () => {
           return (
             <div
               key={item.id}
-              className="group bg-white rounded-xl shadow-sm border border-blue-50 hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden"
+              className="group bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-blue-50 dark:border-slate-700 hover:shadow-lg dark:hover:shadow-none transition-all duration-300 flex flex-col overflow-hidden"
             >
-              <div className="aspect-[4/3] bg-blue-50/30 relative overflow-hidden border-b border-blue-100">
+              <div className="aspect-[4/3] bg-blue-50/30 dark:bg-slate-700 relative overflow-hidden border-b border-blue-100 dark:border-slate-600">
                 {hasPhoto ? (
                   <Image
                     src={mainPhotoUrl!}
@@ -108,9 +108,9 @@ const ShipmentSection = () => {
                     draggable={false}
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-[#f8fafc]">
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-[#f8fafc] dark:bg-slate-700">
                     <svg
-                      className="w-8 h-8 sm:w-10 sm:h-10 text-[#0055a4] opacity-30 mb-1"
+                      className="w-8 h-8 sm:w-10 sm:h-10 text-[#0055a4] dark:text-sky-400 opacity-30 mb-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -122,7 +122,7 @@ const ShipmentSection = () => {
                         d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
                       />
                     </svg>
-                    <span className="text-[#0055a4] text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.2em] opacity-40">
+                    <span className="text-[#0055a4] dark:text-sky-400 text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.2em] opacity-40">
                       Sin Evidencia
                     </span>
                   </div>
@@ -139,7 +139,7 @@ const ShipmentSection = () => {
                       return (
                         <div key={i} className="relative w-3 h-3 sm:w-4 sm:h-4">
                           <svg
-                            className="absolute w-full h-full text-gray-200 fill-current"
+                            className="absolute w-full h-full text-gray-200 dark:text-slate-600 fill-current"
                             viewBox="0 0 20 20"
                           >
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -159,33 +159,33 @@ const ShipmentSection = () => {
                       );
                     })}
                   </div>
-                  <span className="text-[10px] font-bold text-slate-400 ml-0.5">
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 ml-0.5">
                     {(item.rating || 0).toFixed(1)}
                   </span>
                 </div>
 
-                <p className="text-[#334155] text-[11px] sm:text-[13px] leading-snug sm:leading-relaxed italic mb-3 flex-grow line-clamp-4">
+                <p className="text-[#334155] dark:text-slate-300 text-[11px] sm:text-[13px] leading-snug sm:leading-relaxed italic mb-3 flex-grow line-clamp-4">
                   {`"${item.comment || "Sin comentario"}"`}
                 </p>
 
                 {/* FOOTER TARJETA */}
-                <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-1 sm:gap-0">
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-1 sm:gap-0">
                   <div className="min-w-0 w-full sm:w-auto">
-                    <div className="flex items-center gap-1 font-bold text-[#003366] text-[10px] sm:text-xs">
+                    <div className="flex items-center gap-1 font-bold text-[#003366] dark:text-sky-400 text-[10px] sm:text-xs">
                       <span className="truncate">
                         {item.clientName || "Anónimo"}
                       </span>
                       <BadgeCheck
                         size="1.1em"
-                        className="text-[#0055a4] fill-blue-50 shrink-0"
+                        className="text-[#0055a4] dark:text-sky-400 fill-blue-50 dark:fill-slate-800 shrink-0"
                         strokeWidth={2.5}
                       />
                     </div>
-                    <p className="text-[8px] sm:text-[9px] text-slate-400 uppercase tracking-wider font-medium truncate">
+                    <p className="text-[8px] sm:text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-medium truncate">
                       {item.title}
                     </p>
                   </div>
-                  <p className="text-[8px] sm:text-[9px] font-bold text-blue-400 whitespace-nowrap">
+                  <p className="text-[8px] sm:text-[9px] font-bold text-blue-400 dark:text-sky-500 whitespace-nowrap">
                     {item.date
                       ? new Date(item.date).toLocaleDateString("es-MX", {
                           day: "numeric",

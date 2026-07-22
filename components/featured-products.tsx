@@ -51,12 +51,12 @@ const FeaturedProducts = () => {
   if (hasFailed) {
     return (
       <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
-        <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 uppercase tracking-tighter text-center">
+        <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 mb-4 sm:pb-8 uppercase tracking-tighter text-center">
           Productos destacados
         </h3>
-        <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 rounded-2xl bg-sky-50/40">
-          <PackageX className="w-10 h-10 text-sky-300" strokeWidth={1.5} />
-          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 text-center px-4">
+        <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 dark:border-sky-900/50 rounded-2xl bg-sky-50/40 dark:bg-sky-950/20">
+          <PackageX className="w-10 h-10 text-sky-300 dark:text-sky-700" strokeWidth={1.5} />
+          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600 text-center px-4">
             No se pudieron cargar los productos
           </p>
         </div>
@@ -66,7 +66,7 @@ const FeaturedProducts = () => {
 
   return (
     <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
-      <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
+      <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
         Productos destacados
       </h3>
 
@@ -97,7 +97,7 @@ const FeaturedProducts = () => {
                   className="basis-1/2 md:basis-1/3 lg:basis-1/4 pl-2 md:pl-4 group"
                 >
                   <div className="h-full">
-                    <Card className="group flex h-full flex-col py-3 sm:py-4 border border-sky-100 shadow-sm hover:shadow-lg hover:shadow-sky-100/50 transition-all duration-300 bg-white rounded-2xl">
+                    <Card className="group flex h-full flex-col py-3 sm:py-4 border border-sky-100 dark:border-slate-700 shadow-sm hover:shadow-lg hover:shadow-sky-100/50 dark:hover:shadow-none transition-all duration-300 bg-white dark:bg-slate-800 rounded-2xl">
                       <CardContent className="relative flex items-center justify-center px-2 sm:px-6 py-2">
                         <div
                           onClick={() => router.push(`/product/${slug}`)}
@@ -120,10 +120,10 @@ const FeaturedProducts = () => {
                               icon={
                                 <ShoppingCart
                                   size={18}
-                                  className="text-sky-700"
+                                  className="text-sky-700 dark:text-sky-400"
                                 />
                               }
-                              className="bg-white border-sky-100 shadow-md hover:bg-sky-50"
+                              className="bg-white dark:bg-slate-700 border-sky-100 dark:border-slate-600 shadow-md hover:bg-sky-50 dark:hover:bg-slate-600"
                             />
                             <IconButton
                               onClick={(e) => {
@@ -138,24 +138,24 @@ const FeaturedProducts = () => {
                                   className={
                                     isLoved
                                       ? "text-red-500 fill-red-500"
-                                      : "text-sky-700"
+                                      : "text-sky-700 dark:text-sky-400"
                                   }
                                 />
                               }
-                              className="bg-white border-sky-100 shadow-md hover:bg-sky-50"
+                              className="bg-white dark:bg-slate-700 border-sky-100 dark:border-slate-600 shadow-md hover:bg-sky-50 dark:hover:bg-slate-600"
                             />
                           </div>
                         </div>
                       </CardContent>
 
                       <div className="mt-auto flex flex-col justify-between gap-1 px-3 sm:px-8">
-                        <h3 className="text-xs sm:text-lg font-bold text-sky-900 line-clamp-2 min-h-[2rem] sm:min-h-[3rem]">
+                        <h3 className="text-xs sm:text-lg font-bold text-sky-900 dark:text-sky-300 line-clamp-2 min-h-[2rem] sm:min-h-[3rem]">
                           {productName}
                         </h3>
                         {/* Sección de Precio Dinámico */}
                         <div className="flex flex-col mb-2">
                           {isB2B && wholesalePrice && (
-                            <p className="text-[10px] text-slate-400 line-through leading-none">
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500 line-through leading-none">
                               {formatPrice(price)}
                             </p>
                           )}
@@ -178,8 +178,8 @@ const FeaturedProducts = () => {
             })}
         </CarouselContent>
 
-        <CarouselPrevious className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 -left-12" />
-        <CarouselNext className="hidden md:flex text-sky-700 border-sky-200 hover:bg-sky-50 -right-12" />
+        <CarouselPrevious className="hidden md:flex text-sky-700 dark:text-sky-400 border-sky-200 dark:border-slate-600 hover:bg-sky-50 dark:hover:bg-slate-700 -left-12" />
+        <CarouselNext className="hidden md:flex text-sky-700 dark:text-sky-400 border-sky-200 dark:border-slate-600 hover:bg-sky-50 dark:hover:bg-slate-700 -right-12" />
       </Carousel>
     </div>
   );

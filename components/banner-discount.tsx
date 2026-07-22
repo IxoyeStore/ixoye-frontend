@@ -5,8 +5,8 @@ import { buttonVariants } from "./ui/button";
 
 const BannerDiscount = () => {
   return (
-    <div className="p-5 sm:p-20 text-center bg-gradient-to-b from-white to-sky-50/50">
-      <h2 className="uppercase font-black text-2xl text-[#003366]">
+    <div className="p-5 sm:p-20 text-center bg-gradient-to-b from-white to-sky-50/50 dark:from-slate-900 dark:to-slate-900">
+      <h2 className="uppercase font-black text-2xl text-[#003366] dark:text-sky-400">
         Encuentra descuentos en toda la tienda
       </h2>
 
@@ -25,7 +25,7 @@ const BannerDiscount = () => {
           className={buttonVariants({
             variant: "outline",
             className:
-              "w-full sm:w-auto border-sky-200 text-sky-700 hover:bg-sky-50 hover:text-sky-800 transition-colors",
+              "w-full sm:w-auto border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-800 dark:hover:text-sky-300 transition-colors",
           })}
         >
           Más información

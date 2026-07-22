@@ -26,7 +26,7 @@ export default function RecentlyViewedSection({ excludeId }: Props) {
 
   return (
     <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
-      <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:pb-8 tracking-tighter text-left">
+      <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 mb-4 sm:pb-8 tracking-tighter text-left">
         Vistos recientemente
       </h3>
       <Carousel className="w-full" opts={{ dragFree: true, loop: false }}>
@@ -42,7 +42,7 @@ export default function RecentlyViewedSection({ excludeId }: Props) {
                 className="basis-1/2 md:basis-1/3 lg:basis-1/4 pl-2 md:pl-4 group"
               >
                 <div className="h-full">
-                  <Card className="group flex h-full flex-col py-3 sm:py-4 border border-sky-100 shadow-sm hover:shadow-lg hover:shadow-sky-100/50 transition-all duration-300 bg-white rounded-2xl">
+                  <Card className="group flex h-full flex-col py-3 sm:py-4 border border-sky-100 dark:border-slate-700 shadow-sm hover:shadow-lg hover:shadow-sky-100/50 dark:hover:shadow-none transition-all duration-300 bg-white dark:bg-slate-800 rounded-2xl">
                     <CardContent className="relative flex items-center justify-center px-2 sm:px-6 py-2">
                       <Link
                         href={`/product/${product.slug}`}
@@ -57,13 +57,13 @@ export default function RecentlyViewedSection({ excludeId }: Props) {
                     </CardContent>
                     <div className="mt-auto flex flex-col justify-between gap-1 px-3 sm:px-8">
                       <Link href={`/product/${product.slug}`}>
-                        <h3 className="text-xs sm:text-lg font-bold text-sky-900 line-clamp-2 min-h-[2rem] sm:min-h-[3rem]">
+                        <h3 className="text-xs sm:text-lg font-bold text-sky-900 dark:text-sky-300 line-clamp-2 min-h-[2rem] sm:min-h-[3rem]">
                           {product.productName}
                         </h3>
                       </Link>
                       <div className="flex flex-col mb-2">
                         {isB2B && product.wholesalePrice && product.wholesalePrice > 0 && (
-                          <p className="text-[10px] text-slate-400 line-through leading-none">
+                          <p className="text-[10px] text-slate-400 dark:text-slate-500 line-through leading-none">
                             {formatPrice(product.price)}
                           </p>
                         )}
