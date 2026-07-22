@@ -160,7 +160,7 @@ function LoginFormContent() {
     return (
       <div className="flex flex-col items-center justify-center">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0071b1] border-t-transparent mb-4"></div>
-        <p className="text-sm font-semibold text-[#012849] animate-pulse">
+        <p className="text-sm font-semibold text-[#012849] dark:text-sky-300 animate-pulse">
           Cargando...
         </p>
       </div>
@@ -168,12 +168,12 @@ function LoginFormContent() {
   }
 
   return (
-    <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 animate-in fade-in duration-500">
+    <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700 animate-in fade-in duration-500">
       <CardHeader className="space-y-1 text-center pt-8 pb-4">
-        <CardTitle className="text-3xl font-extrabold text-[#012849] tracking-tight">
+        <CardTitle className="text-3xl font-extrabold text-[#012849] dark:text-sky-300 tracking-tight">
           Iniciar sesión
         </CardTitle>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-slate-400">
           Usa tu cuenta Refacciones Diésel y Agrícola Ixoye
         </p>
       </CardHeader>
@@ -182,17 +182,17 @@ function LoginFormContent() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Campo Email */}
           <div className="space-y-2">
-            <div className="text-sm font-bold text-[#012849]">
+            <div className="text-sm font-bold text-[#012849] dark:text-sky-300">
               Correo electrónico
             </div>
             <Input
               type="email"
               {...register("email")}
               placeholder="correo@ejemplo.com"
-              className="border-gray-200 focus-visible:ring-[#0071b1] h-11 bg-gray-50/30"
+              className="border-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white focus-visible:ring-[#0071b1] h-11 bg-gray-50/30"
             />
             {errors.email && (
-              <p className="text-[11px] text-red-500 font-medium">
+              <p className="text-[11px] text-red-500 dark:text-red-400 font-medium">
                 {errors.email.message}
               </p>
             )}
@@ -201,10 +201,10 @@ function LoginFormContent() {
           {/* Campo Contraseña */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <div className="text-sm font-bold text-[#012849]">Contraseña</div>
+              <div className="text-sm font-bold text-[#012849] dark:text-sky-300">Contraseña</div>
               <Link
                 href="/forgot-password"
-                className="text-xs font-semibold text-[#0071b1] hover:underline"
+                className="text-xs font-semibold text-[#0071b1] dark:text-sky-400 hover:underline"
               >
                 ¿Olvidaste tu contraseña?
               </Link>
@@ -214,19 +214,19 @@ function LoginFormContent() {
                 type={showPassword ? "text" : "password"}
                 {...register("password")}
                 placeholder="••••••••"
-                className="border-gray-200 focus-visible:ring-[#0071b1] h-11 bg-gray-50/30 pr-11"
+                className="border-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white focus-visible:ring-[#0071b1] h-11 bg-gray-50/30 pr-11"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0071b1] transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-[#0071b1] dark:hover:text-sky-400 transition-colors"
                 tabIndex={-1}
               >
                 {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-[11px] text-red-500 font-medium">
+              <p className="text-[11px] text-red-500 dark:text-red-400 font-medium">
                 {errors.password.message}
               </p>
             )}
@@ -239,7 +239,7 @@ function LoginFormContent() {
               className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors shrink-0 ${
                 rememberMe
                   ? "bg-[#0071b1] border-[#0071b1]"
-                  : "border-gray-300 bg-white"
+                  : "border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800"
               }`}
             >
               {rememberMe && (
@@ -248,13 +248,13 @@ function LoginFormContent() {
                 </svg>
               )}
             </div>
-            <span className="text-sm text-gray-600">Recordarme</span>
+            <span className="text-sm text-gray-600 dark:text-slate-400">Recordarme</span>
           </label>
 
           {/* Sección de Errores y Reenvío */}
           {loginError && (
             <div className="space-y-3">
-              <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-100 text-center font-medium">
+              <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 p-3 rounded-md border border-red-100 dark:border-red-900 text-center font-medium">
                 {loginError}
               </p>
 
@@ -263,7 +263,7 @@ function LoginFormContent() {
                   type="button"
                   onClick={onResendConfirmation}
                   disabled={isResending}
-                  className="w-full text-xs font-bold text-[#0071b1] hover:text-[#012849] transition-colors disabled:opacity-50"
+                  className="w-full text-xs font-bold text-[#0071b1] dark:text-sky-400 hover:text-[#012849] dark:hover:text-sky-300 transition-colors disabled:opacity-50"
                 >
                   {isResending
                     ? "Enviando..."
@@ -277,8 +277,8 @@ function LoginFormContent() {
             <p
               className={`text-xs p-2 rounded text-center font-medium ${
                 resendStatus.type === "success"
-                  ? "bg-emerald-50 text-emerald-700"
-                  : "bg-amber-50 text-amber-700"
+                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
+                  : "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400"
               }`}
             >
               {resendStatus.message}
@@ -296,21 +296,21 @@ function LoginFormContent() {
 
         <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-gray-100" />
+            <span className="w-full border-t border-gray-100 dark:border-slate-700" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-gray-400 font-medium">
+            <span className="bg-white dark:bg-slate-800 px-2 text-gray-400 dark:text-slate-500 font-medium">
               O también
             </span>
           </div>
         </div>
 
         <div className="text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-slate-400">
             ¿No tienes una cuenta?{" "}
             <Link
               href="/register"
-              className="font-bold text-[#0071b1] hover:underline"
+              className="font-bold text-[#0071b1] dark:text-sky-400 hover:underline"
             >
               Regístrate aquí
             </Link>
@@ -323,12 +323,12 @@ function LoginFormContent() {
 
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center p-4 py-12 min-h-[calc(100vh-80px)] bg-gray-50/50">
+    <div className="flex items-center justify-center p-4 py-12 min-h-[calc(100vh-80px)] bg-gray-50/50 dark:bg-slate-900">
       <Suspense
         fallback={
           <div className="flex flex-col items-center justify-center">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0071b1] border-t-transparent mb-4"></div>
-            <p className="text-sm font-semibold text-[#012849] animate-pulse">
+            <p className="text-sm font-semibold text-[#012849] dark:text-sky-300 animate-pulse">
               Cargando...
             </p>
           </div>

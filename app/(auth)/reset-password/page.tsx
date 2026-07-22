@@ -87,7 +87,7 @@ function ResetPasswordContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0071b1] border-t-transparent mb-4"></div>
-        <p className="text-sm font-semibold text-[#012849] animate-pulse">
+        <p className="text-sm font-semibold text-[#012849] dark:text-sky-300 animate-pulse">
           Cargando...
         </p>
       </div>
@@ -96,18 +96,18 @@ function ResetPasswordContent() {
 
   if (status === "success") {
     return (
-      <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 animate-in zoom-in-95 duration-500">
+      <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700 animate-in zoom-in-95 duration-500">
         <CardContent className="px-8 py-12 text-center space-y-6">
           <div className="flex justify-center">
-            <div className="bg-green-100 p-3 rounded-full">
-              <CheckCircle2 className="w-12 h-12 text-green-600" />
+            <div className="bg-green-100 dark:bg-green-900/40 p-3 rounded-full">
+              <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
             </div>
           </div>
           <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-[#012849]">
+            <h3 className="text-2xl font-bold text-[#012849] dark:text-sky-300">
               ¡Contraseña actualizada!
             </h3>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 dark:text-slate-400 text-sm">
               Tu contraseña ha sido cambiada exitosamente. Ya puedes iniciar
               sesión.
             </p>
@@ -124,12 +124,12 @@ function ResetPasswordContent() {
   }
 
   return (
-    <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 animate-in fade-in duration-500">
+    <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700 animate-in fade-in duration-500">
       <CardHeader className="text-center pt-8 pb-4">
-        <CardTitle className="text-2xl font-extrabold text-[#012849] tracking-tight">
+        <CardTitle className="text-2xl font-extrabold text-[#012849] dark:text-sky-300 tracking-tight">
           Nueva contraseña
         </CardTitle>
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">
           Crea una contraseña segura para tu cuenta.
         </p>
       </CardHeader>
@@ -137,41 +137,41 @@ function ResetPasswordContent() {
       <CardContent className="px-8 pb-10">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1.5">
-            <div className="text-sm font-bold text-[#012849]">
+            <div className="text-sm font-bold text-[#012849] dark:text-sky-300">
               <RequiredLabel>Nueva contraseña</RequiredLabel>
             </div>
             <Input
               type="password"
               placeholder="Mínimo 8 caracteres"
               {...register("password")}
-              className="border-gray-200 h-11 bg-gray-50/30"
+              className="border-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white h-11 bg-gray-50/30"
             />
             {errors.password && (
-              <p className="text-xs text-red-500 font-medium">
+              <p className="text-xs text-red-500 dark:text-red-400 font-medium">
                 {errors.password.message}
               </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <div className="text-sm font-bold text-[#012849]">
+            <div className="text-sm font-bold text-[#012849] dark:text-sky-300">
               <RequiredLabel>Confirmar nueva contraseña</RequiredLabel>
             </div>
             <Input
               type="password"
               placeholder="Repite tu nueva contraseña"
               {...register("confirmPassword")}
-              className="border-gray-200 h-11 bg-gray-50/30"
+              className="border-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white h-11 bg-gray-50/30"
             />
             {errors.confirmPassword && (
-              <p className="text-xs text-red-500 font-medium">
+              <p className="text-xs text-red-500 dark:text-red-400 font-medium">
                 {errors.confirmPassword.message}
               </p>
             )}
           </div>
 
           {status === "error" && (
-            <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-100 font-medium">
+            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 p-3 rounded-lg border border-red-100 dark:border-red-900 font-medium">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <p>{errorMessage}</p>
             </div>
@@ -192,12 +192,12 @@ function ResetPasswordContent() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="flex items-center justify-center p-4 py-12 min-h-[calc(100vh-80px)] bg-gray-50/50">
+    <div className="flex items-center justify-center p-4 py-12 min-h-[calc(100vh-80px)] bg-gray-50/50 dark:bg-slate-900">
       <Suspense
         fallback={
           <div className="flex flex-col items-center justify-center">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0071b1] border-t-transparent mb-4"></div>
-            <p className="text-sm font-semibold text-[#012849] animate-pulse">
+            <p className="text-sm font-semibold text-[#012849] dark:text-sky-300 animate-pulse">
               Cargando...
             </p>
           </div>

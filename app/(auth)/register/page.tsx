@@ -135,9 +135,9 @@ export default function RegisterPage() {
 
   if (!mounted) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] bg-gray-50/50">
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] bg-gray-50/50 dark:bg-slate-900">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0071b1] border-t-transparent mb-4"></div>
-        <p className="text-sm font-semibold text-[#012849] animate-pulse">
+        <p className="text-sm font-semibold text-[#012849] dark:text-sky-300 animate-pulse">
           Cargando...
         </p>
       </div>
@@ -145,13 +145,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex justify-center items-center py-12 px-4 bg-gray-50/50 min-h-[calc(100vh-80px)]">
-      <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100">
+    <div className="flex justify-center items-center py-12 px-4 bg-gray-50/50 dark:bg-slate-900 min-h-[calc(100vh-80px)]">
+      <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700">
         <CardHeader className="text-center pt-8 pb-4">
-          <CardTitle className="text-3xl font-extrabold text-[#012849]">
+          <CardTitle className="text-3xl font-extrabold text-[#012849] dark:text-sky-300">
             Crear cuenta
           </CardTitle>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">
             Únete a Refacciones Ixoye
           </p>
         </CardHeader>
@@ -164,10 +164,10 @@ export default function RegisterPage() {
                 <Input
                   placeholder="ej: juan_perez"
                   {...register("username")}
-                  className="h-11 bg-gray-50/30"
+                  className="h-11 bg-gray-50/30 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
                 />
                 {errors.username && (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-red-500 dark:text-red-400">
                     {errors.username.message}
                   </p>
                 )}
@@ -179,10 +179,10 @@ export default function RegisterPage() {
                   type="email"
                   placeholder="ej: correo@ejemplo.com"
                   {...register("email")}
-                  className="h-11 bg-gray-50/30"
+                  className="h-11 bg-gray-50/30 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
                 />
                 {errors.email && (
-                  <p className="text-xs text-red-500">{errors.email.message}</p>
+                  <p className="text-xs text-red-500 dark:text-red-400">{errors.email.message}</p>
                 )}
               </div>
 
@@ -192,10 +192,10 @@ export default function RegisterPage() {
                   type="password"
                   placeholder="Mínimo 8 caracteres"
                   {...register("password")}
-                  className="h-11 bg-gray-50/30"
+                  className="h-11 bg-gray-50/30 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
                 />
                 {errors.password && (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-red-500 dark:text-red-400">
                     {errors.password.message}
                   </p>
                 )}
@@ -207,10 +207,10 @@ export default function RegisterPage() {
                   type="password"
                   placeholder="Repite tu contraseña"
                   {...register("confirmPassword")}
-                  className="h-11 bg-gray-50/30"
+                  className="h-11 bg-gray-50/30 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
                 />
                 {errors.confirmPassword && (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-red-500 dark:text-red-400">
                     {errors.confirmPassword.message}
                   </p>
                 )}
@@ -223,12 +223,12 @@ export default function RegisterPage() {
                 checked={acceptedTerms}
                 onCheckedChange={(c) => setAcceptedTerms(c as boolean)}
               />
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-slate-400">
                 Acepto los{" "}
                 <button
                   type="button"
                   onClick={() => openLegalModal("terms-and-condition")}
-                  className="text-[#0071b1] font-semibold hover:underline"
+                  className="text-[#0071b1] dark:text-sky-400 font-semibold hover:underline"
                 >
                   Términos
                 </button>{" "}
@@ -236,7 +236,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => openLegalModal("privacy-policy")}
-                  className="text-[#0071b1] font-semibold hover:underline"
+                  className="text-[#0071b1] dark:text-sky-400 font-semibold hover:underline"
                 >
                   Aviso de Privacidad
                 </button>
@@ -245,7 +245,7 @@ export default function RegisterPage() {
             </div>
 
             {registerError && (
-              <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg text-center">
+              <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 p-3 rounded-lg text-center">
                 {registerError}
               </p>
             )}
@@ -259,11 +259,11 @@ export default function RegisterPage() {
             </Button>
           </form>
           <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-slate-400">
               ¿Ya tienes cuenta?{" "}
               <a
                 href="/login"
-                className="font-bold text-[#0071b1] hover:underline"
+                className="font-bold text-[#0071b1] dark:text-sky-400 hover:underline"
               >
                 Inicia sesión
               </a>
@@ -276,27 +276,27 @@ export default function RegisterPage() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] flex flex-col p-0 overflow-hidden">
           <DialogHeader className="p-6 pb-2">
-            <DialogTitle className="text-2xl font-bold text-[#012849]">
+            <DialogTitle className="text-2xl font-bold text-[#012849] dark:text-sky-300">
               {modalTitle}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden px-6">
-            <ScrollArea className="h-[400px] sm:h-[500px] w-full rounded-md border p-4 bg-white shadow-inner">
+            <ScrollArea className="h-[400px] sm:h-[500px] w-full rounded-md border dark:border-slate-700 p-4 bg-white dark:bg-slate-900 shadow-inner">
               {isLoadingLegal ? (
                 <div className="flex flex-col items-center justify-center h-full space-y-2">
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0071b1] border-t-transparent"></div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-slate-400">
                     Cargando contenido...
                   </span>
                 </div>
               ) : (
-                <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line pr-4">
+                <div className="text-sm text-gray-700 dark:text-slate-300 leading-relaxed whitespace-pre-line pr-4">
                   {modalContent}
                 </div>
               )}
             </ScrollArea>
           </div>
-          <DialogFooter className="p-6 pt-2 flex flex-row gap-3 sm:justify-end border-t">
+          <DialogFooter className="p-6 pt-2 flex flex-row gap-3 sm:justify-end border-t dark:border-slate-700">
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
               Cerrar
             </Button>
