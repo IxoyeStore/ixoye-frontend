@@ -156,7 +156,7 @@ const InfoProduct = ({ product }: InfoProductProps) => {
             <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${stock <= 5 ? "bg-orange-50 border-orange-100 text-orange-600" : "bg-green-50 border-green-100 text-green-700"}`}>
               <div className={`h-2 w-2 rounded-full animate-pulse ${stock <= 5 ? "bg-orange-500" : "bg-green-600"}`} />
               <p className="text-[10px] font-black uppercase tracking-wider">
-                {stock <= 5 ? `Últimas ${stock} unidades` : "Existencia Disponible"}
+                {stock === 1 ? "¡Última unidad!" : stock <= 5 ? `Últimas ${stock} unidades` : "Existencia Disponible"}
               </p>
             </div>
           ) : (
