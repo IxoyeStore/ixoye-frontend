@@ -108,6 +108,10 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
   );
 };
 
+// Modo oscuro aun en rollout incremental por el resto del sitio — ocultar
+// el toggle hasta que todas las paginas esten cubiertas.
+const SHOW_THEME_TOGGLE = false;
+
 type PreviewProduct = {
   id: number;
   slug: string;
@@ -390,10 +394,12 @@ export default function Header({
               <SupportMenu />
               <span className={navTextClass}>Soporte</span>
             </div>
-            <button onClick={onToggleTheme} className={iconClass}>
-              {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-              <span className={navTextClass}>{isDark ? "Claro" : "Oscuro"}</span>
-            </button>
+            {SHOW_THEME_TOGGLE && (
+              <button onClick={onToggleTheme} className={iconClass}>
+                {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+                <span className={navTextClass}>{isDark ? "Claro" : "Oscuro"}</span>
+              </button>
+            )}
           </nav>
 
           <button
@@ -507,17 +513,19 @@ export default function Header({
                   </span>
                 )}
               </Link>
-              <button
-                onClick={() => { onToggleTheme(); setOpen(false); }}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm"
-              >
-                {isDark
-                  ? <Sun className="w-6 h-6 text-sky-950 dark:text-sky-400" />
-                  : <Moon className="w-6 h-6 text-sky-950 dark:text-sky-400" />}
-                <span className="text-[10px] font-black uppercase italic dark:text-white">
-                  {isDark ? "Modo Claro" : "Modo Oscuro"}
-                </span>
-              </button>
+              {SHOW_THEME_TOGGLE && (
+                <button
+                  onClick={() => { onToggleTheme(); setOpen(false); }}
+                  className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm"
+                >
+                  {isDark
+                    ? <Sun className="w-6 h-6 text-sky-950 dark:text-sky-400" />
+                    : <Moon className="w-6 h-6 text-sky-950 dark:text-sky-400" />}
+                  <span className="text-[10px] font-black uppercase italic dark:text-white">
+                    {isDark ? "Modo Claro" : "Modo Oscuro"}
+                  </span>
+                </button>
+              )}
             </div>
 
             {/* FILTROS MOBILE */}
