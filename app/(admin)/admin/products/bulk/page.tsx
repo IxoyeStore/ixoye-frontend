@@ -230,10 +230,10 @@ export default function BulkProductsPage() {
           row.forEach((val, i) => { if (colMap[i]) obj[colMap[i]] = val; });
           return obj;
         })
-        .filter((p) => p.documentId);
+        .filter((p) => p.documentId || p.code);
 
       if (products.length === 0) {
-        toast.error("No se encontraron filas válidas — ¿falta la columna ID?");
+        toast.error("No se encontraron filas válidas — ¿falta la columna ID o código?");
         setImporting(false);
         return;
       }
@@ -277,23 +277,28 @@ export default function BulkProductsPage() {
 
         await Promise.all(batch.map(async (product) => {
           const { documentId, ...fields } = product;
+          const isCreate = !documentId;
           const payload = await buildPayload(fields);
+          const label = String(fields.productName ?? fields.code ?? documentId);
           try {
-            const upd = await fetch(`/api/admin/products/${documentId}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
+            const upd = await fetch(
+              isCreate ? "/api/admin/products" : `/api/admin/products/${documentId}`,
+              {
+                method: isCreate ? "POST" : "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              }
+            );
             if (upd.ok) {
               res.success++;
             } else {
               const err = await upd.json().catch(() => ({}));
               res.failed++;
-              res.errors.push({ name: String(fields.productName ?? documentId), error: err?.error?.message || `HTTP ${upd.status}` });
+              res.errors.push({ name: label, error: err?.error?.message || `HTTP ${upd.status}` });
             }
           } catch {
             res.failed++;
-            res.errors.push({ name: String(fields.productName ?? documentId), error: "Error de red" });
+            res.errors.push({ name: label, error: "Error de red" });
           }
           completed++;
           setProgress(Math.round((completed / products.length) * 100));
@@ -468,7 +473,8 @@ export default function BulkProductsPage() {
         <p className="text-[11px] text-amber-700 dark:text-amber-400 font-bold">
           No modifiques ni elimines las columnas <strong>documentId</strong> y <strong>tieneImagenes</strong> del
           Excel — se usan para identificar cada producto y detectar si ya tiene imágenes al importar.
-          El resto de columnas son editables.
+          El resto de columnas son editables. Las filas con <strong>documentId vacío</strong> (pero con
+          código) se crean como productos nuevos.
         </p>
       </div>
 
