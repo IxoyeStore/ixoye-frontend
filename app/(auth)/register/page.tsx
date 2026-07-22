@@ -20,6 +20,7 @@ import { registerSchema } from "@/schemas/register-schema";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
@@ -29,6 +30,9 @@ export default function RegisterPage() {
   const [mounted, setMounted] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -91,21 +95,23 @@ export default function RegisterPage() {
       );
       return;
     }
+    if (!turnstileToken) {
+      setRegisterError("Completa la verificación de seguridad para continuar.");
+      return;
+    }
     setRegisterError(null);
 
     try {
-      const res = await fetch(
-        `https://ixoye-backend-production.up.railway.app/api/auth/local/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: data.username,
-            email: data.email,
-            password: data.password,
-          }),
-        },
-      );
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: data.username,
+          email: data.email,
+          password: data.password,
+          turnstileToken,
+        }),
+      });
 
       const result = await res.json();
 
@@ -113,6 +119,12 @@ export default function RegisterPage() {
         setRegisterError(
           result.error?.message || "El usuario o correo ya existe",
         );
+        return;
+      }
+
+      if (result.user?.confirmed === false) {
+        setSubmittedEmail(data.email);
+        setAwaitingConfirmation(true);
         return;
       }
 
@@ -140,6 +152,32 @@ export default function RegisterPage() {
         <p className="text-sm font-semibold text-[#012849] dark:text-sky-300 animate-pulse">
           Cargando...
         </p>
+      </div>
+    );
+  }
+
+  if (awaitingConfirmation) {
+    return (
+      <div className="flex justify-center items-center py-12 px-4 bg-gray-50/50 dark:bg-slate-900 min-h-[calc(100vh-80px)]">
+        <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700">
+          <CardContent className="px-8 py-10 text-center space-y-4">
+            <CardTitle className="text-2xl font-extrabold text-[#012849] dark:text-sky-300">
+              Confirma tu correo
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-slate-400">
+              Te enviamos un enlace de confirmación a{" "}
+              <span className="font-bold text-[#012849] dark:text-sky-300">{submittedEmail}</span>.
+              Revisa tu bandeja de entrada (y la carpeta de spam) y haz clic en el enlace para
+              poder iniciar sesión.
+            </p>
+            <a
+              href="/login"
+              className="inline-block font-bold text-[#0071b1] dark:text-sky-400 hover:underline text-sm"
+            >
+              Ir a iniciar sesión
+            </a>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -244,6 +282,13 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            <div className="flex justify-center pt-1">
+              <TurnstileWidget
+                onVerify={setTurnstileToken}
+                onExpire={() => setTurnstileToken(null)}
+              />
+            </div>
+
             {registerError && (
               <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 p-3 rounded-lg text-center">
                 {registerError}
@@ -253,7 +298,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               className="w-full bg-[#0071b1] hover:bg-[#005a8e] h-12 font-bold"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !turnstileToken}
             >
               {isSubmitting ? "Creando cuenta..." : "Registrarme"}
             </Button>
