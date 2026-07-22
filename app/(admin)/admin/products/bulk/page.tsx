@@ -73,6 +73,7 @@ async function findCloudinaryImages(rawCode: string): Promise<string[]> {
       if (await imageExists(url)) { hit = url; break; }
     }
     if (hit) found.push(hit);
+    else break; // numeracion consecutiva: si falta un sufijo, no seguir probando los siguientes
   }
   return found;
 }
