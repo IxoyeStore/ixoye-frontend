@@ -13,6 +13,7 @@ const COLUMNS = [
   { key: "documentId",     label: "documentId"       },
   { key: "productName",    label: "descripcion"      },
   { key: "code",           label: "codigo"           },
+  { key: "imageCode",      label: "codigoImagen"     },
   { key: "slug",           label: "slug"             },
   { key: "department",     label: "departamento"     },
   { key: "subDepartment",  label: "subDepartamento"  },
@@ -248,6 +249,7 @@ export default function BulkProductsPage() {
         const payload: Record<string, any> = {};
         if (fields.productName    !== undefined) payload.productName    = String(fields.productName);
         if (fields.code           !== undefined) payload.code           = String(fields.code);
+        if (fields.imageCode      !== undefined) payload.imageCode      = String(fields.imageCode);
         if (fields.slug           !== undefined) payload.slug           = String(fields.slug);
         if (fields.department     !== undefined) payload.department     = String(fields.department);
         if (fields.subDepartment  !== undefined) payload.subDepartment  = String(fields.subDepartment);
@@ -265,8 +267,9 @@ export default function BulkProductsPage() {
         if (fields.description    !== undefined) payload.description    = String(fields.description);
 
         const alreadyHasImages = String(fields.hasImages).toUpperCase() === "TRUE";
-        if (autoAssignImages && fields.code && !alreadyHasImages) {
-          const images = await findCloudinaryImages(String(fields.code));
+        const searchCode = fields.imageCode || fields.code;
+        if (autoAssignImages && searchCode && !alreadyHasImages) {
+          const images = await findCloudinaryImages(String(searchCode));
           if (images.length > 0) payload.images = images;
         }
 
@@ -360,7 +363,8 @@ export default function BulkProductsPage() {
             const docId = product.documentId || String(product.id);
             const label = String(product.productName ?? product.code ?? docId);
             try {
-              const images = await findCloudinaryImages(String(product.code));
+              const searchCode = product.imageCode || product.code;
+              const images = await findCloudinaryImages(String(searchCode));
               if (images.length === 0) {
                 res.skipped!++;
               } else {
@@ -593,7 +597,8 @@ export default function BulkProductsPage() {
           <div>
             <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Actualizar imágenes</h2>
             <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold mt-0.5">
-              Busca en Cloudinary por código y asigna imágenes a los productos que aún no tienen
+              Busca en Cloudinary por código (o por <strong>codigoImagen</strong> si el producto lo tiene definido)
+              y asigna imágenes a los productos que aún no tienen
             </p>
           </div>
         </div>
@@ -690,9 +695,10 @@ export default function BulkProductsPage() {
                         Auto-asignar imágenes desde Cloudinary
                       </span>
                       <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-0.5">
-                        Busca imágenes ya subidas por código de producto (hasta 5 por producto) y las
-                        asigna solo a los productos con <strong>tieneImagenes = FALSE</strong>. No sube
-                        archivos nuevos, no sobrescribe productos que ya tienen imágenes.
+                        Busca imágenes ya subidas por código de producto (o por <strong>codigoImagen</strong> si
+                        está definido, hasta 5 por producto) y las asigna solo a los productos con
+                        <strong> tieneImagenes = FALSE</strong>. No sube archivos nuevos, no sobrescribe
+                        productos que ya tienen imágenes.
                       </span>
                     </span>
                   </label>

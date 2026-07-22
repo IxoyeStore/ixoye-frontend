@@ -8,6 +8,7 @@ const COLUMNS = [
   { key: "documentId",     label: "documentId",       width: 34 },
   { key: "productName",    label: "descripcion",      width: 30 },
   { key: "code",           label: "codigo",           width: 16 },
+  { key: "imageCode",      label: "codigoImagen",     width: 16 },
   { key: "slug",           label: "slug",             width: 30 },
   { key: "department",     label: "departamento",     width: 20 },
   { key: "subDepartment",  label: "subDepartamento",  width: 20 },
