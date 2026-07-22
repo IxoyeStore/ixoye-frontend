@@ -49,7 +49,9 @@ function imageExists(url: string): Promise<boolean> {
   });
 }
 
-async function findCloudinaryImages(code: string): Promise<string[]> {
+async function findCloudinaryImages(rawCode: string): Promise<string[]> {
+  const code = rawCode.trim();
+  if (!code) return [];
   const found: string[] = [];
   for (const suffix of IMAGE_SUFFIXES) {
     let hit: string | null = null;
@@ -248,8 +250,8 @@ export default function BulkProductsPage() {
       const buildPayload = async (fields: Record<string, any>) => {
         const payload: Record<string, any> = {};
         if (fields.productName    !== undefined) payload.productName    = String(fields.productName);
-        if (fields.code           !== undefined) payload.code           = String(fields.code);
-        if (fields.imageCode      !== undefined) payload.imageCode      = String(fields.imageCode);
+        if (fields.code           !== undefined) payload.code           = String(fields.code).trim();
+        if (fields.imageCode      !== undefined) payload.imageCode      = String(fields.imageCode).trim();
         if (fields.slug           !== undefined) payload.slug           = String(fields.slug);
         if (fields.department     !== undefined) payload.department     = String(fields.department);
         if (fields.subDepartment  !== undefined) payload.subDepartment  = String(fields.subDepartment);
