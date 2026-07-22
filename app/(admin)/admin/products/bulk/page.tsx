@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Download, Upload, FileSpreadsheet, Loader2,
-  CheckCircle, XCircle, AlertCircle, Search, X, FolderOpen,
+  CheckCircle, XCircle, AlertCircle, Search, X, FolderOpen, RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
@@ -73,6 +73,7 @@ type ImportResult = {
   total: number;
   success: number;
   failed: number;
+  skipped?: number;
   errors: { name: string; error: string }[];
 };
 
@@ -95,6 +96,7 @@ export default function BulkProductsPage() {
   const [result, setResult]         = useState<ImportResult | null>(null);
   const [dragOver, setDragOver]     = useState(false);
   const [autoAssignImages, setAutoAssignImages] = useState(false);
+  const [modalMode, setModalMode]   = useState<"import" | "images">("import");
 
   const fileInputRef  = useRef<HTMLInputElement>(null);
   const countDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -148,6 +150,7 @@ export default function BulkProductsPage() {
   const hasFilters = Object.values(filters).some(Boolean);
 
   const openModal = () => {
+    setModalMode("import");
     setResult(null);
     setProgress(0);
     setProgressLabel("");
@@ -316,6 +319,86 @@ export default function BulkProductsPage() {
       setImporting(false);
       setProgressLabel("");
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  // ── Update images (standalone, no Excel needed) ─────────────────────────────
+  const runImageUpdate = async () => {
+    setModalMode("images");
+    setResult(null);
+    setProgress(0);
+    setProgressLabel("Buscando productos sin imágenes...");
+    setShowModal(true);
+    setImporting(true);
+
+    try {
+      const missing: any[] = [];
+      let p = 1;
+      let hasMore = true;
+      while (hasMore) {
+        const res = await fetch(`/api/admin/products?page=${p}&pageSize=100`);
+        const data = await res.json();
+        const batch = (data.data || []).filter(
+          (prod: any) => !Array.isArray(prod.images) || prod.images.length === 0
+        );
+        missing.push(...batch);
+        const pagination = data.meta?.pagination;
+        hasMore = pagination ? p < pagination.pageCount : false;
+        p++;
+      }
+
+      const res: ImportResult = { total: missing.length, success: 0, failed: 0, skipped: 0, errors: [] };
+
+      if (missing.length > 0) {
+        const CONCURRENCY = 10;
+        let completed = 0;
+
+        for (let i = 0; i < missing.length; i += CONCURRENCY) {
+          const batch = missing.slice(i, i + CONCURRENCY);
+
+          await Promise.all(batch.map(async (product: any) => {
+            const docId = product.documentId || String(product.id);
+            const label = String(product.productName ?? product.code ?? docId);
+            try {
+              const images = await findCloudinaryImages(String(product.code));
+              if (images.length === 0) {
+                res.skipped!++;
+              } else {
+                const upd = await fetch(`/api/admin/products/${docId}`, {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ images }),
+                });
+                if (upd.ok) {
+                  res.success++;
+                } else {
+                  const err = await upd.json().catch(() => ({}));
+                  res.failed++;
+                  res.errors.push({ name: label, error: err?.error?.message || `HTTP ${upd.status}` });
+                }
+              }
+            } catch {
+              res.failed++;
+              res.errors.push({ name: label, error: "Error de red" });
+            }
+            completed++;
+            setProgress(Math.round((completed / missing.length) * 100));
+          }));
+
+          setProgressLabel(`${Math.min(i + CONCURRENCY, missing.length)} / ${missing.length}`);
+        }
+      }
+
+      setResult(res);
+      if (res.total === 0) toast.success("No hay productos sin imágenes");
+      else if (res.failed === 0) toast.success(`${res.success} producto(s) actualizados con imágenes`);
+      else toast.warning(`${res.success} actualizados, ${res.failed} con error`);
+    } catch {
+      toast.error("Error al buscar imágenes");
+      setShowModal(false);
+    } finally {
+      setImporting(false);
+      setProgressLabel("");
     }
   };
 
@@ -501,6 +584,29 @@ export default function BulkProductsPage() {
         </button>
       </div>
 
+      {/* ── Update images trigger ───────────────────────────────────────────── */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 space-y-4">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 bg-sky-50 dark:bg-sky-900/30 rounded-xl flex items-center justify-center shrink-0">
+            <RefreshCw size={18} className="text-sky-600 dark:text-sky-400" />
+          </div>
+          <div>
+            <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Actualizar imágenes</h2>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold mt-0.5">
+              Busca en Cloudinary por código y asigna imágenes a los productos que aún no tienen
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={runImageUpdate}
+          className="flex items-center gap-2 px-6 py-3 bg-sky-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-sky-700 shadow-lg shadow-sky-100 dark:shadow-sky-900/20 transition-all"
+        >
+          <RefreshCw size={14} />
+          Actualizar búsqueda de imágenes
+        </button>
+      </div>
+
       {/* ── Import Modal ────────────────────────────────────────────────────── */}
       {showModal && (
         <div
@@ -518,7 +624,9 @@ export default function BulkProductsPage() {
                   <FileSpreadsheet size={16} className="text-sky-600 dark:text-sky-400" />
                 </div>
                 <h3 className="text-[13px] font-black uppercase tracking-widest text-slate-900 dark:text-white">
-                  {importing ? "Importando..." : result ? "Resultado" : "Seleccionar archivo"}
+                  {importing
+                    ? (modalMode === "images" ? "Buscando imágenes..." : "Importando...")
+                    : result ? "Resultado" : "Seleccionar archivo"}
                 </h3>
               </div>
               {!importing && (
@@ -617,7 +725,7 @@ export default function BulkProductsPage() {
                   </div>
 
                   <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 text-center">
-                    No cierres esta ventana hasta que termine la importación
+                    No cierres esta ventana hasta que termine {modalMode === "images" ? "la búsqueda" : "la importación"}
                   </p>
                 </div>
               )}
@@ -625,7 +733,7 @@ export default function BulkProductsPage() {
               {/* ── Result state ── */}
               {result && !importing && (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className={`grid gap-3 ${result.skipped !== undefined ? "grid-cols-4" : "grid-cols-3"}`}>
                     <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 text-center">
                       <p className="text-2xl font-black text-slate-900 dark:text-white">{result.total}</p>
                       <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">Total</p>
@@ -634,6 +742,12 @@ export default function BulkProductsPage() {
                       <p className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{result.success}</p>
                       <p className="text-[9px] font-black uppercase tracking-widest text-emerald-500 mt-1">Exitosos</p>
                     </div>
+                    {result.skipped !== undefined && (
+                      <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 text-center">
+                        <p className="text-2xl font-black text-slate-400 dark:text-slate-500">{result.skipped}</p>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">Sin Match</p>
+                      </div>
+                    )}
                     <div className={`rounded-xl p-3 text-center ${result.failed > 0 ? "bg-red-50 dark:bg-red-900/30" : "bg-slate-50 dark:bg-slate-700"}`}>
                       <p className={`text-2xl font-black ${result.failed > 0 ? "text-red-700 dark:text-red-400" : "text-slate-300 dark:text-slate-600"}`}>
                         {result.failed}
