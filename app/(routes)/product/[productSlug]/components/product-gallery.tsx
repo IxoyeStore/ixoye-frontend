@@ -47,10 +47,10 @@ export default function ProductGallery({ images, productName }: Props) {
   const ThumbnailButton = ({ idx }: { idx: number }) => (
     <button
       onClick={() => setSelectedIdx(idx)}
-      className={`w-[68px] h-[68px] rounded-xl overflow-hidden border-2 transition-all bg-white shrink-0 ${
+      className={`w-[68px] h-[68px] rounded-xl overflow-hidden border-2 transition-all bg-white dark:bg-slate-800 shrink-0 ${
         idx === safeIdx
-          ? "border-sky-500 shadow-md shadow-sky-100"
-          : "border-slate-100 opacity-55 hover:opacity-100 hover:border-slate-300"
+          ? "border-sky-500 shadow-md shadow-sky-100 dark:shadow-none"
+          : "border-slate-100 dark:border-slate-700 opacity-55 hover:opacity-100 hover:border-slate-300 dark:hover:border-slate-500"
       }`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -69,7 +69,7 @@ export default function ProductGallery({ images, productName }: Props) {
                 <button
                   onClick={() => setThumbOffset((o) => Math.max(0, o - 1))}
                   disabled={!canScrollUp}
-                  className="w-full flex justify-center py-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 transition-colors"
+                  className="w-full flex justify-center py-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 disabled:opacity-20 transition-colors"
                 >
                   <ChevronUp size={16} />
                 </button>
@@ -81,7 +81,7 @@ export default function ProductGallery({ images, productName }: Props) {
                 <button
                   onClick={() => setThumbOffset((o) => Math.min(images.length - THUMBS_VISIBLE, o + 1))}
                   disabled={!canScrollDown}
-                  className="w-full flex justify-center py-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 transition-colors"
+                  className="w-full flex justify-center py-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 disabled:opacity-20 transition-colors"
                 >
                   <ChevronDown size={16} />
                 </button>
@@ -91,7 +91,7 @@ export default function ProductGallery({ images, productName }: Props) {
 
           <div
             ref={zoomRef}
-            className="relative flex-1 aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-white cursor-crosshair select-none"
+            className="relative flex-1 aspect-square rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-crosshair select-none"
             onMouseEnter={() => images.length > 0 && setZoomed(true)}
             onMouseLeave={() => setZoomed(false)}
             onMouseMove={handleMouseMove}
@@ -129,7 +129,7 @@ export default function ProductGallery({ images, productName }: Props) {
         {/* Outer zoom panel — appears to the right overlaying the info column */}
         {zoomed && images.length > 0 && (
           <div
-            className="absolute top-0 left-[calc(100%+1.5rem)] w-[130%] aspect-square rounded-2xl border border-slate-200 shadow-xl z-20 overflow-hidden pointer-events-none"
+            className="absolute top-0 left-[calc(100%+1.5rem)] w-[130%] aspect-square rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl z-20 overflow-hidden pointer-events-none"
             style={{
               backgroundImage: `url(${images[safeIdx]})`,
               backgroundSize: `${ZOOM_FACTOR * 100}%`,
@@ -144,7 +144,7 @@ export default function ProductGallery({ images, productName }: Props) {
       {/* ── Mobile: main image + nav arrows + horizontal thumbs ───────────── */}
       <div className="flex flex-col gap-3 sm:hidden px-3">
         <div
-          className="relative aspect-square w-full rounded-2xl overflow-hidden border border-slate-100 bg-white select-none"
+          className="relative aspect-square w-full rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 select-none"
           onClick={() => images.length > 0 && setLightboxOpen(true)}
         >
           {images.length > 0 ? (
@@ -159,14 +159,14 @@ export default function ProductGallery({ images, productName }: Props) {
               <button
                 onClick={(e) => { e.stopPropagation(); prev(); }}
                 disabled={safeIdx === 0}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-lg flex items-center justify-center disabled:opacity-20 shadow-sm"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-lg flex items-center justify-center disabled:opacity-20 shadow-sm dark:text-white"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); next(); }}
                 disabled={safeIdx === images.length - 1}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-lg flex items-center justify-center disabled:opacity-20 shadow-sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-lg flex items-center justify-center disabled:opacity-20 shadow-sm dark:text-white"
               >
                 <ChevronRight size={16} />
               </button>
@@ -180,10 +180,10 @@ export default function ProductGallery({ images, productName }: Props) {
               <button
                 key={i}
                 onClick={() => setSelectedIdx(i)}
-                className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all bg-white ${
+                className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all bg-white dark:bg-slate-800 ${
                   i === safeIdx
-                    ? "border-sky-500 shadow-md shadow-sky-100"
-                    : "border-slate-100 opacity-55 hover:opacity-100"
+                    ? "border-sky-500 shadow-md shadow-sky-100 dark:shadow-none"
+                    : "border-slate-100 dark:border-slate-700 opacity-55 hover:opacity-100"
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}

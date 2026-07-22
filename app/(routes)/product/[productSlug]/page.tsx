@@ -62,10 +62,10 @@ export default async function ProductPage({
   if (!product) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center px-4">
-        <p className="text-2xl font-black text-slate-300 uppercase tracking-widest">
+        <p className="text-2xl font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest">
           Producto no encontrado
         </p>
-        <Link href="/" className="mt-6 text-sm font-bold text-sky-600 hover:underline">
+        <Link href="/" className="mt-6 text-sm font-bold text-sky-600 dark:text-sky-400 hover:underline">
           Volver a la tienda
         </Link>
       </div>
@@ -90,27 +90,27 @@ export default async function ProductPage({
       }} />
 
       {/* ── Breadcrumb (desktop) ─────────────────────────────────────────── */}
-      <nav className="hidden sm:flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-wider">
-        <Link href="/" className="hover:text-slate-700 transition-colors">Inicio</Link>
-        <ChevronRight size={15} className="text-slate-300 shrink-0" />
-        <Link href="/category" className="hover:text-slate-700 transition-colors">Tienda</Link>
-        <ChevronRight size={15} className="text-slate-300 shrink-0" />
+      <nav className="hidden sm:flex items-center gap-2 text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+        <Link href="/" className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">Inicio</Link>
+        <ChevronRight size={15} className="text-slate-300 dark:text-slate-600 shrink-0" />
+        <Link href="/category" className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">Tienda</Link>
+        <ChevronRight size={15} className="text-slate-300 dark:text-slate-600 shrink-0" />
         {product.category && (
           <>
-            <Link href={`/category/${product.category.slug}`} className="hover:text-slate-700 transition-colors">
+            <Link href={`/category/${product.category.slug}`} className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
               {product.category.categoryName}
             </Link>
-            <ChevronRight size={15} className="text-slate-300 shrink-0" />
+            <ChevronRight size={15} className="text-slate-300 dark:text-slate-600 shrink-0" />
           </>
         )}
-        <span className="text-slate-600 truncate max-w-[280px]">{product.productName}</span>
+        <span className="text-slate-600 dark:text-slate-300 truncate max-w-[280px]">{product.productName}</span>
       </nav>
 
       {/* ── Mobile back link ─────────────────────────────────────────────── */}
       <div className="sm:hidden flex items-center gap-1 px-3">
         <Link
           href={product.category ? `/category/${product.category.slug}` : "/category"}
-          className="flex items-center gap-1 text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-700 transition-colors"
+          className="flex items-center gap-1 text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
         >
           <ChevronRight size={12} className="rotate-180" />
           {product.category ? product.category.categoryName : "Tienda"}
@@ -133,60 +133,60 @@ export default async function ProductPage({
 
         <ProductDescription text={product.description || "Sin descripción adicional disponible."} />
 
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-          <div className="bg-slate-50 px-5 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+          <div className="bg-slate-50 dark:bg-slate-900 px-5 py-3 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Hash size={16} className="text-[#0055a4]" strokeWidth={3} />
-              <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+              <Hash size={16} className="text-[#0055a4] dark:text-sky-400" strokeWidth={3} />
+              <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                 Numero de Parte
               </span>
             </div>
-            <span className="text-lg font-mono font-black text-[#001e36] tracking-tighter">
+            <span className="text-lg font-mono font-black text-[#001e36] dark:text-sky-300 tracking-tighter">
               {product.code}
             </span>
           </div>
 
           <div className="p-5 flex flex-col gap-4">
-            <div className="flex justify-between items-baseline border-b border-slate-50 pb-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Marca</span>
-              <p className="text-sm font-black text-slate-700 uppercase">{product.brand || "Estandarizado"}</p>
+            <div className="flex justify-between items-baseline border-b border-slate-50 dark:border-slate-700 pb-2">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Marca</span>
+              <p className="text-sm font-black text-slate-700 dark:text-slate-200 uppercase">{product.brand || "Estandarizado"}</p>
             </div>
 
             {product.oemCode && (
-              <div className="flex justify-between items-baseline border-b border-slate-50 pb-2">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">OEM</span>
-                <p className="text-sm font-mono font-black text-slate-700 uppercase tracking-tight">{product.oemCode}</p>
+              <div className="flex justify-between items-baseline border-b border-slate-50 dark:border-slate-700 pb-2">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">OEM</span>
+                <p className="text-sm font-mono font-black text-slate-700 dark:text-slate-200 uppercase tracking-tight">{product.oemCode}</p>
               </div>
             )}
 
-            <div className="flex justify-between items-baseline border-b border-slate-50 pb-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipo</span>
-              <p className="text-sm font-black text-slate-700 uppercase">{product.productType || "—"}</p>
+            <div className="flex justify-between items-baseline border-b border-slate-50 dark:border-slate-700 pb-2">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tipo</span>
+              <p className="text-sm font-black text-slate-700 dark:text-slate-200 uppercase">{product.productType || "—"}</p>
             </div>
 
-            <div className="flex justify-between items-baseline border-b border-slate-50 pb-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Línea</span>
-              <p className="text-sm font-black text-slate-700 uppercase text-right">
+            <div className="flex justify-between items-baseline border-b border-slate-50 dark:border-slate-700 pb-2">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">Línea</span>
+              <p className="text-sm font-black text-slate-700 dark:text-slate-200 uppercase text-right">
                 {product.department}
                 {product.subDepartment && (
-                  <span className="text-slate-400 font-medium"> / {product.subDepartment}</span>
+                  <span className="text-slate-400 dark:text-slate-500 font-medium"> / {product.subDepartment}</span>
                 )}
               </p>
             </div>
 
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Serie / Modelo</span>
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Serie / Modelo</span>
               {product.series ? (
-                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{product.series}</p>
+                <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">{product.series}</p>
               ) : (
-                <p className="text-sm font-black text-slate-300 uppercase">N/A</p>
+                <p className="text-sm font-black text-slate-300 dark:text-slate-600 uppercase">N/A</p>
               )}
             </div>
 
             {product.motors && (
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Motores Compatibles</span>
-                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{product.motors}</p>
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Motores Compatibles</span>
+                <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">{product.motors}</p>
               </div>
             )}
           </div>
