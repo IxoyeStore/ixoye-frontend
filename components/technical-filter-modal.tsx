@@ -96,11 +96,11 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
-      <div className="bg-white w-full max-w-md rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden border border-slate-100 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-200">
         {/* Encabezado  */}
-        <div className="p-7 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+        <div className="p-7 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-slate-900 rounded-2xl text-white shadow-lg shadow-slate-200">
+            <div className="p-3 bg-slate-900 dark:bg-sky-600 rounded-2xl text-white shadow-lg shadow-slate-200 dark:shadow-none">
               {type === "tractor" ? (
                 <Tractor size={22} />
               ) : (
@@ -108,17 +108,17 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
               )}
             </div>
             <div>
-              <h2 className="text-sm font-black text-slate-900 uppercase tracking-tighter italic leading-none">
+              <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter italic leading-none">
                 Buscador por Aplicación
               </h2>
-              <p className="text-[9px] text-blue-600 font-bold uppercase tracking-[0.2em] mt-1">
+              <p className="text-[9px] text-blue-600 dark:text-sky-400 font-bold uppercase tracking-[0.2em] mt-1">
                 Localización de {type}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400"
+            className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-400 dark:text-slate-500"
           >
             <X size={20} />
           </button>
@@ -127,12 +127,12 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
         <div className="p-8 space-y-8">
           {/* SELECCIÓN DE MODELO */}
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block ml-1">
+            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block ml-1">
               01. Identificar Modelo / Serie
             </label>
             <div className="relative">
               <select
-                className="w-full appearance-none bg-slate-50 border border-slate-200 p-4 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-100 focus:border-slate-400 cursor-pointer uppercase transition-all disabled:opacity-50"
+                className="w-full appearance-none bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 p-4 rounded-2xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-slate-100 dark:focus:ring-slate-600 focus:border-slate-400 cursor-pointer uppercase transition-all disabled:opacity-50"
                 value={selections.step1}
                 onChange={(e) =>
                   setSelections({ step1: e.target.value, step2: "" })
@@ -151,7 +151,7 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
                 ))}
               </select>
               <ChevronDown
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none"
                 size={16}
               />
             </div>
@@ -159,12 +159,12 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
 
           {/* SELECCIÓN DE SISTEMA */}
           <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 block ml-1">
+            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block ml-1">
               02. Filtrar por Sistema
             </label>
             <div className="relative">
               <select
-                className="w-full appearance-none bg-slate-50 border border-slate-200 p-4 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-100 focus:border-slate-400 cursor-pointer uppercase transition-all disabled:opacity-50"
+                className="w-full appearance-none bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 p-4 rounded-2xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-slate-100 dark:focus:ring-slate-600 focus:border-slate-400 cursor-pointer uppercase transition-all disabled:opacity-50"
                 value={selections.step2}
                 onChange={(e) =>
                   setSelections({ ...selections, step2: e.target.value })
@@ -183,7 +183,7 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
                 ))}
               </select>
               <Cpu
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none"
                 size={16}
               />
             </div>
@@ -193,7 +193,7 @@ export default function TechnicalFilterModal({ isOpen, type, onClose }: any) {
           <button
             onClick={handleSearch}
             disabled={!selections.step1}
-            className="w-full py-5 bg-slate-900 hover:bg-black disabled:bg-slate-100 disabled:text-slate-400 text-white rounded-2xl font-black uppercase italic tracking-widest text-xs transition-all flex items-center justify-center gap-3 shadow-xl active:scale-[0.97]"
+            className="w-full py-5 bg-slate-900 dark:bg-sky-600 hover:bg-black dark:hover:bg-sky-700 disabled:bg-slate-100 dark:disabled:bg-slate-700 disabled:text-slate-400 dark:disabled:text-slate-500 text-white rounded-2xl font-black uppercase italic tracking-widest text-xs transition-all flex items-center justify-center gap-3 shadow-xl active:scale-[0.97]"
           >
             <Search size={18} strokeWidth={3} /> Consultar Catálogo
           </button>

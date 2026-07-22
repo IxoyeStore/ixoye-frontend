@@ -38,9 +38,9 @@ function ProductListItem({ product }: { product: ProductType }) {
   const isLoved = lovedItems.some((item) => item.id === product.id);
 
   return (
-    <div className="flex items-center gap-4 p-3 bg-white border border-slate-100 hover:border-sky-200 hover:shadow-sm transition-all rounded-xl">
+    <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-sky-200 dark:hover:border-sky-800 hover:shadow-sm transition-all rounded-xl">
       <Link href={`/product/${product.slug}`} className="shrink-0">
-        <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-slate-50 border border-slate-100">
+        <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-700 border border-slate-100 dark:border-slate-600">
           {product.images?.[0] ? (
             <Image
               src={product.images[0]}
@@ -51,7 +51,7 @@ function ProductListItem({ product }: { product: ProductType }) {
               sizes="80px"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-300 text-[9px] font-black uppercase">Sin imagen</div>
+            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-500 text-[9px] font-black uppercase">Sin imagen</div>
           )}
         </div>
       </Link>
@@ -59,28 +59,28 @@ function ProductListItem({ product }: { product: ProductType }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start gap-2 mb-0.5">
           {product.code && (
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider bg-slate-100 px-1.5 py-0.5 rounded shrink-0">
+            <span className="text-[9px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded shrink-0">
               {product.code}
             </span>
           )}
           {product.brand && (
-            <span className="text-[9px] font-bold text-sky-600 uppercase tracking-wider bg-sky-50 border border-sky-100 px-1.5 py-0.5 rounded shrink-0">
+            <span className="text-[9px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900 px-1.5 py-0.5 rounded shrink-0">
               {product.brand}
             </span>
           )}
         </div>
         <Link href={`/product/${product.slug}`}>
-          <p className="text-sm font-bold text-sky-900 line-clamp-2 hover:text-sky-600 transition-colors">
+          <p className="text-sm font-bold text-sky-900 dark:text-sky-300 line-clamp-2 hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
             {product.productName}
           </p>
         </Link>
         {product.productType && (
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{product.productType}</p>
+          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">{product.productType}</p>
         )}
       </div>
 
       <div className="flex flex-col items-end gap-2 shrink-0">
-        <p className="font-bold text-green-600 text-base">{formatPrice(product.price)}</p>
+        <p className="font-bold text-green-600 dark:text-green-400 text-base">{formatPrice(product.price)}</p>
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => addItem(product)}
@@ -93,8 +93,8 @@ function ProductListItem({ product }: { product: ProductType }) {
             onClick={() => isLoved ? removeLovedItem(product.id) : addLovedItem(product)}
             className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-all ${
               isLoved
-                ? "bg-red-50 border-red-200 text-red-500"
-                : "border-slate-200 text-slate-400 hover:bg-red-50 hover:border-red-200 hover:text-red-400"
+                ? "bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800 text-red-500 dark:text-red-400"
+                : "border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-200 dark:hover:border-red-800 hover:text-red-400"
             }`}
           >
             <Heart size={14} strokeWidth={2.5} fill={isLoved ? "currentColor" : "none"} />
@@ -226,12 +226,12 @@ function CategoryContent() {
   if (error)
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-4 text-center px-4">
-        <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+        <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600">
           No se pudieron cargar los productos
         </p>
         <button
           onClick={() => fetchProducts(1)}
-          className="text-xs font-black uppercase tracking-widest text-[#0055a4] hover:text-[#003d7a] underline underline-offset-4 transition-colors"
+          className="text-xs font-black uppercase tracking-widest text-[#0055a4] dark:text-sky-400 hover:text-[#003d7a] dark:hover:text-sky-300 underline underline-offset-4 transition-colors"
         >
           Intentar de nuevo
         </button>
@@ -244,11 +244,11 @@ function CategoryContent() {
       {/* ── Header row ───────────────────────────────────────────────────── */}
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-black text-sky-900 uppercase tracking-tighter italic leading-none">
+          <h1 className="text-3xl sm:text-4xl font-black text-sky-900 dark:text-sky-300 uppercase tracking-tighter italic leading-none">
             Tienda Principal
           </h1>
           {!loading && (
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
               {totalCount} {totalCount === 1 ? "producto" : "productos"}
             </p>
           )}
@@ -256,19 +256,19 @@ function CategoryContent() {
 
         <div className="flex items-center gap-2 shrink-0">
           {/* View toggle */}
-          <div className="flex border border-slate-200 rounded-xl overflow-hidden">
+          <div className="flex border border-slate-200 dark:border-slate-600 rounded-xl overflow-hidden">
             <button
               onClick={() => setViewMode("grid")}
               className={`w-9 h-9 flex items-center justify-center transition-colors ${
-                viewMode === "grid" ? "bg-sky-600 text-white" : "bg-white text-slate-400 hover:text-sky-600"
+                viewMode === "grid" ? "bg-sky-600 text-white" : "bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-sky-600 dark:hover:text-sky-400"
               }`}
             >
               <LayoutGrid size={15} />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`w-9 h-9 flex items-center justify-center border-l border-slate-200 transition-colors ${
-                viewMode === "list" ? "bg-sky-600 text-white" : "bg-white text-slate-400 hover:text-sky-600"
+              className={`w-9 h-9 flex items-center justify-center border-l border-slate-200 dark:border-slate-600 transition-colors ${
+                viewMode === "list" ? "bg-sky-600 text-white" : "bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-sky-600 dark:hover:text-sky-400"
               }`}
             >
               <List size={15} />
@@ -281,7 +281,7 @@ function CategoryContent() {
             className={`flex items-center gap-2 h-9 px-3 rounded-xl border text-xs font-bold transition-all ${
               showFilters || activeFilters.length > 0
                 ? "bg-sky-600 border-sky-600 text-white"
-                : "border-slate-200 bg-white text-slate-600 hover:border-sky-300 hover:text-sky-700"
+                : "border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-sky-300 dark:hover:border-sky-700 hover:text-sky-700 dark:hover:text-sky-400"
             }`}
           >
             <SlidersHorizontal size={13} />
@@ -302,7 +302,7 @@ function CategoryContent() {
             <button
               key={f.key}
               onClick={() => setParam(f.key, null)}
-              className="flex items-center gap-1.5 h-7 px-3 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-[11px] font-bold hover:bg-red-50 hover:border-red-200 hover:text-red-500 transition-colors"
+              className="flex items-center gap-1.5 h-7 px-3 rounded-full bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 text-[11px] font-bold hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-200 dark:hover:border-red-800 hover:text-red-500 transition-colors"
             >
               {f.label}
               <X size={10} />
@@ -310,7 +310,7 @@ function CategoryContent() {
           ))}
           <button
             onClick={clearAll}
-            className="h-7 px-3 rounded-full text-[11px] font-bold text-slate-400 hover:text-red-500 transition-colors"
+            className="h-7 px-3 rounded-full text-[11px] font-bold text-slate-400 dark:text-slate-500 hover:text-red-500 transition-colors"
           >
             Limpiar todo
           </button>
@@ -319,16 +319,16 @@ function CategoryContent() {
 
       {/* ── Filter panel ─────────────────────────────────────────────────── */}
       {showFilters && (
-        <div className="mb-4 p-4 bg-white border border-slate-200 shadow-sm rounded-xl">
+        <div className="mb-4 p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl">
           <div className="flex flex-wrap items-end gap-3">
 
             {/* Sort */}
             <div className="flex flex-col gap-1 min-w-[180px]">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ordenar por</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Ordenar por</label>
               <select
                 value={currentSort}
                 onChange={e => setParam("sort", e.target.value)}
-                className="h-9 px-3 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:border-sky-400 cursor-pointer"
+                className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:border-sky-400 cursor-pointer"
               >
                 {SORT_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -336,15 +336,15 @@ function CategoryContent() {
               </select>
             </div>
 
-            <div className="w-full border-t border-slate-100 sm:hidden" />
+            <div className="w-full border-t border-slate-100 dark:border-slate-700 sm:hidden" />
 
             {/* Brand */}
             <div className="flex flex-col gap-1 min-w-[160px]">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Marca</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Marca</label>
               <select
                 value={brand || ""}
                 onChange={e => setParam("brand", e.target.value || null)}
-                className="h-9 px-3 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:border-sky-400 cursor-pointer"
+                className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:border-sky-400 cursor-pointer"
               >
                 <option value="">Todas las marcas</option>
                 {BRANDS.map(b => (
@@ -355,11 +355,11 @@ function CategoryContent() {
 
             {/* Category */}
             <div className="flex flex-col gap-1 min-w-[180px]">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Categoría</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Categoría</label>
               <select
                 value={category || ""}
                 onChange={e => setParam("category", e.target.value || null)}
-                className="h-9 px-3 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:border-sky-400 cursor-pointer"
+                className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:border-sky-400 cursor-pointer"
               >
                 <option value="">Todas las categorías</option>
                 {Array.isArray(categories) && categories.map((cat: CategoryType) => (
@@ -370,22 +370,22 @@ function CategoryContent() {
 
             {/* Price range */}
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Precio</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Precio</label>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
                   placeholder="Mín"
                   value={priceMinInput}
                   onChange={e => setPriceMinInput(e.target.value)}
-                  className="w-24 h-9 px-3 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:border-sky-400"
+                  className="w-24 h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-400"
                 />
-                <span className="text-slate-300 font-bold">—</span>
+                <span className="text-slate-300 dark:text-slate-600 font-bold">—</span>
                 <input
                   type="number"
                   placeholder="Máx"
                   value={priceMaxInput}
                   onChange={e => setPriceMaxInput(e.target.value)}
-                  className="w-24 h-9 px-3 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:border-sky-400"
+                  className="w-24 h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-400"
                 />
                 <button
                   onClick={applyPriceFilter}
@@ -400,7 +400,7 @@ function CategoryContent() {
             {activeFilters.length > 0 && (
               <button
                 onClick={() => { clearAll(); setShowFilters(false); }}
-                className="h-9 px-3 text-xs font-bold text-slate-400 hover:text-red-500 transition-colors self-end"
+                className="h-9 px-3 text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-red-500 transition-colors self-end"
               >
                 Limpiar todo
               </button>
@@ -409,19 +409,19 @@ function CategoryContent() {
         </div>
       )}
 
-      <Separator className="my-4 bg-sky-100" />
+      <Separator className="my-4 bg-sky-100 dark:bg-slate-700" />
 
       {/* ── Products ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col">
         {/* Empty state */}
         {!loading && result.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-            <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+            <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600">
               No se encontraron productos
             </p>
             <button
               onClick={clearAll}
-              className="text-xs font-black uppercase tracking-widest text-[#0055a4] hover:text-[#003d7a] underline underline-offset-4 transition-colors"
+              className="text-xs font-black uppercase tracking-widest text-[#0055a4] dark:text-sky-400 hover:text-[#003d7a] dark:hover:text-sky-300 underline underline-offset-4 transition-colors"
             >
               Limpiar filtros
             </button>
@@ -453,7 +453,7 @@ function CategoryContent() {
             <button
               onClick={() => goToPage(page - 1)}
               disabled={page === 1}
-              className="w-9 h-9 flex items-center justify-center border border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-9 h-9 flex items-center justify-center border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-sky-300 dark:hover:border-sky-700 hover:text-sky-600 dark:hover:text-sky-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <ChevronLeft size={16} />
             </button>
@@ -465,7 +465,7 @@ function CategoryContent() {
                 className={`w-9 h-9 flex items-center justify-center text-sm font-bold transition-all ${
                   page === p
                     ? "bg-sky-600 text-white border border-sky-600"
-                    : "border border-slate-200 text-slate-600 hover:border-sky-300 hover:text-sky-600"
+                    : "border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-sky-300 dark:hover:border-sky-700 hover:text-sky-600 dark:hover:text-sky-400"
                 }`}
               >
                 {p}
@@ -475,7 +475,7 @@ function CategoryContent() {
             <button
               onClick={() => goToPage(page + 1)}
               disabled={page === totalPages}
-              className="w-9 h-9 flex items-center justify-center border border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-9 h-9 flex items-center justify-center border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-sky-300 dark:hover:border-sky-700 hover:text-sky-600 dark:hover:text-sky-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <ChevronRight size={16} />
             </button>

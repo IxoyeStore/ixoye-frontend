@@ -62,7 +62,7 @@ export default function RelatedProductsSection({ productName, currentProductId }
 
   return (
     <div className="max-w-7xl py-4 mx-auto sm:py-10 sm:px-24 px-2">
-      <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] mb-4 sm:mb-8 tracking-tighter text-left">
+      <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 mb-4 sm:mb-8 tracking-tighter text-left">
         Productos relacionados
       </h3>
 
@@ -71,11 +71,11 @@ export default function RelatedProductsSection({ productName, currentProductId }
           {loading
             ? skeletons.map((_, i) => (
                 <CarouselItem key={i} className="basis-1/2 sm:basis-1/3 lg:basis-1/5 pl-2 md:pl-3">
-                  <div className="flex flex-col gap-2 rounded-xl border border-sky-100 bg-white p-3 animate-pulse">
-                    <div className="aspect-square rounded-lg bg-slate-100" />
-                    <div className="h-3 w-4/5 rounded bg-slate-100" />
-                    <div className="h-3 w-3/5 rounded bg-slate-100" />
-                    <div className="h-4 w-2/5 rounded bg-slate-100" />
+                  <div className="flex flex-col gap-2 rounded-xl border border-sky-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-3 animate-pulse">
+                    <div className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-700" />
+                    <div className="h-3 w-4/5 rounded bg-slate-100 dark:bg-slate-700" />
+                    <div className="h-3 w-3/5 rounded bg-slate-100 dark:bg-slate-700" />
+                    <div className="h-4 w-2/5 rounded bg-slate-100 dark:bg-slate-700" />
                   </div>
                 </CarouselItem>
               ))
@@ -86,25 +86,25 @@ export default function RelatedProductsSection({ productName, currentProductId }
                   <CarouselItem key={id} className="basis-1/2 sm:basis-1/3 lg:basis-1/5 pl-2 md:pl-3">
                     <Link
                       href={`/product/${slug}`}
-                      className="flex flex-col gap-2 rounded-xl border border-sky-100 bg-white p-3 shadow-sm hover:shadow-md hover:shadow-sky-100/50 hover:-translate-y-0.5 transition-all duration-200 group h-full"
+                      className="flex flex-col gap-2 rounded-xl border border-sky-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-3 shadow-sm hover:shadow-md hover:shadow-sky-100/50 dark:hover:shadow-none hover:-translate-y-0.5 transition-all duration-200 group h-full"
                     >
-                      <div className="relative w-full aspect-square overflow-hidden rounded-lg bg-slate-50">
+                      <div className="relative w-full aspect-square overflow-hidden rounded-lg bg-slate-50 dark:bg-slate-700">
                         <ProductImage
                           url={images?.[0]}
                           alt={name}
                           className="w-full h-full transition-transform duration-300 group-hover:scale-105"
                         />
                       </div>
-                      <h4 className="text-[11px] sm:text-xs font-bold text-sky-900 line-clamp-2 leading-tight">
+                      <h4 className="text-[11px] sm:text-xs font-bold text-sky-900 dark:text-sky-300 line-clamp-2 leading-tight">
                         {name}
                       </h4>
                       <div className="flex flex-col mt-auto">
                         {isB2B && wholesalePrice && (
-                          <p className="text-[9px] text-slate-400 line-through leading-none">
+                          <p className="text-[9px] text-slate-400 dark:text-slate-500 line-through leading-none">
                             {formatPrice(price)}
                           </p>
                         )}
-                        <p className="text-xs sm:text-sm font-black italic text-green-700">
+                        <p className="text-xs sm:text-sm font-black italic text-green-700 dark:text-green-400">
                           {formatPrice(finalPrice)}
                         </p>
                         {isB2B && wholesalePrice && (

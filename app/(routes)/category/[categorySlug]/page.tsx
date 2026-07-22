@@ -30,7 +30,7 @@ export default function Page() {
   if (error)
     return (
       <div className="max-w-6xl py-32 mx-auto text-center px-4">
-        <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+        <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600">
           No se pudieron cargar los productos
         </p>
       </div>
@@ -39,16 +39,16 @@ export default function Page() {
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
       {loadingCategory ? (
-        <div className="h-10 w-64 bg-sky-100 animate-pulse rounded-md mb-4" />
+        <div className="h-10 w-64 bg-sky-100 dark:bg-slate-700 animate-pulse rounded-md mb-4" />
       ) : (
         category?.categoryName && (
-          <h1 className="text-3xl font-bold text-sky-900">
+          <h1 className="text-3xl font-bold text-sky-900 dark:text-sky-300">
             {category.categoryName}
           </h1>
         )
       )}
 
-      <Separator className="my-4 bg-sky-100" />
+      <Separator className="my-4 bg-sky-100 dark:bg-slate-700" />
 
       <div className="w-full">
         <div className="grid w-full gap-3 mt-8 grid-cols-2 md:grid-cols-3 md:gap-10">
@@ -60,7 +60,7 @@ export default function Page() {
             </>
           )}
           {!loading && filteredProducts && filteredProducts.length === 0 && (
-            <p className="col-span-full text-center text-sky-800/60 mt-15 font-medium">
+            <p className="col-span-full text-center text-sky-800/60 dark:text-sky-400/60 mt-15 font-medium">
               No se encontraron productos en esta categoría.
             </p>
           )}

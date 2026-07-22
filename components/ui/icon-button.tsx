@@ -14,7 +14,7 @@ const IconButton = (props: IconButtonProps) => {
     <button
       onClick={onClick}
       className={cn(
-        "ronded-full flex items-center bg-white border shadow-md p-2 hover:scale-110 transition",
+        "ronded-full flex items-center bg-white dark:bg-slate-800 border shadow-md p-2 hover:scale-110 transition",
         className
       )}
     >

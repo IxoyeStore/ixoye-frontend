@@ -51,7 +51,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     : product.price;
 
   return (
-    <div className="relative p-2 transition-all duration-200 rounded-lg hover:shadow-md group border border-transparent hover:border-slate-100 flex flex-col h-full">
+    <div className="relative p-2 transition-all duration-200 rounded-lg hover:shadow-md group border border-transparent hover:border-slate-100 dark:hover:border-slate-700 flex flex-col h-full">
       <div className="relative rounded-xl overflow-hidden">
         {/* CÓDIGO */}
         {product.code && (
@@ -65,7 +65,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* MARCA */}
         {product.brand && (
           <div className="absolute top-2 right-2 z-20">
-            <span className="bg-sky-100 text-[#0055a4] text-[9px] font-bold px-2 py-1 rounded shadow-sm border border-sky-200 uppercase">
+            <span className="bg-sky-100 dark:bg-sky-950/60 text-[#0055a4] dark:text-sky-400 text-[9px] font-bold px-2 py-1 rounded shadow-sm border border-sky-200 dark:border-sky-800 uppercase">
               {product.brand}
             </span>
           </div>
@@ -121,7 +121,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 e.stopPropagation();
                 addItem(product);
               }}
-              icon={<ShoppingCart size={18} className="text-sky-700" />}
+              icon={<ShoppingCart size={18} className="text-sky-700 dark:text-sky-400" />}
             />
             <IconButton
               onClick={(e) => {
@@ -133,7 +133,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 <Heart
                   size={18}
                   className={
-                    isLoved ? "text-red-500 fill-red-500" : "text-sky-700"
+                    isLoved ? "text-red-500 fill-red-500" : "text-sky-700 dark:text-sky-400"
                   }
                 />
               }
@@ -144,30 +144,30 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
       <div className="mt-3 flex flex-col flex-grow text-center">
         <Link href={`/product/${product.slug}`}>
-          <p className="text-sm font-bold text-sky-900 line-clamp-2 min-h-[40px] flex items-center justify-center">
+          <p className="text-sm font-bold text-sky-900 dark:text-sky-300 line-clamp-2 min-h-[40px] flex items-center justify-center">
             {product.productName}
           </p>
         </Link>
 
         <div className="mt-auto pt-2 flex flex-col items-center">
           {hasWholesalePrice && (
-            <p className="text-xs text-slate-400 line-through">
+            <p className="text-xs text-slate-400 dark:text-slate-500 line-through">
               {formatPrice(product.price)}
             </p>
           )}
 
-          <p className="font-bold text-green-600 text-lg">
+          <p className="font-bold text-green-600 dark:text-green-400 text-lg">
             {formatPrice(displayPrice!)}
           </p>
 
           {hasWholesalePrice && (
-            <span className="text-[10px] bg-sky-50 text-[#0071b1] px-2 py-0.5 rounded-full font-bold uppercase mt-1 border border-sky-100">
+            <span className="text-[10px] bg-sky-50 dark:bg-sky-950/40 text-[#0071b1] dark:text-sky-400 px-2 py-0.5 rounded-full font-bold uppercase mt-1 border border-sky-100 dark:border-sky-900">
               Precio preferencial
             </span>
           )}
 
           {product.productType && (
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mt-1">
+            <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mt-1">
               {product.productType}
             </span>
           )}

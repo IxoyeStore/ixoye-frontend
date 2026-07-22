@@ -25,7 +25,7 @@ const ProductSort = () => {
   return (
     <div className="flex items-center gap-2">
       <Select value={currentSort} onValueChange={handleSortChange}>
-        <SelectTrigger className="w-[180px] h-9 text-xs font-bold border-slate-200 bg-white text-slate-600 focus:ring-sky-500">
+        <SelectTrigger className="w-[180px] h-9 text-xs font-bold border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:ring-sky-500">
           <div className="flex items-center gap-2">
             <ArrowUpDown size={14} className="text-sky-600" />
             <SelectValue placeholder="Ordenar por" />

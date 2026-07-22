@@ -34,14 +34,14 @@ const SupportMenu = () => {
 
       {/* Menú Desplegable */}
       <div
-        className={`absolute right-0 mt-4 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[70] transition-all duration-200 origin-top-right ${
+        className={`absolute right-0 mt-4 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-[70] transition-all duration-200 origin-top-right ${
           isOpen
             ? "scale-100 opacity-100"
             : "scale-95 opacity-0 pointer-events-none"
         }`}
       >
-        <div className="bg-slate-50 p-3 border-b border-slate-100">
-          <p className="text-[10px] font-bold text-slate-900 uppercase tracking-widest text-center italic">
+        <div className="bg-slate-50 dark:bg-slate-700 p-3 border-b border-slate-100 dark:border-slate-600">
+          <p className="text-[10px] font-bold text-slate-900 dark:text-white uppercase tracking-widest text-center italic">
             Atención al Cliente
           </p>
         </div>
@@ -51,28 +51,28 @@ const SupportMenu = () => {
             href={`https://wa.me/${whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 hover:bg-green-50 rounded-xl transition-colors group"
+            className="flex items-center gap-3 p-3 hover:bg-green-50 dark:hover:bg-green-950/40 rounded-xl transition-colors group"
           >
-            <div className="bg-green-100 p-2 rounded-lg text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+            <div className="bg-green-100 dark:bg-green-900/40 p-2 rounded-lg text-green-600 dark:text-green-400 group-hover:bg-green-600 group-hover:text-white transition-colors">
               <span className="flex items-center justify-center">
                 <MessageCircle size={18} />
               </span>
             </div>
-            <span className="text-sm font-bold text-slate-700 uppercase italic text-[11px]">
+            <span className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase italic text-[11px]">
               WhatsApp
             </span>
           </a>
 
           <a
             href={`mailto:${supportEmail}`}
-            className="flex items-center gap-3 p-3 hover:bg-red-50 rounded-xl transition-colors group"
+            className="flex items-center gap-3 p-3 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl transition-colors group"
           >
-            <div className="bg-red-100 p-2 rounded-lg text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+            <div className="bg-red-100 dark:bg-red-900/40 p-2 rounded-lg text-red-600 dark:text-red-400 group-hover:bg-red-600 group-hover:text-white transition-colors">
               <span className="flex items-center justify-center">
                 <Mail size={18} />
               </span>
             </div>
-            <span className="text-sm font-bold text-slate-700 uppercase italic text-[11px]">
+            <span className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase italic text-[11px]">
               Correo
             </span>
           </a>
