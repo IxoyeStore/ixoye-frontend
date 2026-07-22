@@ -118,10 +118,9 @@ export default function AdminProductsPage() {
 
   // Selection
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selectAllPages, setSelectAllPages] = useState(false);
 
   const [togglingActive, setTogglingActive] = useState<string | null>(null);
-
-  // Inline editing
 
   // Bulk action
   const [bulkAction, setBulkAction] = useState("");
@@ -141,6 +140,7 @@ export default function AdminProductsPage() {
     setProducts(data.data || []);
     setTotal(data.meta?.pagination?.total || 0);
     setSelected(new Set());
+    setSelectAllPages(false);
 
     fetch("/api/metrics")
       .then((r) => r.json())
@@ -162,6 +162,7 @@ export default function AdminProductsPage() {
   const clearFilters = () => {
     setSearch(""); setQuery(""); setActive(""); setSort("productName:asc");
     setPriceMin(""); setPriceMax(""); setPage(1);
+    setSelectAllPages(false);
   };
 
   const hasActiveFilters = query || active || sort !== "productName:asc" || priceMin || priceMax;
@@ -173,17 +174,41 @@ export default function AdminProductsPage() {
   const toggleAll = () => {
     if (allSelected) {
       setSelected(new Set());
+      setSelectAllPages(false);
     } else {
       setSelected(new Set(allDocIds));
+      setSelectAllPages(false);
     }
   };
 
   const toggleOne = (docId: string) => {
+    setSelectAllPages(false);
     setSelected((prev) => {
       const next = new Set(prev);
       next.has(docId) ? next.delete(docId) : next.add(docId);
       return next;
     });
+  };
+
+  const fetchAllProducts = async (): Promise<any[]> => {
+    const all: any[] = [];
+    let p = 1;
+    let hasMore = true;
+    while (hasMore) {
+      const params = new URLSearchParams({ page: String(p), pageSize: "100" });
+      if (query)    params.set("search",   query);
+      if (active)   params.set("active",   active);
+      if (sort)     params.set("sort",     sort);
+      if (priceMin) params.set("priceMin", priceMin);
+      if (priceMax) params.set("priceMax", priceMax);
+      const res  = await fetch(`/api/admin/products?${params}`);
+      const data = await res.json();
+      all.push(...(data.data || []));
+      const pagination = data.meta?.pagination;
+      hasMore = pagination ? p < pagination.pageCount : false;
+      p++;
+    }
+    return all;
   };
 
   // --- Inline editing ---
@@ -229,31 +254,38 @@ export default function AdminProductsPage() {
 
   // --- Bulk actions ---
   const applyBulk = async () => {
-    if (!bulkAction || selected.size === 0) return;
+    if (!bulkAction) return;
+    if (!selectAllPages && selected.size === 0) return;
     const action = BULK_ACTIONS.find((a) => a.value === bulkAction);
     if (!action) return;
     if (action.needsValue && !bulkValue.trim()) { toast.error("Ingresa un valor"); return; }
 
+    const targetCount = selectAllPages ? total : selected.size;
+
     if (bulkAction === "delete") {
-      if (!confirm(`¿Eliminar ${selected.size} producto(s)? Esta acción no se puede deshacer.`)) return;
+      if (!confirm(`¿Eliminar ${targetCount} producto(s)? Esta acción no se puede deshacer.`)) return;
       setApplyingBulk(true);
+      const docIds = selectAllPages
+        ? (await fetchAllProducts()).map((p: any) => p.documentId || String(p.id))
+        : [...selected];
       const results = await Promise.all(
-        [...selected].map((docId) => fetch(`/api/admin/products/${docId}`, { method: "DELETE" }))
+        docIds.map((docId) => fetch(`/api/admin/products/${docId}`, { method: "DELETE" }))
       );
       const failed = results.filter((r) => !r.ok).length;
-      toast.success(`${selected.size - failed} eliminado(s)${failed ? `, ${failed} con error` : ""}`);
+      toast.success(`${docIds.length - failed} eliminado(s)${failed ? `, ${failed} con error` : ""}`);
       setApplyingBulk(false);
-      setBulkAction("");
-      setBulkValue("");
+      setBulkAction(""); setBulkValue(""); setSelectAllPages(false);
       fetchProducts();
       return;
     }
 
     setApplyingBulk(true);
-    const updates = [...selected].map((docId) => {
-      const product = products.find((p) => (p.documentId || String(p.id)) === docId);
-      if (!product) return null;
+    const targetProducts = selectAllPages
+      ? await fetchAllProducts()
+      : products.filter((p) => selected.has(p.documentId || String(p.id)));
 
+    const updates = targetProducts.map((product) => {
+      const docId = product.documentId || String(product.id);
       let body: any = {};
       if (bulkAction === "activate") body = { active: true };
       else if (bulkAction === "deactivate") body = { active: false };
@@ -267,20 +299,18 @@ export default function AdminProductsPage() {
       } else if (bulkAction === "set_stock") {
         body = { stock: parseInt(bulkValue) };
       }
-
       return fetch(`/api/admin/products/${docId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-    }).filter(Boolean);
+    });
 
-    const results = await Promise.all(updates as Promise<Response>[]);
+    const results = await Promise.all(updates);
     const failed = results.filter((r) => !r.ok).length;
     toast.success(`${results.length - failed} producto(s) actualizados${failed ? `, ${failed} con error` : ""}`);
     setApplyingBulk(false);
-    setBulkAction("");
-    setBulkValue("");
+    setBulkAction(""); setBulkValue(""); setSelectAllPages(false);
     fetchProducts();
   };
 
@@ -450,60 +480,90 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Bulk action toolbar */}
-      {selected.size > 0 && (
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-sky-950 text-white rounded-2xl px-4 py-4 shadow-xl shadow-sky-900/30">
-          <div className="flex items-center justify-between sm:justify-start gap-3">
-            <span className="text-[11px] font-black uppercase tracking-widest shrink-0">
-              {selected.size} seleccionado{selected.size !== 1 ? "s" : ""}
-            </span>
+      {(selected.size > 0 || selectAllPages) && (
+        <div className="space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-sky-950 text-white rounded-2xl px-4 py-4 shadow-xl shadow-sky-900/30">
+            <div className="flex items-center justify-between sm:justify-start gap-3">
+              <span className="text-[11px] font-black uppercase tracking-widest shrink-0">
+                {selectAllPages ? total : selected.size} seleccionado{(selectAllPages ? total : selected.size) !== 1 ? "s" : ""}
+                {selectAllPages && <span className="ml-1.5 text-sky-400">(todos)</span>}
+              </span>
+              <button
+                onClick={() => { setSelected(new Set()); setSelectAllPages(false); }}
+                className="sm:hidden p-1.5 rounded-lg text-sky-400 hover:text-white hover:bg-sky-800 transition-all"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 flex-1">
+              <div className="relative flex-1 sm:flex-none">
+                <select
+                  value={bulkAction}
+                  onChange={(e) => { setBulkAction(e.target.value); setBulkValue(""); }}
+                  className="appearance-none w-full bg-sky-800 border border-sky-700 text-white rounded-xl px-4 py-2 pr-8 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-sky-400 cursor-pointer"
+                >
+                  <option value="">Acción masiva...</option>
+                  {BULK_ACTIONS.map((a) => (
+                    <option key={a.value} value={a.value}>{a.label}</option>
+                  ))}
+                </select>
+                <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-sky-300" />
+              </div>
+              {selectedAction?.needsValue && (
+                <input
+                  type="number"
+                  value={bulkValue}
+                  onChange={(e) => setBulkValue(e.target.value)}
+                  placeholder={selectedAction.placeholder}
+                  className="bg-sky-800 border border-sky-700 text-white rounded-xl px-4 py-2 text-[11px] font-black focus:outline-none focus:border-sky-400 flex-1 sm:w-40 sm:flex-none placeholder:text-sky-500"
+                />
+              )}
+              <button
+                onClick={applyBulk}
+                disabled={!bulkAction || applyingBulk}
+                className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-40 shrink-0 ${
+                  bulkAction === "delete"
+                    ? "bg-red-500 hover:bg-red-400 text-white"
+                    : "bg-white text-sky-950 hover:bg-sky-50"
+                }`}
+              >
+                {applyingBulk ? "Aplicando..." : "Aplicar"}
+              </button>
+            </div>
             <button
-              onClick={() => setSelected(new Set())}
-              className="sm:hidden p-1.5 rounded-lg text-sky-400 hover:text-white hover:bg-sky-800 transition-all"
+              onClick={() => { setSelected(new Set()); setSelectAllPages(false); }}
+              className="hidden sm:block p-1.5 rounded-lg text-sky-400 hover:text-white hover:bg-sky-800 transition-all shrink-0"
             >
               <X size={16} />
             </button>
           </div>
-          <div className="flex flex-wrap gap-2 flex-1">
-            <div className="relative flex-1 sm:flex-none">
-              <select
-                value={bulkAction}
-                onChange={(e) => { setBulkAction(e.target.value); setBulkValue(""); }}
-                className="appearance-none w-full bg-sky-800 border border-sky-700 text-white rounded-xl px-4 py-2 pr-8 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-sky-400 cursor-pointer"
-              >
-                <option value="">Acción masiva...</option>
-                {BULK_ACTIONS.map((a) => (
-                  <option key={a.value} value={a.value}>{a.label}</option>
-                ))}
-              </select>
-              <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-sky-300" />
+
+          {/* Banner seleccionar todos / deseleccionar todos */}
+          {allSelected && total > products.length && (
+            <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-xl text-[11px] font-bold text-sky-700 dark:text-sky-300">
+              {selectAllPages ? (
+                <>
+                  <span>Todos los <strong>{total}</strong> productos están seleccionados.</span>
+                  <button
+                    onClick={() => { setSelectAllPages(false); setSelected(new Set(allDocIds)); }}
+                    className="underline underline-offset-2 hover:text-sky-900 dark:hover:text-white transition-colors font-black"
+                  >
+                    Desmarcar
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span>Solo los <strong>{products.length}</strong> productos de esta página están seleccionados.</span>
+                  <button
+                    onClick={() => setSelectAllPages(true)}
+                    className="underline underline-offset-2 hover:text-sky-900 dark:hover:text-white transition-colors font-black"
+                  >
+                    Seleccionar los {total} productos
+                  </button>
+                </>
+              )}
             </div>
-            {selectedAction?.needsValue && (
-              <input
-                type="number"
-                value={bulkValue}
-                onChange={(e) => setBulkValue(e.target.value)}
-                placeholder={selectedAction.placeholder}
-                className="bg-sky-800 border border-sky-700 text-white rounded-xl px-4 py-2 text-[11px] font-black focus:outline-none focus:border-sky-400 flex-1 sm:w-40 sm:flex-none placeholder:text-sky-500"
-              />
-            )}
-            <button
-              onClick={applyBulk}
-              disabled={!bulkAction || applyingBulk}
-              className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-40 shrink-0 ${
-                bulkAction === "delete"
-                  ? "bg-red-500 hover:bg-red-400 text-white"
-                  : "bg-white text-sky-950 hover:bg-sky-50"
-              }`}
-            >
-              {applyingBulk ? "Aplicando..." : "Aplicar"}
-            </button>
-          </div>
-          <button
-            onClick={() => setSelected(new Set())}
-            className="hidden sm:block p-1.5 rounded-lg text-sky-400 hover:text-white hover:bg-sky-800 transition-all shrink-0"
-          >
-            <X size={16} />
-          </button>
+          )}
         </div>
       )}
 
