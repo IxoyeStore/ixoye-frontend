@@ -171,19 +171,19 @@ export default function Page() {
 
   return (
     <div className="max-w-6xl px-4 py-16 mx-auto min-h-[75vh]">
-      <h1 className="mb-8 text-4xl font-black text-sky-950 uppercase italic tracking-tighter">
+      <h1 className="mb-8 text-4xl font-black text-sky-950 dark:text-sky-300 uppercase italic tracking-tighter">
         Carrito de compras
       </h1>
 
       {!hasItems ? (
-        <div className="flex flex-col items-center justify-center py-24 sm:py-32 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100/50">
-            <ShoppingBasket size={32} className="text-slate-300" />
+        <div className="flex flex-col items-center justify-center py-24 sm:py-32 text-center bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-700 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="bg-white dark:bg-slate-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100/50 dark:ring-slate-800">
+            <ShoppingBasket size={32} className="text-slate-300 dark:text-slate-600" />
           </div>
-          <p className="text-slate-500 font-black uppercase text-xs tracking-widest mb-2">
+          <p className="text-slate-500 dark:text-slate-400 font-black uppercase text-xs tracking-widest mb-2">
             Tu carrito está vacío
           </p>
-          <p className="text-slate-400 text-sm italic mb-8 max-w-xs mx-auto">
+          <p className="text-slate-400 dark:text-slate-500 text-sm italic mb-8 max-w-xs mx-auto">
             Parece que aún no has agregado productos a tu pedido.
           </p>
           <Link href="/category">
@@ -196,7 +196,7 @@ export default function Page() {
       ) : (
         <div className="grid md:grid-cols-2 gap-10 animate-in fade-in duration-500">
           <div className="flex flex-col gap-4">
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-700">
               {validItems.map((item) => (
                 <CartItem key={item.id} product={item} />
               ))}
@@ -204,61 +204,61 @@ export default function Page() {
           </div>
 
           <div className="max-w-xl">
-            <div className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-xl shadow-sky-100/30 sticky top-24">
-              <p className="mb-4 text-xs font-black text-sky-950 uppercase tracking-widest">
+            <div className="p-8 rounded-[2rem] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl shadow-sky-100/30 dark:shadow-none sticky top-24">
+              <p className="mb-4 text-xs font-black text-sky-950 dark:text-sky-300 uppercase tracking-widest">
                 Resumen de pedido
               </p>
-              <Separator className="bg-slate-100" />
+              <Separator className="bg-slate-100 dark:bg-slate-700" />
 
               <div className="space-y-4 my-6">
                 {isB2B && totalSavings > 0 && (
                   <div className="flex justify-between items-center">
-                    <p className="text-slate-400 font-bold uppercase text-[10px]">
+                    <p className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[10px]">
                       Precio original
                     </p>
-                    <p className="text-base font-bold text-slate-400 line-through decoration-red-400/40">
+                    <p className="text-base font-bold text-slate-400 dark:text-slate-500 line-through decoration-red-400/40">
                       {formatPrice(totalOriginalPrice)}
                     </p>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center">
-                  <p className="text-slate-500 font-bold uppercase text-[10px]">
+                  <p className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px]">
                     Subtotal
                   </p>
-                  <p className="text-sm font-bold text-slate-600">
+                  <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
                     {formatPrice(subtotal)}
                   </p>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <p className="text-slate-500 font-bold uppercase text-[10px]">
+                  <p className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px]">
                     IVA (16%)
                   </p>
-                  <p className="text-sm font-bold text-slate-600">
+                  <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
                     {formatPrice(iva)}
                   </p>
                 </div>
 
                 {/* SECCIÓN DE ENVÍO */}
-                <div className="flex justify-between items-center pt-2 border-t border-slate-50">
+                <div className="flex justify-between items-center pt-2 border-t border-slate-50 dark:border-slate-700">
                   <div className="flex flex-col">
-                    <p className="text-slate-500 font-bold uppercase text-[10px]">
+                    <p className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px]">
                       Envío {shippingQuote ? `(${shippingQuote.label})` : ""}
                     </p>
                     {!userCP && (
-                      <p className="text-[9px] text-amber-600 font-black uppercase tracking-tight italic">
+                      <p className="text-[9px] text-amber-600 dark:text-amber-400 font-black uppercase tracking-tight italic">
                         Configura tu dirección en el perfil
                       </p>
                     )}
                     {shippingQuote?.cost === -1 && (
-                      <p className="text-[9px] text-amber-600 font-black uppercase tracking-tight italic">
+                      <p className="text-[9px] text-amber-600 dark:text-amber-400 font-black uppercase tracking-tight italic">
                         Comunícate con nosotros
                       </p>
                     )}
                   </div>
                   <p
-                    className={`text-sm font-black ${shippingQuote?.cost === 0 ? "text-green-600" : shippingQuote?.cost === -1 ? "text-amber-600" : "text-slate-600"}`}
+                    className={`text-sm font-black ${shippingQuote?.cost === 0 ? "text-green-600 dark:text-green-400" : shippingQuote?.cost === -1 ? "text-amber-600 dark:text-amber-400" : "text-slate-600 dark:text-slate-300"}`}
                   >
                     {shippingQuote
                       ? shippingQuote.cost === 0
@@ -270,18 +270,18 @@ export default function Page() {
                   </p>
                 </div>
 
-                <Separator className="bg-slate-100" />
+                <Separator className="bg-slate-100 dark:bg-slate-700" />
 
                 <div className="flex justify-between items-center">
-                  <p className="text-sky-950 font-black uppercase text-[10px]">
+                  <p className="text-sky-950 dark:text-sky-300 font-black uppercase text-[10px]">
                     Total del pedido
                   </p>
                   <div className="text-right">
-                    <p className="text-2xl font-black text-green-600 tracking-tighter italic">
+                    <p className="text-2xl font-black text-green-600 dark:text-green-400 tracking-tighter italic">
                       {/* Usamos finalTotal aquí para que sume el envío */}
                       {formatPrice(totalPrice + (shippingQuote?.cost || 0))}
                     </p>
-                    <p className="text-[8px] text-slate-400 font-bold uppercase">
+                    <p className="text-[8px] text-slate-400 dark:text-slate-500 font-bold uppercase">
                       IVA Incluido
                     </p>
                   </div>
@@ -296,7 +296,7 @@ export default function Page() {
                 {loading ? "Preparando pago..." : "Realizar pedido y pagar"}
               </Button>
 
-              <p className="mt-4 text-center text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+              <p className="mt-4 text-center text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                 🔒 Pago seguro con Openpay by BBVA
               </p>
             </div>

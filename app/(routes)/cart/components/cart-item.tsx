@@ -30,7 +30,7 @@ const CartItem = ({ product }: CartItemProps) => {
     isB2B && product.wholesalePrice && product.wholesalePrice < product.price;
 
   return (
-    <li className="flex py-6 border-b">
+    <li className="flex py-6 border-b dark:border-slate-700">
       <Link
         href={`/product/${product.slug}`}
         className="cursor-pointer shrink-0"
@@ -38,26 +38,26 @@ const CartItem = ({ product }: CartItemProps) => {
         <ProductImage
           url={product.images?.[0]}
           alt={product.productName}
-          className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-xl border border-slate-100 shadow-sm"
+          className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm"
         />
       </Link>
 
       <div className="flex justify-between flex-1 px-4 sm:px-6">
         <div className="flex flex-col justify-between min-w-0">
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-[#001e36] line-clamp-2 uppercase leading-tight">
+            <h2 className="text-base sm:text-lg font-bold text-[#001e36] dark:text-white line-clamp-2 uppercase leading-tight">
               {product.productName}
             </h2>
 
             <div className="flex flex-col mt-1">
               {showTachado && (
-                <p className="text-[10px] sm:text-xs text-slate-400 line-through decoration-red-400/60 mb-0.5">
+                <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 line-through decoration-red-400/60 mb-0.5">
                   {formatPrice(priceB2C)}
                 </p>
               )}
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                <p className="font-bold text-green-600">
+                <p className="font-bold text-green-600 dark:text-green-400">
                   {formatPrice(priceToPay)}
                 </p>
 
@@ -70,21 +70,21 @@ const CartItem = ({ product }: CartItemProps) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 mt-3 border w-fit rounded-lg p-1 bg-white shadow-sm">
+          <div className="flex items-center gap-3 mt-3 border dark:border-slate-600 w-fit rounded-lg p-1 bg-white dark:bg-slate-800 shadow-sm">
             <button
               onClick={() => updateQuantity(product.id, quantity - 1)}
               disabled={quantity <= 1}
-              className="p-1 hover:bg-slate-100 rounded-md disabled:opacity-30 transition"
+              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-white rounded-md disabled:opacity-30 transition"
             >
               <Minus size={15} />
             </button>
-            <span className="font-bold text-sm min-w-[20px] text-center">
+            <span className="font-bold text-sm min-w-[20px] text-center dark:text-white">
               {quantity}
             </span>
             <button
               onClick={() => updateQuantity(product.id, quantity + 1)}
               disabled={quantity >= stock}
-              className="p-1 hover:bg-slate-100 rounded-md disabled:opacity-30"
+              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-white rounded-md disabled:opacity-30"
             >
               <Plus size={15} />
             </button>
@@ -94,16 +94,16 @@ const CartItem = ({ product }: CartItemProps) => {
         <div className="flex flex-col justify-between items-end ml-2">
           <button
             onClick={() => removeItem(product.id)}
-            className="rounded-full flex items-center justify-center bg-white border shadow-md p-1.5 hover:scale-110 transition text-rose-700 hover:bg-rose-50"
+            className="rounded-full flex items-center justify-center bg-white dark:bg-slate-800 border dark:border-slate-600 shadow-md p-1.5 hover:scale-110 transition text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
           >
             <X size={20} />
           </button>
 
           <div className="text-right">
-            <p className="text-[10px] uppercase text-slate-400 font-black tracking-widest">
+            <p className="text-[10px] uppercase text-slate-400 dark:text-slate-500 font-black tracking-widest">
               Subtotal
             </p>
-            <p className="font-bold text-green-600 text-sm sm:text-base">
+            <p className="font-bold text-green-600 dark:text-green-400 text-sm sm:text-base">
               {formatPrice(priceToPay * quantity)}
             </p>
           </div>
