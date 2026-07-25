@@ -19,9 +19,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 const BRANDS = [
-  "EMMARK","WEGA","SAKURA","DAI","EDTPART","GABRIEL",
-  "FERSA","KANADIAN","ZSG","PFI","RYCO","KOMAN",
-  "BEZARES","TOYOPOWER","BALDWIN",
+  "EMMARK","WEGA","BALDWIN","SAKURA","PFI","FERSA","DAI","EDTPART","GABRIEL",
+  "KANADIAN","ZSG","RYCO","KOMAN",
+  "BEZARES","TOYOPOWER",
 ];
 
 const SORT_OPTIONS = [

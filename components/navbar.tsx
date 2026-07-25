@@ -35,19 +35,19 @@ const API = process.env.NEXT_PUBLIC_API_URL;
 const STATIC_BRANDS = [
   { name: "EMMARK",    logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/EMMARK.png" },
   { name: "WEGA",      logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323342/WEGA.png" },
+  { name: "BALDWIN",   logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/BALDWIN.png" },
   { name: "SAKURA",    logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323340/SAKURA.png" },
+  { name: "PFI",       logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323340/PFI.png" },
+  { name: "FERSA",     logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/fersa_logo.png" },
   { name: "DAI",       logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/DAI.png" },
   { name: "EDTPART",   logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/EDTP.png" },
   { name: "GABRIEL",   logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323339/GABRIEL.png" },
-  { name: "FERSA",     logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/fersa_logo.png" },
   { name: "KANADIAN",  logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323339/knadian_logo.jpg" },
   { name: "ZSG",       logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323342/ZSG.png" },
-  { name: "PFI",       logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323340/PFI.png" },
   { name: "RYCO",      logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323339/RYCO.png" },
   { name: "KOMAN",     logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323339/KOMAN.png" },
   { name: "BEZARES",   logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779325108/BEZARES.png" },
   { name: "TOYOPOWER", logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323340/TOYOPOWER.webp" },
-  { name: "BALDWIN",   logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/BALDWIN.png" },
 ];
 
 const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
@@ -97,7 +97,7 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
               onClick={() => onSelect(name)}
               className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:border-sky-200 dark:hover:border-sky-800 border border-transparent transition-all group/brand"
             >
-              <div className="w-14 h-9 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50 dark:bg-slate-700">
+              <div className="w-14 h-9 shrink-0 flex items-center justify-center rounded-lg p-1 bg-white border border-slate-100 dark:border-slate-600">
                 <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
               </div>
               <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover/brand:text-sky-700 dark:group-hover/brand:text-sky-400 leading-tight">
@@ -357,7 +357,7 @@ export default function Header({
           </Link>
 
           {/* Desktop search */}
-          <div ref={desktopRef} className="hidden md:flex flex-1 max-w-xl relative">
+          <div ref={desktopRef} className="hidden md:flex flex-1 max-w-2xl relative">
             <form onSubmit={handleSearch} className="w-full relative group">
               <input
                 type="text"
@@ -469,20 +469,10 @@ export default function Header({
                 </div>
               )}
             </div>
-            <div className={iconClass} title="Soporte">
+            <div className={`${iconClass} relative z-10`} title="Soporte">
               <SupportMenu />
               <span className={navTextClass}>Soporte</span>
             </div>
-            {SHOW_THEME_TOGGLE && (
-              <button
-                onClick={onToggleTheme}
-                className={iconClass}
-                title={isDark ? "Modo claro" : "Modo oscuro"}
-              >
-                {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-                <span className={navTextClass}>{isDark ? "Claro" : "Oscuro"}</span>
-              </button>
-            )}
           </nav>
 
           <button
@@ -495,24 +485,36 @@ export default function Header({
       </div>
 
       {/* FRANJA INFERIOR */}
-      <div className="hidden md:flex w-full bg-[#004a99] border-b border-white/10 py-3 justify-center items-center gap-8 shadow-md">
-        <div className="flex items-center gap-2 mr-4">
-          <div className="h-2 w-2 bg-[#00a3e0] rounded-full shadow-[0_0_10px_rgba(0,163,224,0.4)]" />
-          <span className="text-[11px] font-bold text-white uppercase tracking-widest antialiased">
-            Búsqueda por:
-          </span>
+      <div className="hidden md:flex w-full bg-[#004a99] border-b border-white/10 py-3 items-center shadow-md relative">
+        <div className="flex-1 flex justify-center items-center gap-8">
+          <div className="flex items-center gap-2 mr-4">
+            <div className="h-2 w-2 bg-[#00a3e0] rounded-full shadow-[0_0_10px_rgba(0,163,224,0.4)]" />
+            <span className="text-[11px] font-bold text-white uppercase tracking-widest antialiased">
+              Búsqueda por:
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <NavDropdown
+              label="Categoría"
+              items={dynamicProductTypes}
+              icon={Package}
+              color="text-sky-300"
+              onSelect={(val: string) => handleStaticSelect(val, "category")}
+            />
+            <BrandDropdown onSelect={(val) => handleStaticSelect(val, "brand")} />
+          </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <NavDropdown
-            label="Categoría"
-            items={dynamicProductTypes}
-            icon={Package}
-            color="text-sky-300"
-            onSelect={(val: string) => handleStaticSelect(val, "category")}
-          />
-          <BrandDropdown onSelect={(val) => handleStaticSelect(val, "brand")} />
-        </div>
+        {SHOW_THEME_TOGGLE && (
+          <button
+            onClick={onToggleTheme}
+            className="absolute right-6 flex items-center justify-center w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white transition-all"
+            title={isDark ? "Modo claro" : "Modo oscuro"}
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+        )}
       </div>
 
       <TechnicalFilterModal
@@ -728,7 +730,7 @@ export default function Header({
                         onClick={() => { handleStaticSelect(name, "brand"); setOpen(false); }}
                         className="flex items-center gap-3 px-3 py-3 rounded-xl border border-transparent hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:border-sky-200 dark:hover:border-sky-800 transition-all"
                       >
-                        <div className="w-12 h-8 shrink-0 flex items-center justify-center rounded-lg p-1 bg-slate-50 dark:bg-slate-700">
+                        <div className="w-12 h-8 shrink-0 flex items-center justify-center rounded-lg p-1 bg-white border border-slate-100 dark:border-slate-600">
                           <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
                         </div>
                         <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-tight">{name}</span>
