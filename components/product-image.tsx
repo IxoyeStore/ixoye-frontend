@@ -41,9 +41,14 @@ export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
   // explicitamente, y por default se usa contain para no cortar el producto.
   const fit = className.includes("object-cover") ? "object-cover" : "object-contain";
 
+  // Las fotos de producto vienen sobre fondo blanco; con object-contain
+  // puede quedar espacio vacio alrededor de la imagen (letterboxing) si la
+  // proporcion no coincide con el contenedor. Ese espacio debe ser blanco
+  // puro (no adaptable a modo oscuro) para que se mimetice con el fondo
+  // real de la foto en vez de mostrar un recuadro oscuro detras.
   return (
     <div
-      className={`relative overflow-hidden rounded-xl select-none ${className}`}
+      className={`relative overflow-hidden rounded-xl select-none bg-white ${className}`}
     >
       <Image
         src={url}

@@ -297,7 +297,7 @@ export default function ProductForm({
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {images.map((url, i) => (
-              <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700">
+              <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={url}

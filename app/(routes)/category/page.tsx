@@ -40,7 +40,7 @@ function ProductListItem({ product }: { product: ProductType }) {
   return (
     <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-sky-200 dark:hover:border-sky-800 hover:shadow-sm transition-all rounded-xl">
       <Link href={`/product/${product.slug}`} className="shrink-0">
-        <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-700 border border-slate-100 dark:border-slate-600">
+        <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-white border border-slate-100 dark:border-slate-600">
           {product.images?.[0] ? (
             <Image
               src={product.images[0]}
@@ -51,7 +51,7 @@ function ProductListItem({ product }: { product: ProductType }) {
               sizes="80px"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-500 text-[9px] font-black uppercase">Sin imagen</div>
+            <div className="w-full h-full flex items-center justify-center text-slate-300 text-[9px] font-black uppercase">Sin imagen</div>
           )}
         </div>
       </Link>

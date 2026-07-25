@@ -281,11 +281,11 @@ export default function Header({
             onMouseDown={(e) => { e.preventDefault(); handlePreviewSelect(p.slug); }}
             className="w-full flex items-center gap-5 px-6 py-5 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition-colors border-b border-slate-50 dark:border-slate-700 last:border-0 text-left"
           >
-            <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 flex items-center justify-center">
+            <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 bg-white flex items-center justify-center">
               {p.images[0] ? (
                 <img src={p.images[0]} alt={p.productName} className="w-full h-full object-contain" />
               ) : (
-                <Package size={32} className="text-slate-300 dark:text-slate-500" />
+                <Package size={32} className="text-slate-300" />
               )}
             </div>
             <div className="flex-1 min-w-0">

@@ -78,7 +78,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 <CarouselContent>
                   {product.images.map((imageUrl, index) => (
                     <CarouselItem key={index}>
-                      <div className="relative aspect-square select-none">
+                      <div className="relative aspect-square select-none bg-white">
                         <Image
                           src={imageUrl}
                           alt={product.productName}
@@ -95,13 +95,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 </CarouselContent>
               </Carousel>
             ) : (
-              <div className="relative aspect-square select-none">
+              <div className="relative aspect-square select-none bg-white">
                 <Image
                   src={product.images[0]}
                   alt={product.productName}
                   fill
                   draggable={false}
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   onError={() => setImageError(true)}
                 />
