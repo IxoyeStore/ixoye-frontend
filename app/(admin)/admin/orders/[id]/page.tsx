@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Save, User, MapPin, Truck, Package } from "lucide-react";
+import { ChevronLeft, Save, User, MapPin, Truck } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 import { toast } from "sonner";
+import { ProductImage } from "@/components/product-image";
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pendiente" },
@@ -38,6 +39,7 @@ export default function AdminOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<any>(null);
   const [address, setAddress] = useState<any>(null);
+  const [productLookup, setProductLookup] = useState<Record<string, { code?: string; image?: string }>>({});
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
@@ -57,6 +59,21 @@ export default function AdminOrderDetailPage() {
           const addrJson = await addrRes.json();
           const raw = addrJson._raw?.data?.[0] ?? null;
           setAddress(raw ? (raw.attributes ?? raw) : null);
+        }
+
+        // Pedidos anteriores a que se guardara code/image en el snapshot:
+        // buscamos esos datos por documentId para que igual muestren miniatura.
+        const missing = (o?.products || [])
+          .filter((p: any) => p.documentId && (!p.code || !p.image))
+          .map((p: any) => p.documentId);
+        if (missing.length > 0) {
+          const prodRes = await fetch(`/api/admin/products?documentIds=${missing.join(",")}`);
+          const prodJson = await prodRes.json();
+          const lookup: Record<string, { code?: string; image?: string }> = {};
+          for (const item of prodJson.data || []) {
+            lookup[item.documentId] = { code: item.code, image: Array.isArray(item.images) ? item.images[0] : undefined };
+          }
+          setProductLookup(lookup);
         }
       } catch (e) {
         setOrder(null);
@@ -106,7 +123,12 @@ export default function AdminOrderDetailPage() {
         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${STATUS_COLORS[status] || "bg-slate-100 text-slate-600"}`}>
           {currentStatus?.label || status}
         </span>
-        <p className="ml-auto text-xs text-slate-400 dark:text-slate-500 font-bold hidden sm:block">{date}</p>
+        <div className="ml-auto hidden sm:flex flex-col items-end gap-0.5">
+          <p className="text-xs text-slate-400 dark:text-slate-500 font-bold">{date}</p>
+          {order.stripeId && (
+            <p className="text-[10px] font-mono text-slate-300 dark:text-slate-600">{order.stripeId}</p>
+          )}
+        </div>
       </div>
 
       {/* Status action bar */}
@@ -133,23 +155,8 @@ export default function AdminOrderDetailPage() {
         </div>
       </div>
 
-      {/* Info cards — 3 columns */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Order info */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 space-y-4">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
-              <Package size={13} className="text-slate-500 dark:text-slate-400" />
-            </div>
-            <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Pedido</h2>
-          </div>
-          <div className="space-y-3">
-            <Row label="Fecha" value={date} />
-            <Row label="Pago" value={order.cardBrand ? `${order.cardBrand} ···· ${order.cardLast4}` : "—"} />
-            <Row label="Ref." value={order.stripeId || "—"} mono />
-          </div>
-        </div>
-
+      {/* Info cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Customer */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 space-y-4">
           <div className="flex items-center gap-2">
@@ -215,17 +222,46 @@ export default function AdminOrderDetailPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
-            {(order.products || []).map((p: any, i: number) => (
-              <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                <td className="px-6 py-4 font-black uppercase text-slate-900 dark:text-white">{p.productName || p.name}</td>
-                <td className="px-6 py-4 text-center font-bold text-slate-600 dark:text-slate-400">{p.quantity || 1}</td>
-                <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-400">{formatPrice(p.price)}</td>
-                <td className="px-6 py-4 text-right font-black text-slate-900 dark:text-white">{formatPrice(p.price * (p.quantity || 1))}</td>
-              </tr>
-            ))}
+            {(order.products || []).map((p: any, i: number) => {
+              const fallback = productLookup[p.documentId] || {};
+              const code = p.code || fallback.code;
+              const image = p.image || fallback.image;
+              return (
+                <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 shrink-0">
+                        <ProductImage url={image} alt={p.productName || p.name} className="w-full h-full" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-black uppercase text-slate-900 dark:text-white truncate">{p.productName || p.name}</p>
+                        {code && (
+                          <p className="font-mono text-[11px] font-bold text-slate-400 dark:text-slate-500 mt-0.5">{code}</p>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-center font-bold text-slate-600 dark:text-slate-400">{p.quantity || 1}</td>
+                  <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-400">{formatPrice(p.price)}</td>
+                  <td className="px-6 py-4 text-right font-black text-slate-900 dark:text-white">{formatPrice(p.price * (p.quantity || 1))}</td>
+                </tr>
+              );
+            })}
           </tbody>
-          <tfoot className="border-t-2 border-slate-900 dark:border-slate-600">
-            <tr>
+          <tfoot>
+            {order.subtotal != null && (
+              <tr>
+                <td colSpan={3} className="px-6 py-2 text-right text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Subtotal</td>
+                <td className="px-6 py-2 text-right text-sm font-bold text-slate-500 dark:text-slate-400">{formatPrice(order.subtotal)}</td>
+              </tr>
+            )}
+            {order.iva != null && (
+              <tr>
+                <td colSpan={3} className="px-6 py-2 text-right text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">IVA</td>
+                <td className="px-6 py-2 text-right text-sm font-bold text-slate-500 dark:text-slate-400">{formatPrice(order.iva)}</td>
+              </tr>
+            )}
+            <tr className="border-t-2 border-slate-900 dark:border-slate-600">
               <td colSpan={3} className="px-6 py-4 text-right text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">Total</td>
               <td className="px-6 py-4 text-right text-2xl font-black text-slate-900 dark:text-white">{formatPrice(order.total)}</td>
             </tr>

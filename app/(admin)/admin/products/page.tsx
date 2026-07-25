@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/formatPrice";
-import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown, Eye, ShoppingCart, TrendingUp, SearchIcon, LayoutList, Copy, Check } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown, Eye, TrendingUp, Copy, Check } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
 import { toast } from "sonner";
 
@@ -715,7 +715,12 @@ export default function AdminProductsPage() {
                               className="w-full h-full"
                             />
                           </div>
-                          <span className="font-bold text-sm text-slate-800 dark:text-white max-w-[200px] leading-snug">{p.productName}</span>
+                          <Link
+                            href={`/admin/products/${docId}`}
+                            className="font-bold text-sm text-slate-800 dark:text-white max-w-[200px] leading-snug hover:text-sky-600 dark:hover:text-sky-400 hover:underline transition-colors"
+                          >
+                            {p.productName}
+                          </Link>
                         </div>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
@@ -749,22 +754,10 @@ export default function AdminProductsPage() {
                         {(() => {
                           const m = metrics[p.id] ?? { views: 0, cartAdds: 0, purchases: 0, searchImpressions: 0, categoryImpressions: 0 };
                           return (
-                            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-                              <span title="Impresiones en búsqueda" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
-                                <SearchIcon size={11} className="text-violet-400" />
-                                {m.searchImpressions}
-                              </span>
-                              <span title="Impresiones en categoría" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
-                                <LayoutList size={11} className="text-cyan-400" />
-                                {m.categoryImpressions}
-                              </span>
+                            <div className="flex items-center justify-center gap-3">
                               <span title="Vistas de producto" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
                                 <Eye size={11} className="text-sky-400" />
                                 {m.views}
-                              </span>
-                              <span title="Al carrito" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
-                                <ShoppingCart size={11} className="text-amber-400" />
-                                {m.cartAdds}
                               </span>
                               <span title="Compras" className="flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
                                 <TrendingUp size={11} className="text-emerald-400" />

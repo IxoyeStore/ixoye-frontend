@@ -89,7 +89,6 @@ function MetricsPanel({ productId }: { productId: number }) {
 
   const { searchImpressions, categoryImpressions, views, cartAdds, purchases } = metrics;
   const totalImpressions = searchImpressions + categoryImpressions;
-  const abandonment = cartAdds > 0 ? ((cartAdds - purchases) / cartAdds * 100).toFixed(1) + "%" : "—";
 
   return (
     <div className="mt-6 rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
@@ -99,89 +98,48 @@ function MetricsPanel({ productId }: { productId: number }) {
         <h2 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">Métricas del Producto</h2>
       </div>
 
-      <div className="p-6 space-y-8">
-
-        {/* Funnel */}
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Embudo de conversión</p>
-          <div className="flex flex-wrap items-center gap-1">
-            <FunnelStep
-              icon={<SearchIcon size={16} className="text-white" />}
-              label="Búsqueda"
-              value={searchImpressions}
-              color="bg-violet-500"
-              showArrow
-              convRate={pct(categoryImpressions, searchImpressions)}
-            />
-            <FunnelStep
-              icon={<LayoutList size={16} className="text-white" />}
-              label="Categoría"
-              value={categoryImpressions}
-              color="bg-cyan-500"
-              showArrow
-              convRate={pct(views, totalImpressions)}
-            />
-            <FunnelStep
-              icon={<Eye size={16} className="text-white" />}
-              label="Vistas"
-              value={views}
-              color="bg-sky-500"
-              showArrow
-              convRate={pct(cartAdds, views)}
-            />
-            <FunnelStep
-              icon={<ShoppingCart size={16} className="text-white" />}
-              label="Carrito"
-              value={cartAdds}
-              color="bg-amber-500"
-              showArrow
-              convRate={pct(purchases, cartAdds)}
-            />
-            <FunnelStep
-              icon={<TrendingUp size={16} className="text-white" />}
-              label="Compras"
-              value={purchases}
-              color="bg-emerald-500"
-            />
-          </div>
+      <div className="p-6">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Embudo de conversión</p>
+        <div className="flex flex-wrap items-center gap-1">
+          <FunnelStep
+            icon={<SearchIcon size={16} className="text-white" />}
+            label="Búsqueda"
+            value={searchImpressions}
+            color="bg-violet-500"
+            showArrow
+            convRate={pct(categoryImpressions, searchImpressions)}
+          />
+          <FunnelStep
+            icon={<LayoutList size={16} className="text-white" />}
+            label="Categoría"
+            value={categoryImpressions}
+            color="bg-cyan-500"
+            showArrow
+            convRate={pct(views, totalImpressions)}
+          />
+          <FunnelStep
+            icon={<Eye size={16} className="text-white" />}
+            label="Vistas"
+            value={views}
+            color="bg-sky-500"
+            showArrow
+            convRate={pct(cartAdds, views)}
+          />
+          <FunnelStep
+            icon={<ShoppingCart size={16} className="text-white" />}
+            label="Carrito"
+            value={cartAdds}
+            color="bg-amber-500"
+            showArrow
+            convRate={pct(purchases, cartAdds)}
+          />
+          <FunnelStep
+            icon={<TrendingUp size={16} className="text-white" />}
+            label="Compras"
+            value={purchases}
+            color="bg-emerald-500"
+          />
         </div>
-
-        {/* KPIs */}
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Tasas clave</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="rounded-xl bg-slate-50 dark:bg-slate-700/50 p-4">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">CTR Búsqueda</p>
-              <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{pct(views, searchImpressions)}</p>
-              <p className="text-[10px] text-slate-400 mt-1">vistas / búsquedas</p>
-            </div>
-            <div className="rounded-xl bg-slate-50 dark:bg-slate-700/50 p-4">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">CTR Categoría</p>
-              <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{pct(views, categoryImpressions)}</p>
-              <p className="text-[10px] text-slate-400 mt-1">vistas / categoría</p>
-            </div>
-            <div className="rounded-xl bg-slate-50 dark:bg-slate-700/50 p-4">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Conv. Carrito</p>
-              <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{pct(cartAdds, views)}</p>
-              <p className="text-[10px] text-slate-400 mt-1">carrito / vistas</p>
-            </div>
-            <div className="rounded-xl bg-slate-50 dark:bg-slate-700/50 p-4">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Conv. Compra</p>
-              <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{pct(purchases, views)}</p>
-              <p className="text-[10px] text-slate-400 mt-1">compras / vistas</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Abandonment */}
-        <div className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-700 px-5 py-4">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Abandono de carrito</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Productos agregados al carrito que no se compraron</p>
-          </div>
-          <p className="text-3xl font-black text-amber-500">{abandonment}</p>
-        </div>
-
       </div>
     </div>
   );

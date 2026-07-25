@@ -8,6 +8,20 @@ export async function GET(request: NextRequest) {
   if (!jwt) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
   const { searchParams } = new URL(request.url);
+
+  const documentIds = searchParams.get("documentIds");
+  if (documentIds) {
+    const ids = documentIds.split(",").filter(Boolean);
+    if (ids.length === 0) return NextResponse.json({ data: [] });
+    const filterQs = ids.map((id, i) => `&filters[documentId][$in][${i}]=${encodeURIComponent(id)}`).join("");
+    const res = await fetch(
+      `${API}/api/products?pagination[pageSize]=${ids.length}${filterQs}`,
+      { headers: { Authorization: `Bearer ${jwt}` }, cache: "no-store" }
+    );
+    const data = await res.json();
+    return NextResponse.json(data);
+  }
+
   const page     = searchParams.get("page")     || "1";
   const pageSize = searchParams.get("pageSize") || "20";
   const search = searchParams.get("search") || "";

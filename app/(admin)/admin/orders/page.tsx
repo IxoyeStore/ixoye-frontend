@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/formatPrice";
-import { Filter } from "lucide-react";
+import { Filter, ChevronRight } from "lucide-react";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Todos" },
@@ -25,6 +25,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function AdminOrdersPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("");
@@ -120,7 +121,11 @@ export default function AdminOrdersPage() {
                     ? new Date(order.createdAt).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })
                     : "—";
                   return (
-                    <tr key={order.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <tr
+                      key={order.id}
+                      onClick={() => router.push(`/admin/orders/${order.documentId || order.id}`)}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                    >
                       <td className="px-4 md:px-6 py-4 font-mono font-black text-slate-900 dark:text-white">#{order.id}</td>
                       <td className="px-4 md:px-6 py-4">
                         <div className="font-black text-slate-900 dark:text-white">{order.user?.username || "—"}</div>
@@ -133,13 +138,8 @@ export default function AdminOrdersPage() {
                         </span>
                       </td>
                       <td className="px-4 md:px-6 py-4 text-right font-black text-slate-900 dark:text-white">{formatPrice(order.total)}</td>
-                      <td className="px-4 md:px-6 py-4">
-                        <Link
-                          href={`/admin/orders/${order.documentId || order.id}`}
-                          className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300 transition-colors whitespace-nowrap"
-                        >
-                          Ver →
-                        </Link>
+                      <td className="px-4 md:px-6 py-4 text-slate-300 dark:text-slate-600">
+                        <ChevronRight size={16} />
                       </td>
                     </tr>
                   );
