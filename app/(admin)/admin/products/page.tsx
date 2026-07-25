@@ -143,9 +143,15 @@ export default function AdminProductsPage() {
     setSelectAllPages(false);
 
     fetch("/api/metrics")
-      .then((r) => r.json())
-      .then((m) => setMetrics(m))
-      .catch(() => {});
+      .then(async (r) => {
+        const m = await r.json();
+        if (!r.ok) {
+          console.error("No se pudieron cargar las metricas:", m?.error || r.status);
+          return;
+        }
+        setMetrics(m);
+      })
+      .catch((err) => console.error("No se pudieron cargar las metricas:", err));
 
     setLoading(false);
   }, [page, query, active, sort, priceMin, priceMax]);

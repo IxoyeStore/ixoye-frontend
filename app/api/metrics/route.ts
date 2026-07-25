@@ -20,6 +20,11 @@ export async function GET() {
       `${API}/api/product-metrics?pagination[page]=${page}&pagination[pageSize]=${PAGE_SIZE}`,
       { headers: { Authorization: `Bearer ${TOKEN}` }, cache: "no-store" }
     );
+    if (!res.ok) {
+      const detail = await res.text();
+      console.error(`[metrics] fetch failed: ${res.status} ${detail}`);
+      return NextResponse.json({ error: `Strapi ${res.status}: ${detail}` }, { status: 502 });
+    }
     const data = await res.json();
     const items: any[] = data.data ?? [];
 
