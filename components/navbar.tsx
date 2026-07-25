@@ -108,9 +108,7 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
   );
 };
 
-// Modo oscuro aun en rollout incremental por el resto del sitio — ocultar
-// el toggle hasta que todas las paginas esten cubiertas.
-const SHOW_THEME_TOGGLE = false;
+const SHOW_THEME_TOGGLE = true;
 
 type PreviewProduct = {
   id: number;
