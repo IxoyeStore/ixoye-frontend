@@ -112,7 +112,6 @@ function CategoryContent() {
   const [result, setResult]           = useState<ProductType[]>([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState<string | null>(null);
-  const [page, setPage]               = useState(1);
   const [totalPages, setTotalPages]   = useState(1);
   const [totalCount, setTotalCount]   = useState(0);
   const [showFilters, setShowFilters] = useState(false);
@@ -120,6 +119,7 @@ function CategoryContent() {
   const [priceMinInput, setPriceMinInput] = useState("");
   const [priceMaxInput, setPriceMaxInput] = useState("");
 
+  const page         = parseInt(searchParams.get("page") || "1", 10) || 1;
   const currentSort  = searchParams.get("sort")        || "createdAt:desc";
   const category     = searchParams.get("category");
   const brand        = searchParams.get("brand");
@@ -130,10 +130,12 @@ function CategoryContent() {
 
   const { result: categories }: ResponeType = useGetCategories();
 
+  // Cambiar un filtro siempre reinicia la paginacion a la pagina 1.
   const setParam = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set(key, value);
     else params.delete(key);
+    params.delete("page");
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -190,14 +192,14 @@ function CategoryContent() {
   };
 
   useEffect(() => {
-    setPage(1);
-    fetchProducts(1);
-  }, [currentSort, category, brand, series, productName, priceMin, priceMax]);
+    fetchProducts(page);
+  }, [page, currentSort, category, brand, series, productName, priceMin, priceMax]);
 
   const goToPage = (p: number) => {
     if (p < 1 || p > totalPages || p === page) return;
-    setPage(p);
-    fetchProducts(p);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(p));
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   const getPageNumbers = (current: number, total: number): number[] => {
@@ -219,6 +221,7 @@ function CategoryContent() {
     else params.delete("priceMin");
     if (priceMaxInput) params.set("priceMax", priceMaxInput);
     else params.delete("priceMax");
+    params.delete("page");
     router.push(`?${params.toString()}`, { scroll: false });
     setShowFilters(false);
   };
