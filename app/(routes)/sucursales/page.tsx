@@ -32,9 +32,9 @@ const SUCURSALES = [
     maps: "https://maps.app.goo.gl/RUo5wi8PFk7XDab79",
   },
   {
-    name: "Sucursal Compostela",
-    address: "Hidalgo 347, Sta Ana, 63700 Compostela, Nay.",
-    maps: "https://maps.app.goo.gl/QcLpdPbJbojjfEXP7",
+    name: "Sucursal La Peñita",
+    address: "México 200, Paraíso Escondido, 63720 Paraíso Escondido, Nay.",
+    maps: "https://maps.app.goo.gl/9pAtNdJ35nK81cxq7",
   },
 ];
 
