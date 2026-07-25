@@ -58,6 +58,12 @@ export default function Page() {
       router.push("/profile/edit?new=true");
       return;
     }
+    if (shippingUnavailable) {
+      toast.error(
+        "Por ahora solo hacemos envíos dentro de Nayarit. Contáctanos por WhatsApp a través del botón de Soporte para más información.",
+      );
+      return;
+    }
     setLoading(true);
 
     try {
@@ -69,7 +75,7 @@ export default function Page() {
             id: item.id,
             quantity: item.quantity || 1,
           })),
-          shippingPrice: shippingQuote?.cost || 0,
+          shippingPrice: shippingCost,
           shippingLabel: shippingQuote?.label || "Envío Estándar",
           postalCode: userCP,
           total: finalTotal,
@@ -167,7 +173,9 @@ export default function Page() {
     );
   };
 
-  const finalTotal = totalPrice + (shippingQuote?.cost || 0);
+  const shippingUnavailable = shippingQuote?.cost === -1;
+  const shippingCost = shippingQuote && shippingQuote.cost > 0 ? shippingQuote.cost : 0;
+  const finalTotal = totalPrice + shippingCost;
 
   return (
     <div className="max-w-6xl px-4 py-16 mx-auto min-h-[75vh]">
@@ -278,8 +286,7 @@ export default function Page() {
                   </p>
                   <div className="text-right">
                     <p className="text-2xl font-black text-green-600 dark:text-green-400 tracking-tighter italic">
-                      {/* Usamos finalTotal aquí para que sume el envío */}
-                      {formatPrice(totalPrice + (shippingQuote?.cost || 0))}
+                      {formatPrice(finalTotal)}
                     </p>
                     <p className="text-[8px] text-slate-400 dark:text-slate-500 font-bold uppercase">
                       IVA Incluido
@@ -289,11 +296,15 @@ export default function Page() {
               </div>
 
               <Button
-                disabled={loading}
-                className="w-full rounded-full bg-sky-800 hover:bg-sky-900 text-white font-black uppercase text-[11px] tracking-[0.2em] py-7 shadow-lg transition-transform active:scale-95"
+                disabled={loading || shippingUnavailable}
+                className="w-full rounded-full bg-sky-800 hover:bg-sky-900 text-white font-black uppercase text-[11px] tracking-[0.2em] py-7 shadow-lg transition-transform active:scale-95 disabled:opacity-50"
                 onClick={handleCheckoutClick}
               >
-                {loading ? "Preparando pago..." : "Realizar pedido y pagar"}
+                {loading
+                  ? "Preparando pago..."
+                  : shippingUnavailable
+                    ? "Envío no disponible"
+                    : "Realizar pedido y pagar"}
               </Button>
 
               <p className="mt-4 text-center text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">

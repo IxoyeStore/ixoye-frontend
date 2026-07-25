@@ -4,28 +4,10 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/formatPrice";
-import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown, Eye, TrendingUp, Copy, Check } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown, Eye, TrendingUp } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
+import { CopyableCode } from "@/components/copyable-code";
 import { toast } from "sonner";
-
-const CopyButton = ({ text }: { text: string }) => {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
-  return (
-    <button
-      onClick={handleCopy}
-      title="Copiar código"
-      className="shrink-0 p-0.5 rounded text-slate-400 dark:text-slate-500 hover:text-sky-500 dark:hover:text-sky-400 transition-colors"
-    >
-      {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
-    </button>
-  );
-};
 
 type EditingCellField = "price" | "wholesalePrice" | "stock";
 type EditingCell = { docId: string; field: EditingCellField };
@@ -617,8 +599,11 @@ export default function AdminProductsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-semibold text-slate-700 dark:text-slate-300 text-sm shrink-0">{p.code || "—"}</span>
-                      {p.code && <CopyButton text={p.code} />}
+                      {p.code ? (
+                        <CopyableCode code={p.code} className="font-mono font-semibold text-slate-700 dark:text-slate-300 text-sm" />
+                      ) : (
+                        <span className="font-mono font-semibold text-slate-700 dark:text-slate-300 text-sm shrink-0">—</span>
+                      )}
                     </div>
                     <div className="flex items-baseline gap-2 mt-0.5">
                       <span className="text-slate-700 dark:text-slate-300 text-xs font-semibold truncate">{p.productName}</span>
@@ -725,8 +710,11 @@ export default function AdminProductsPage() {
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         <div className="flex items-center gap-1">
-                          <span className="font-mono text-sm font-semibold text-slate-700 dark:text-slate-300">{p.code || "—"}</span>
-                          {p.code && <CopyButton text={p.code} />}
+                          {p.code ? (
+                            <CopyableCode code={p.code} className="font-mono text-sm font-semibold text-slate-700 dark:text-slate-300" />
+                          ) : (
+                            <span className="font-mono text-sm font-semibold text-slate-700 dark:text-slate-300">—</span>
+                          )}
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 hidden lg:table-cell">{p.category?.categoryName || "—"}</td>

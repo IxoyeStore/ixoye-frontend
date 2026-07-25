@@ -7,6 +7,7 @@ import { ChevronLeft, Save, User, MapPin, Truck } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 import { toast } from "sonner";
 import { ProductImage } from "@/components/product-image";
+import { CopyableCode } from "@/components/copyable-code";
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pendiente" },
@@ -216,8 +217,10 @@ export default function AdminOrderDetailPage() {
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 uppercase font-black tracking-widest bg-slate-200 dark:bg-slate-700/50">
               <th className="text-left px-6 py-3">Producto</th>
+              <th className="text-left px-6 py-3">Código</th>
               <th className="text-center px-6 py-3">Cant.</th>
               <th className="text-right px-6 py-3">Precio</th>
+              <th className="text-right px-6 py-3">IVA</th>
               <th className="text-right px-6 py-3">Subtotal</th>
             </tr>
           </thead>
@@ -226,6 +229,8 @@ export default function AdminOrderDetailPage() {
               const fallback = productLookup[p.documentId] || {};
               const code = p.code || fallback.code;
               const image = p.image || fallback.image;
+              const lineTotal = p.price * (p.quantity || 1);
+              const lineIva = lineTotal - lineTotal / 1.16;
               return (
                 <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                   <td className="px-6 py-4">
@@ -233,17 +238,16 @@ export default function AdminOrderDetailPage() {
                       <div className="w-12 h-12 shrink-0">
                         <ProductImage url={image} alt={p.productName || p.name} className="w-full h-full" />
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-black uppercase text-slate-900 dark:text-white truncate">{p.productName || p.name}</p>
-                        {code && (
-                          <p className="font-mono text-[11px] font-bold text-slate-400 dark:text-slate-500 mt-0.5">{code}</p>
-                        )}
-                      </div>
+                      <p className="font-black uppercase text-slate-900 dark:text-white truncate">{p.productName || p.name}</p>
                     </div>
+                  </td>
+                  <td className="px-6 py-4 font-mono text-xs font-bold text-slate-500 dark:text-slate-400">
+                    {code ? <CopyableCode code={code} /> : "—"}
                   </td>
                   <td className="px-6 py-4 text-center font-bold text-slate-600 dark:text-slate-400">{p.quantity || 1}</td>
                   <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-400">{formatPrice(p.price)}</td>
-                  <td className="px-6 py-4 text-right font-black text-slate-900 dark:text-white">{formatPrice(p.price * (p.quantity || 1))}</td>
+                  <td className="px-6 py-4 text-right text-slate-500 dark:text-slate-400">{formatPrice(lineIva)}</td>
+                  <td className="px-6 py-4 text-right font-black text-slate-900 dark:text-white">{formatPrice(lineTotal)}</td>
                 </tr>
               );
             })}
@@ -251,18 +255,18 @@ export default function AdminOrderDetailPage() {
           <tfoot>
             {order.subtotal != null && (
               <tr>
-                <td colSpan={3} className="px-6 py-2 text-right text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Subtotal</td>
+                <td colSpan={5} className="px-6 py-2 text-right text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Subtotal</td>
                 <td className="px-6 py-2 text-right text-sm font-bold text-slate-500 dark:text-slate-400">{formatPrice(order.subtotal)}</td>
               </tr>
             )}
             {order.iva != null && (
               <tr>
-                <td colSpan={3} className="px-6 py-2 text-right text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">IVA</td>
+                <td colSpan={5} className="px-6 py-2 text-right text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">IVA</td>
                 <td className="px-6 py-2 text-right text-sm font-bold text-slate-500 dark:text-slate-400">{formatPrice(order.iva)}</td>
               </tr>
             )}
             <tr className="border-t-2 border-slate-900 dark:border-slate-600">
-              <td colSpan={3} className="px-6 py-4 text-right text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">Total</td>
+              <td colSpan={5} className="px-6 py-4 text-right text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">Total</td>
               <td className="px-6 py-4 text-right text-2xl font-black text-slate-900 dark:text-white">{formatPrice(order.total)}</td>
             </tr>
           </tfoot>
