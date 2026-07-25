@@ -32,13 +32,13 @@ const LovedItemProduct = ({ product }: LovedItemProductProps) => {
   };
 
   return (
-    <div className="flex p-4 border border-slate-200 rounded-xl items-center hover:shadow-md transition-all bg-white relative group">
+    <div className="flex p-4 border border-slate-200 dark:border-slate-700 rounded-xl items-center hover:shadow-md dark:hover:shadow-none transition-all bg-white dark:bg-slate-800 relative group">
       <div className="shrink-0">
         <Link href={`/product/${product.slug}`}>
           <ProductImage
             url={product.images?.[0]}
             alt={product.productName}
-            className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-lg border border-slate-50 shadow-sm"
+            className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-lg border border-slate-50 dark:border-slate-700 shadow-sm"
           />
         </Link>
       </div>
@@ -46,22 +46,22 @@ const LovedItemProduct = ({ product }: LovedItemProductProps) => {
       <div className="flex flex-col justify-between flex-1 px-4 min-h-[110px]">
         <div>
           <Link href={`/product/${product.slug}`}>
-            <h2 className="text-sm font-bold text-[#001e36] hover:text-[#0055a4] transition-colors line-clamp-2 leading-snug">
+            <h2 className="text-sm font-bold text-[#001e36] dark:text-white hover:text-[#0055a4] dark:hover:text-sky-400 transition-colors line-clamp-2 leading-snug">
               {product.productName}
             </h2>
           </Link>
           {hasWholesalePrice && (
-            <p className="text-xs text-slate-400 line-through">
+            <p className="text-xs text-slate-400 dark:text-slate-500 line-through">
               {formatPrice(product.price)}
             </p>
           )}
-          <p className={`font-bold mt-1 text-base ${outOfStock ? "text-slate-400" : "text-green-700"}`}>
+          <p className={`font-bold mt-1 text-base ${outOfStock ? "text-slate-400 dark:text-slate-500" : "text-green-700 dark:text-green-400"}`}>
             {formatPrice(displayPrice!)}
           </p>
         </div>
 
         {outOfStock ? (
-          <div className="mt-2 flex items-center gap-2 text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 h-8 w-full md:w-fit">
+          <div className="mt-2 flex items-center gap-2 text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-3 h-8 w-full md:w-fit">
             <PackageX size={14} />
             <span className="text-[11px] font-bold uppercase tracking-wider">Agotado</span>
           </div>
@@ -81,7 +81,7 @@ const LovedItemProduct = ({ product }: LovedItemProductProps) => {
       <button
         onClick={() => removeLovedItem(product.id)}
         className={cn(
-          "absolute top-2 right-2 rounded-full flex items-center justify-center bg-white border border-slate-100 shadow-sm p-2 hover:scale-110 transition text-rose-700 hover:bg-rose-50",
+          "absolute top-2 right-2 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm p-2 hover:scale-110 transition text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40",
           "opacity-100 md:opacity-0 md:group-hover:opacity-100",
         )}
       >
