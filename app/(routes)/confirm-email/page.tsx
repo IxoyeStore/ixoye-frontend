@@ -45,14 +45,14 @@ function ConfirmEmailContent() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
-      <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+      <div className="max-w-md w-full bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
         {status === "loading" && (
           <div className="space-y-4">
             <Loader2 className="w-12 h-12 animate-spin text-[#0071b1] mx-auto" />
-            <h1 className="text-xl font-bold text-[#012849]">
+            <h1 className="text-xl font-bold text-[#012849] dark:text-sky-300">
               Verificando tu cuenta...
             </h1>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 dark:text-slate-400 text-sm">
               Estamos validando tu correo con nuestro servidor.
             </p>
           </div>
@@ -61,10 +61,10 @@ function ConfirmEmailContent() {
         {status === "success" && (
           <div className="space-y-4 animate-in fade-in zoom-in duration-500">
             <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
-            <h1 className="text-2xl font-black text-[#012849]">
+            <h1 className="text-2xl font-black text-[#012849] dark:text-sky-300">
               ¡Correo verificado!
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-slate-400">
               Tu cuenta ha sido activada correctamente. En unos segundos serás
               redirigido al inicio de sesión.
             </p>
@@ -82,17 +82,17 @@ function ConfirmEmailContent() {
         {status === "error" && (
           <div className="space-y-4 animate-in fade-in duration-500">
             <XCircle className="w-16 h-16 text-red-500 mx-auto" />
-            <h1 className="text-2xl font-black text-[#012849]">
+            <h1 className="text-2xl font-black text-[#012849] dark:text-sky-300">
               Enlace inválido
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-slate-400">
               El código de confirmación es incorrecto, ha expirado o ya fue
               utilizado anteriormente.
             </p>
             <div className="pt-4">
               <Link
                 href="/"
-                className="text-[#0071b1] font-bold hover:underline"
+                className="text-[#0071b1] dark:text-sky-400 font-bold hover:underline"
               >
                 Volver al inicio
               </Link>

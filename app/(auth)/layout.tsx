@@ -13,7 +13,7 @@ export default function AuthLayout({
   const { isDark } = useSiteTheme();
 
   return (
-    <div className={isDark ? "dark" : ""}>
+    <div className={`${isDark ? "dark" : ""} text-foreground`}>
       <div className="min-h-screen bg-background">
         {/* HOME */}
         <div className="absolute top-4 left-4">

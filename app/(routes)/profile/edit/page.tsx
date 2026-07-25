@@ -338,19 +338,19 @@ export default function EditProfilePage() {
     );
 
   return (
-    <div className="flex justify-center items-center py-10 px-4 bg-gray-50/50 min-h-[calc(100vh-80px)] text-black">
+    <div className="flex justify-center items-center py-10 px-4 bg-gray-50/50 dark:bg-slate-900 min-h-[calc(100vh-80px)] text-black dark:text-white">
       <div className="w-full max-w-2xl space-y-4">
         <Link
           href="/profile"
-          className="inline-flex items-center text-sm font-semibold text-[#0071b1] hover:text-[#012849] group"
+          className="inline-flex items-center text-sm font-semibold text-[#0071b1] hover:text-[#012849] dark:text-sky-400 dark:hover:text-sky-300 group"
         >
           <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1" />
           Volver al perfil
         </Link>
 
-        <Card className="shadow-xl border-none ring-1 ring-gray-100">
-          <CardHeader className="text-center pt-8 border-b border-gray-100">
-            <CardTitle className="text-3xl font-extrabold text-[#012849]">
+        <Card className="shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700">
+          <CardHeader className="text-center pt-8 border-b border-gray-100 dark:border-slate-700">
+            <CardTitle className="text-3xl font-extrabold text-[#012849] dark:text-sky-300">
               {isNewAddress
                 ? "Agregar Nueva Dirección"
                 : addressId
@@ -363,7 +363,7 @@ export default function EditProfilePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
-                <Label className="text-sm font-bold text-[#012849]">
+                <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                   Nombre(s) *
                 </Label>
                 <Input
@@ -372,7 +372,7 @@ export default function EditProfilePage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-sm font-bold text-[#012849]">
+                <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                   Apellido Paterno *
                 </Label>
                 <Input
@@ -381,7 +381,7 @@ export default function EditProfilePage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-sm font-bold text-[#012849]">
+                <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                   Apellido Materno
                 </Label>
                 <Input
@@ -392,7 +392,7 @@ export default function EditProfilePage() {
                 />
               </div>
                             <div className="space-y-1.5">
-                <Label className="text-sm font-bold text-[#012849]">
+                <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                   Teléfono *
                 </Label>
                 <Input
@@ -403,7 +403,7 @@ export default function EditProfilePage() {
               </div>
                 {form.type === "b2b" && (
                 <div className="md:col-span-2 space-y-1.5">
-                  <Label className="text-sm font-bold text-[#012849]">
+                  <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                     Nombre Comercial
                   </Label>
                   <Input
@@ -416,9 +416,9 @@ export default function EditProfilePage() {
               )}
 
               <div className="space-y-1.5">
-                <Label className="text-sm font-bold text-[#012849] flex items-center">
+                <Label className="text-sm font-bold text-[#012849] dark:text-sky-300 flex items-center">
                   Fecha de Nacimiento
-                  <Info size={14} className="ml-1.5 text-slate-400" />
+                  <Info size={14} className="ml-1.5 text-slate-400 dark:text-slate-500" />
                 </Label>
                 <Input
                   type="date"
@@ -429,13 +429,13 @@ export default function EditProfilePage() {
               </div>
 
               {/* DIRECCIÓN */}
-              <div className="md:col-span-2 pt-6 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <h3 className="md:col-span-2 font-bold text-[#012849]">
+              <div className="md:col-span-2 pt-6 border-t border-gray-100 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <h3 className="md:col-span-2 font-bold text-[#012849] dark:text-sky-300">
                   Información de Entrega
                 </h3>
 
                 <div className="md:col-span-2 space-y-1.5">
-                  <Label className="text-sm font-bold text-[#012849]">
+                  <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                     Nombre de la dirección (alias)
                   </Label>
                   <Input
@@ -448,7 +448,7 @@ export default function EditProfilePage() {
                 </div>
 
                 <div className="md:col-span-2 space-y-1.5">
-                  <Label className="text-sm font-bold text-[#012849]">
+                  <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                     Calle y Número *
                   </Label>
                   <Input
@@ -462,7 +462,7 @@ export default function EditProfilePage() {
                 <div className="space-y-1.5">
                   <Label
                     className={`text-sm font-bold ${
-                      cpError ? "text-red-500" : "text-[#012849]"
+                      cpError ? "text-red-500 dark:text-red-400" : "text-[#012849] dark:text-sky-300"
                     }`}
                   >
                     Código Postal *
@@ -478,7 +478,7 @@ export default function EditProfilePage() {
                       }
                       maxLength={5}
                       className={`${
-                        cpError ? "border-red-500 focus:ring-red-500" : ""
+                        cpError ? "border-red-500 dark:border-red-500 focus:ring-red-500" : ""
                       } transition-colors`}
                     />
                   </div>
@@ -491,7 +491,7 @@ export default function EditProfilePage() {
                       />
                       <p
                         className={`text-xs font-medium ${
-                          shippingQuote.cost === 0 ? "text-green-600" : "text-amber-600"
+                          shippingQuote.cost === 0 ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-400"
                         }`}
                       >
                         {shippingQuote.cost === 0
@@ -503,7 +503,7 @@ export default function EditProfilePage() {
 
                   {/* Mensaje de Error */}
                   {cpError && (
-                    <p className="text-xs text-red-500 font-medium mt-1 flex items-center gap-1">
+                    <p className="text-xs text-red-500 dark:text-red-400 font-medium mt-1 flex items-center gap-1">
                       <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
                       CP no encontrado. Por favor, verifica los 5 dígitos.
                     </p>
@@ -511,7 +511,7 @@ export default function EditProfilePage() {
                 </div>
 
                 <div className="space-y-1.5 relative">
-                  <Label className="text-sm font-bold text-[#012849]">
+                  <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                     Colonia *
                   </Label>
 
@@ -524,11 +524,11 @@ export default function EditProfilePage() {
                       onChange={(e) =>
                         handleAddressChange("neighborhood", e.target.value)
                       }
-                      className="cursor-pointer bg-white"
+                      className="cursor-pointer bg-white dark:bg-slate-800"
                     />
 
                     {/* Icono indicador */}
-                    <div className="absolute right-3 top-2.5 text-gray-400 pointer-events-none">
+                    <div className="absolute right-3 top-2.5 text-gray-400 dark:text-slate-500 pointer-events-none">
                       <ChevronLeft
                         size={16}
                         className={`transition-transform duration-200 ${showColonias ? "-rotate-90" : "rotate-0"}`}
@@ -543,7 +543,7 @@ export default function EditProfilePage() {
                           onClick={() => setShowColonias(false)}
                         />
 
-                        <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+                        <div className="absolute z-20 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl shadow-2xl max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
                           <div className="p-2 space-y-1">
                             {coloniasSugericdas.map((col, idx) => (
                               <button
@@ -551,8 +551,8 @@ export default function EditProfilePage() {
                                 type="button"
                                 className={`w-full text-left px-4 py-3 text-sm rounded-lg transition-colors ${
                                   addressForm.neighborhood === col
-                                    ? "bg-blue-50 text-[#0071b1] font-bold"
-                                    : "hover:bg-gray-50 text-gray-700"
+                                    ? "bg-blue-50 dark:bg-sky-950/40 text-[#0071b1] dark:text-sky-400 font-bold"
+                                    : "hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300"
                                 }`}
                                 onClick={() => {
                                   handleAddressChange("neighborhood", col);
@@ -570,11 +570,11 @@ export default function EditProfilePage() {
                 </div>
 
                 <div className="space-y-1.5 text-left">
-                  <Label className="text-sm font-bold text-[#012849]">
+                  <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                     Estado *
                   </Label>
                   <select
-                    className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#0071b1] text-black"
+                    className="flex h-10 w-full rounded-md border border-input bg-white dark:bg-slate-800 dark:border-slate-600 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#0071b1] text-black dark:text-white"
                     value={addressForm.state}
                     onChange={(e) =>
                       handleAddressChange("state", e.target.value as string)
@@ -590,12 +590,12 @@ export default function EditProfilePage() {
                 </div>
 
                 <div className="space-y-1.5 text-left">
-                  <Label className="text-sm font-bold text-[#012849]">
+                  <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                     Ciudad *
                   </Label>
 
                   <select
-                    className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-black"
+                    className="flex h-10 w-full rounded-md border border-input bg-white dark:bg-slate-800 dark:border-slate-600 px-3 py-2 text-sm text-black dark:text-white"
                     value={addressForm.city}
                     onChange={(e) =>
                       handleAddressChange("city", e.target.value as string)
@@ -628,7 +628,7 @@ export default function EditProfilePage() {
                 </div>
 
                 <div className="md:col-span-2 space-y-1.5">
-                  <Label className="text-sm font-bold text-[#012849]">
+                  <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                     Referencias (Opcional)
                   </Label>
                   <Input
@@ -649,8 +649,8 @@ export default function EditProfilePage() {
                 }
                 className={`flex items-center space-x-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${
                   addressForm.isDefault
-                    ? "border-[#0071b1] bg-blue-50/50"
-                    : "border-gray-100 bg-gray-50/30 hover:border-gray-200"
+                    ? "border-[#0071b1] bg-blue-50/50 dark:bg-sky-950/30"
+                    : "border-gray-100 dark:border-slate-700 bg-gray-50/30 dark:bg-slate-800 hover:border-gray-200 dark:hover:border-slate-600"
                 }`}
               >
                 <Checkbox
@@ -664,11 +664,11 @@ export default function EditProfilePage() {
                 <div className="space-y-0.5 cursor-pointer">
                   <Label
                     htmlFor="isDefault"
-                    className="text-sm font-bold text-[#012849] cursor-pointer"
+                    className="text-sm font-bold text-[#012849] dark:text-sky-300 cursor-pointer"
                   >
                     Establecer como dirección principal
                   </Label>
-                  <p className="text-xs text-gray-500 font-medium">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
                     Usar esta dirección por defecto para mis pedidos.
                   </p>
                 </div>
@@ -676,7 +676,7 @@ export default function EditProfilePage() {
             </div>
 
             {errors.general && (
-              <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg text-center font-medium">
+              <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 p-3 rounded-lg text-center font-medium">
                 {errors.general}
               </p>
             )}
@@ -684,7 +684,7 @@ export default function EditProfilePage() {
             <Button
               className={`w-full h-12 font-bold transition-all ${
                 !hasChanges || saving
-                  ? "bg-gray-300 text-gray-500"
+                  ? "bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-slate-400"
                   : "bg-[#0071b1] hover:bg-[#012849] text-white"
               }`}
               onClick={handleSave}
@@ -699,10 +699,10 @@ export default function EditProfilePage() {
               )}
             </Button>
 
-            <div className="pt-2 border-t border-gray-100 text-center">
+            <div className="pt-2 border-t border-gray-100 dark:border-slate-700 text-center">
               <Link
                 href="/profile/security"
-                className="text-sm font-semibold text-[#0071b1] hover:text-[#012849] hover:underline"
+                className="text-sm font-semibold text-[#0071b1] dark:text-sky-400 hover:text-[#012849] dark:hover:text-sky-300 hover:underline"
               >
                 Cambiar contraseña
               </Link>

@@ -12,7 +12,7 @@ export default function RoutesLayout({
   const { isDark, toggleTheme } = useSiteTheme();
 
   return (
-    <div className={isDark ? "dark" : ""}>
+    <div className={`${isDark ? "dark" : ""} text-foreground`}>
       <Navbar isDark={isDark} onToggleTheme={toggleTheme} />
       <main className="bg-white dark:bg-slate-900">{children}</main>
       <Footer />

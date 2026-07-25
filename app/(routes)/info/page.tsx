@@ -49,10 +49,10 @@ export default function InfoPage() {
           isLoaded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
         }`}
       >
-        <h1 className="text-3xl font-medium text-center text-sky-900">
+        <h1 className="text-3xl font-medium text-center text-sky-900 dark:text-sky-300">
           ¿Por qué comprar con nosotros?
         </h1>
-        <p className="mt-4 text-center text-sky-700 max-w-2xl mx-auto">
+        <p className="mt-4 text-center text-sky-700 dark:text-sky-400 max-w-2xl mx-auto">
           Queremos que compres con total confianza. Por eso cuidamos cada
           detalle desde el pago hasta la entrega de tu pedido.
         </p>
@@ -63,7 +63,7 @@ export default function InfoPage() {
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
       >
-        <Separator className="my-10 bg-sky-100" />
+        <Separator className="my-10 bg-sky-100 dark:bg-slate-700" />
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -74,7 +74,7 @@ export default function InfoPage() {
             style={{ transitionDelay: `${500 + index * 150}ms` }}
           >
             <Card
-              className={`border-sky-100 bg-white shadow-sm shadow-sky-50 h-full hover:shadow-md transition-all duration-300 hover:-translate-y-1 ${
+              className={`border-sky-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm shadow-sky-50 dark:shadow-none h-full hover:shadow-md dark:hover:shadow-none transition-all duration-300 hover:-translate-y-1 ${
                 isLoaded
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-8"
@@ -84,8 +84,8 @@ export default function InfoPage() {
                 <div className="p-3 bg-sky-700 rounded-full">
                   <item.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-semibold text-sky-900">{item.title}</h3>
-                <p className="text-sm text-sky-600">{item.desc}</p>
+                <h3 className="font-semibold text-sky-900 dark:text-sky-300">{item.title}</h3>
+                <p className="text-sm text-sky-600 dark:text-sky-400">{item.desc}</p>
               </CardContent>
             </Card>
           </div>
@@ -98,7 +98,7 @@ export default function InfoPage() {
         }`}
         style={{ transitionDelay: "1300ms" }}
       >
-        <h2 className="text-2xl font-semibold text-sky-900">
+        <h2 className="text-2xl font-semibold text-sky-900 dark:text-sky-300">
           Explora nuestra tienda y descubre productos seleccionados para ti.
         </h2>
 
@@ -116,7 +116,7 @@ export default function InfoPage() {
             href="/"
             className={buttonVariants({
               variant: "outline",
-              className: "border-sky-200 text-sky-700 hover:bg-sky-50",
+              className: "border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/40",
             })}
           >
             Volver al inicio

@@ -12,25 +12,25 @@ export default function Page() {
 
   return (
     <div className="max-w-6xl py-12 mx-auto px-6 min-h-[70vh] animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="border-b border-slate-100 pb-6 mb-10">
-        <h1 className="text-4xl font-black text-sky-950 uppercase italic tracking-tighter">
+      <div className="border-b border-slate-100 dark:border-slate-700 pb-6 mb-10">
+        <h1 className="text-4xl font-black text-sky-950 dark:text-sky-300 uppercase italic tracking-tighter">
           Productos guardados
         </h1>
-        <p className="text-sky-600 font-bold uppercase text-[10px] tracking-[0.3em] mt-1">
+        <p className="text-sky-600 dark:text-sky-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-1">
           Tus refacciones favoritas
         </p>
       </div>
 
       <div className="mt-6">
         {lovedItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 sm:py-32 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 px-4">
-            <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100/50">
-              <Heart size={32} className="text-slate-300" />
+          <div className="flex flex-col items-center justify-center py-24 sm:py-32 text-center bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-700 px-4">
+            <div className="bg-white dark:bg-slate-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100/50 dark:ring-slate-800">
+              <Heart size={32} className="text-slate-300 dark:text-slate-600" />
             </div>
-            <p className="text-slate-500 font-black uppercase text-xs tracking-widest mb-2">
+            <p className="text-slate-500 dark:text-slate-400 font-black uppercase text-xs tracking-widest mb-2">
               Lista vacía
             </p>
-            <p className="text-slate-400 text-sm italic mb-8 max-w-xs mx-auto">
+            <p className="text-slate-400 dark:text-slate-500 text-sm italic mb-8 max-w-xs mx-auto">
               Aún no has guardado ningún producto. Explora nuestro catálogo para
               encontrar lo que necesitas.
             </p>

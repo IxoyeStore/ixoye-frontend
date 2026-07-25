@@ -606,7 +606,7 @@ export default function AdminProductsPage() {
                     <ProductImage
                       url={Array.isArray(p.images) && p.images[0] ? p.images[0] : undefined}
                       alt={p.productName}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
                     />
                   </div>
                   <div className="flex-1 min-w-0">

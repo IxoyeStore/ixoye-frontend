@@ -116,24 +116,24 @@ function SearchContent() {
   }, [products, selectedBrands]);
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 py-12 min-h-[70vh] bg-white">
+    <div className="max-w-[1440px] mx-auto px-4 py-12 min-h-[70vh] bg-white dark:bg-slate-900">
       {loading ? (
         <SearchSkeleton />
       ) : isQueryTooShort ? (
         <div className="flex flex-col items-center justify-center py-32 gap-3 text-center px-4">
-          <Target size={32} className="text-slate-200 stroke-[1.5]" />
-          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+          <Target size={32} className="text-slate-200 dark:text-slate-700 stroke-[1.5]" />
+          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600">
             Ingresa al menos dos caracteres
           </p>
         </div>
       ) : error ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4 text-center px-4">
-          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600">
             No se pudieron obtener resultados
           </p>
           <button
             onClick={() => router.refresh()}
-            className="text-xs font-black uppercase tracking-widest text-[#0055a4] hover:text-[#003d7a] underline underline-offset-4 transition-colors"
+            className="text-xs font-black uppercase tracking-widest text-[#0055a4] dark:text-sky-400 hover:text-[#003d7a] dark:hover:text-sky-300 underline underline-offset-4 transition-colors"
           >
             Intentar de nuevo
           </button>
@@ -145,11 +145,11 @@ function SearchContent() {
               <div className="md:sticky md:top-32">
                 <button
                   onClick={() => setShowMobileFilters(!showMobileFilters)}
-                  className="flex md:hidden items-center justify-between w-full p-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 transition-all active:scale-[0.98]"
+                  className="flex md:hidden items-center justify-between w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 transition-all active:scale-[0.98]"
                 >
                   <div className="flex items-center gap-2">
-                    <Filter size={16} className="text-sky-700" />
-                    <span className="text-xs font-black uppercase italic text-slate-900">
+                    <Filter size={16} className="text-sky-700 dark:text-sky-400" />
+                    <span className="text-xs font-black uppercase italic text-slate-900 dark:text-white">
                       Filtros de Marca
                     </span>
                     {selectedBrands.length > 0 && (
@@ -160,7 +160,7 @@ function SearchContent() {
                   </div>
                   <ChevronRight
                     size={16}
-                    className={`text-slate-400 transition-transform ${showMobileFilters ? "rotate-90" : ""}`}
+                    className={`text-slate-400 dark:text-slate-500 transition-transform ${showMobileFilters ? "rotate-90" : ""}`}
                   />
                 </button>
 
@@ -168,21 +168,21 @@ function SearchContent() {
                   className={`${showMobileFilters ? "block" : "hidden"} md:block animate-in fade-in slide-in-from-top-4 duration-300`}
                 >
                   <div className="flex items-center justify-between mb-6 px-2 md:px-0">
-                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-tighter italic">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">
                       Especificaciones
                     </h3>
                     {selectedBrands.length > 0 && (
                       <button
                         onClick={() => setSelectedBrands([])}
-                        className="text-[10px] font-bold text-blue-600 uppercase border-b border-blue-600 pb-0.5"
+                        className="text-[10px] font-bold text-blue-600 dark:text-sky-400 uppercase border-b border-blue-600 dark:border-sky-400 pb-0.5"
                       >
                         Reiniciar
                       </button>
                     )}
                   </div>
-                  <div className="space-y-6 bg-white md:bg-transparent p-4 md:p-0 border md:border-0 border-slate-100 rounded-xl">
+                  <div className="space-y-6 bg-white dark:bg-slate-800 md:bg-transparent dark:md:bg-transparent p-4 md:p-0 border md:border-0 border-slate-100 dark:border-slate-700 rounded-xl">
                     <div>
-                      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">
+                      <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-4">
                         Fabricante / Marca
                       </h4>
                       <div className="flex flex-col gap-3 max-h-64 md:max-h-80 overflow-y-auto pr-2 custom-scrollbar">
@@ -201,10 +201,10 @@ function SearchContent() {
                                     : [...prev, brand],
                                 )
                               }
-                              className="peer appearance-none w-4 h-4 border border-slate-300 rounded-sm checked:bg-slate-900 transition-all"
+                              className="peer appearance-none w-4 h-4 border border-slate-300 dark:border-slate-600 rounded-sm checked:bg-slate-900 dark:checked:bg-sky-500 transition-all"
                             />
                             <span
-                              className={`text-xs font-bold uppercase transition-colors ${selectedBrands.includes(brand) ? "text-slate-900" : "text-slate-400 group-hover:text-slate-600"}`}
+                              className={`text-xs font-bold uppercase transition-colors ${selectedBrands.includes(brand) ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300"}`}
                             >
                               {brand}
                             </span>
@@ -219,16 +219,16 @@ function SearchContent() {
           )}
 
           <main className="flex-1">
-            <div className="flex flex-col gap-6 mb-10 border-b border-slate-100 pb-6">
+            <div className="flex flex-col gap-6 mb-10 border-b border-slate-100 dark:border-slate-700 pb-6">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">
+                    <span className="text-[10px] font-bold text-blue-600 dark:text-sky-400 uppercase tracking-widest">
                       Resultados de Catálogo
                     </span>
                     <button
                       onClick={() => router.push("/category")}
-                      className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 hover:bg-red-600 text-slate-500 hover:text-white rounded-md transition-all duration-200 shadow-sm"
+                      className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-red-600 text-slate-500 dark:text-slate-400 hover:text-white rounded-md transition-all duration-200 shadow-sm"
                     >
                       <X size={10} strokeWidth={3} />
                       <span className="text-[9px] font-black uppercase">
@@ -236,22 +236,22 @@ function SearchContent() {
                       </span>
                     </button>
                   </div>
-                  <h2 className="text-2xl md:text-4xl font-black text-slate-900 uppercase italic leading-none truncate">
+                  <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white uppercase italic leading-none truncate">
                     {query}
                   </h2>
                 </div>
 
                 <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 pt-4 md:pt-0">
-                  <div className="text-left md:text-right md:border-r md:border-slate-100 md:pr-8">
-                    <span className="block text-xl md:text-2xl font-light text-slate-400 leading-none">
+                  <div className="text-left md:text-right md:border-r md:border-slate-100 dark:md:border-slate-700 md:pr-8">
+                    <span className="block text-xl md:text-2xl font-light text-slate-400 dark:text-slate-500 leading-none">
                       {filteredProducts.length}
                     </span>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">
                       Productos encontrados
                     </span>
                   </div>
                   <div className="shrink-0 flex flex-col gap-1">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter text-left md:text-right">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter text-left md:text-right">
                       Ordenar por
                     </span>
                     <ProductSort />
@@ -267,8 +267,8 @@ function SearchContent() {
                 ))
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-32 gap-4 text-center">
-                  <Search size={36} className="text-slate-200 stroke-[1]" />
-                  <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300">
+                  <Search size={36} className="text-slate-200 dark:text-slate-700 stroke-[1]" />
+                  <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600">
                     No se encontraron coincidencias
                   </p>
                   <Button

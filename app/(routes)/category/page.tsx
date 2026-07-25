@@ -40,18 +40,18 @@ function ProductListItem({ product }: { product: ProductType }) {
   return (
     <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-sky-200 dark:hover:border-sky-800 hover:shadow-sm transition-all rounded-xl">
       <Link href={`/product/${product.slug}`} className="shrink-0">
-        <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-700 border border-slate-100 dark:border-slate-600">
+        <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-white border border-slate-100 dark:border-slate-600">
           {product.images?.[0] ? (
             <Image
               src={product.images[0]}
               alt={product.productName}
               fill
               draggable={false}
-              className="object-cover"
+              className="object-contain"
               sizes="80px"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-500 text-[9px] font-black uppercase">Sin imagen</div>
+            <div className="w-full h-full flex items-center justify-center text-slate-300 text-[9px] font-black uppercase">Sin imagen</div>
           )}
         </div>
       </Link>
@@ -112,7 +112,6 @@ function CategoryContent() {
   const [result, setResult]           = useState<ProductType[]>([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState<string | null>(null);
-  const [page, setPage]               = useState(1);
   const [totalPages, setTotalPages]   = useState(1);
   const [totalCount, setTotalCount]   = useState(0);
   const [showFilters, setShowFilters] = useState(false);
@@ -120,6 +119,7 @@ function CategoryContent() {
   const [priceMinInput, setPriceMinInput] = useState("");
   const [priceMaxInput, setPriceMaxInput] = useState("");
 
+  const page         = parseInt(searchParams.get("page") || "1", 10) || 1;
   const currentSort  = searchParams.get("sort")        || "createdAt:desc";
   const category     = searchParams.get("category");
   const brand        = searchParams.get("brand");
@@ -130,10 +130,12 @@ function CategoryContent() {
 
   const { result: categories }: ResponeType = useGetCategories();
 
+  // Cambiar un filtro siempre reinicia la paginacion a la pagina 1.
   const setParam = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set(key, value);
     else params.delete(key);
+    params.delete("page");
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -190,14 +192,14 @@ function CategoryContent() {
   };
 
   useEffect(() => {
-    setPage(1);
-    fetchProducts(1);
-  }, [currentSort, category, brand, series, productName, priceMin, priceMax]);
+    fetchProducts(page);
+  }, [page, currentSort, category, brand, series, productName, priceMin, priceMax]);
 
   const goToPage = (p: number) => {
     if (p < 1 || p > totalPages || p === page) return;
-    setPage(p);
-    fetchProducts(p);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(p));
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   const getPageNumbers = (current: number, total: number): number[] => {
@@ -219,6 +221,7 @@ function CategoryContent() {
     else params.delete("priceMin");
     if (priceMaxInput) params.set("priceMax", priceMaxInput);
     else params.delete("priceMax");
+    params.delete("page");
     router.push(`?${params.toString()}`, { scroll: false });
     setShowFilters(false);
   };
