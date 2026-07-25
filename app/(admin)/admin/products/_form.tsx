@@ -302,7 +302,7 @@ export default function ProductForm({
                 <img
                   src={url}
                   alt={`Imagen ${i + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
                   <button

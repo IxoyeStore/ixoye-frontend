@@ -283,7 +283,7 @@ export default function Header({
           >
             <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 flex items-center justify-center">
               {p.images[0] ? (
-                <img src={p.images[0]} alt={p.productName} className="w-full h-full object-cover" />
+                <img src={p.images[0]} alt={p.productName} className="w-full h-full object-contain" />
               ) : (
                 <Package size={32} className="text-slate-300 dark:text-slate-500" />
               )}

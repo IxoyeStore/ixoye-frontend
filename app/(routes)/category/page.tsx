@@ -47,7 +47,7 @@ function ProductListItem({ product }: { product: ProductType }) {
               alt={product.productName}
               fill
               draggable={false}
-              className="object-cover"
+              className="object-contain"
               sizes="80px"
             />
           ) : (

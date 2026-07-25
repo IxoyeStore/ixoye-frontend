@@ -38,7 +38,7 @@ const CartItem = ({ product }: CartItemProps) => {
         <ProductImage
           url={product.images?.[0]}
           alt={product.productName}
-          className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm"
+          className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm"
         />
       </Link>
 

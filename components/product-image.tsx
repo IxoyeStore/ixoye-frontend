@@ -34,6 +34,13 @@ export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
     );
   }
 
+  // object-cover recorta la imagen para llenar el contenedor; object-contain
+  // la muestra completa. Antes el fit venia hardcodeado a cover sin importar
+  // lo que el caller pidiera en className, por eso algunas miniaturas se
+  // veian recortadas. Ahora se respeta object-cover si el caller lo pide
+  // explicitamente, y por default se usa contain para no cortar el producto.
+  const fit = className.includes("object-cover") ? "object-cover" : "object-contain";
+
   return (
     <div
       className={`relative overflow-hidden rounded-xl select-none ${className}`}
@@ -43,7 +50,7 @@ export function ProductImage({ url, alt, className = "" }: ProductImageProps) {
         alt={alt || "Producto Ixoye"}
         fill
         draggable={false}
-        className="object-cover"
+        className={fit}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         onError={() => setHasError(true)}
       />

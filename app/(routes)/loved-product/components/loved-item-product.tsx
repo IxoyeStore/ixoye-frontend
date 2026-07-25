@@ -38,7 +38,7 @@ const LovedItemProduct = ({ product }: LovedItemProductProps) => {
           <ProductImage
             url={product.images?.[0]}
             alt={product.productName}
-            className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-lg border border-slate-50 dark:border-slate-700 shadow-sm"
+            className="w-24 h-24 md:w-28 md:h-28 rounded-lg border border-slate-50 dark:border-slate-700 shadow-sm"
           />
         </Link>
       </div>
