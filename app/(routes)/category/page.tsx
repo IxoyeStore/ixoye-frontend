@@ -167,7 +167,7 @@ function CategoryContent() {
       if (priceMax)    params.set("filters[price][$lte]", priceMax);
 
       const res  = await fetch(
-        `https://ixoye-backend-production.up.railway.app/api/products?${params.toString()}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products?${params.toString()}`
       );
       const json = await res.json();
 

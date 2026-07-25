@@ -113,7 +113,7 @@ export default function Page() {
       if (user?.id && user?.jwt) {
         try {
           const res = await fetch(
-            `https://ixoye-backend-production.up.railway.app/api/addresses?filters[users_permissions_user][id][$eq]=${user.id}&filters[isDefault][$eq]=true`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${user.id}&filters[isDefault][$eq]=true`,
             { headers: { Authorization: `Bearer ${user.jwt}` } },
           );
           const json = await res.json();

@@ -22,7 +22,8 @@ export async function GET(request: NextRequest) {
   ]);
 
   const users: any[] = await usersRes.json();
-  const count = await countRes.json();
+  const countData = await countRes.json();
+  const count = countRes.ok && typeof countData === "number" ? countData : 0;
 
   // Fetch profiles for this page of users in one call
   let profileMap: Record<number, string> = {};

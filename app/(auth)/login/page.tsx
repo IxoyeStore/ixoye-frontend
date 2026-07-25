@@ -62,7 +62,7 @@ function LoginFormContent() {
 
     try {
       const res = await fetch(
-        "https://ixoye-backend-production.up.railway.app/api/auth/send-email-confirmation",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/send-email-confirmation`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -94,22 +94,20 @@ function LoginFormContent() {
   const onSubmit = async (data: LoginForm) => {
     setLoginError(null);
     try {
-      const res = await fetch(
-        "https://ixoye-backend-production.up.railway.app/api/auth/local",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            identifier: data.email,
-            password: data.password,
-          }),
-        },
-      );
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          identifier: data.email,
+          password: data.password,
+          rememberMe,
+        }),
+      });
 
       const result = await res.json();
 
       if (!res.ok) {
-        const message = result.error?.message || "";
+        const message = result.error || "";
 
         let translatedError = "Credenciales inválidas";
 
@@ -123,27 +121,14 @@ function LoginFormContent() {
         ) {
           translatedError =
             "Demasiados intentos. Por favor, intenta de nuevo en un minuto.";
-        } else if (result.error?.message) {
-          translatedError = result.error.message;
+        } else if (message) {
+          translatedError = message;
         }
 
         setLoginError(translatedError);
         return;
       }
-      const sessionRes = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jwt: result.jwt,
-          user: result.user,
-          rememberMe,
-        }),
-      });
 
-      if (!sessionRes.ok) {
-        setLoginError("Error al crear la sesión en el navegador");
-        return;
-      }
       setUser(result.user);
       await refreshUser();
 

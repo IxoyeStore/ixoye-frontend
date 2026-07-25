@@ -21,13 +21,16 @@ import {
   MessageCircle,
   Sun,
   Moon,
+  Bell,
+  MessageCircleQuestion,
 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
+import { useCustomerQuestionNotifications } from "@/hooks/use-customer-question-notifications";
 import SupportMenu from "./support-menu";
 import TechnicalFilterModal from "./technical-filter-modal";
 
-const API = "https://ixoye-backend-production.up.railway.app";
+const API = process.env.NEXT_PUBLIC_API_URL;
 
 const STATIC_BRANDS = [
   { name: "EMMARK",    logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/EMMARK.png" },
@@ -137,10 +140,14 @@ export default function Header({
     type: "tractor" | "motor" | null;
   }>({ isOpen: false, type: null });
 
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
   const router = useRouter();
   const pathname = usePathname();
   const cart = useCart();
   const { lovedItems } = useLovedProducts();
+  const { newAnswers, newCount, clearNotifications, removeAnswer } = useCustomerQuestionNotifications();
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const desktopRef  = useRef<HTMLDivElement>(null);
@@ -150,7 +157,17 @@ export default function Header({
   useEffect(() => {
     setShowPreview(false);
     setSearchQuery("");
+    setNotifOpen(false);
   }, [pathname]);
+
+  // Click outside → close notifications dropdown
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (!notifRef.current?.contains(e.target as Node)) setNotifOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   // Click outside → close preview
   useEffect(() => {
@@ -309,7 +326,7 @@ export default function Header({
     ) : null;
 
   const iconClass =
-    "flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/10 text-white/90 min-w-[70px]";
+    "flex flex-col items-center justify-center gap-1 px-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/10 text-white/90 h-14 min-w-[64px]";
   const navTextClass =
     "text-[9px] font-black uppercase italic tracking-wider text-center";
 
@@ -363,21 +380,21 @@ export default function Header({
           </div>
 
           <nav className="hidden md:flex gap-1 items-center">
-            <Link href="/category" className={iconClass}>
+            <Link href="/category" className={iconClass} title="Tienda">
               <Store className="w-6 h-6" />
               <span className={navTextClass}>Tienda</span>
             </Link>
-            <Link href="/profile" className={iconClass}>
+            <Link href="/profile" className={iconClass} title="Perfil">
               <UserRound className="w-6 h-6" />
               <span className={navTextClass}>Perfil</span>
             </Link>
-            <Link href="/loved-product" className={iconClass}>
+            <Link href="/loved-product" className={iconClass} title="Favoritos">
               <Heart
                 className={`w-6 h-6 ${lovedItems.length > 0 ? "fill-red-400 text-red-400" : ""}`}
               />
               <span className={navTextClass}>Favoritos</span>
             </Link>
-            <Link href="/cart" className={`relative ${iconClass}`}>
+            <Link href="/cart" className={`relative ${iconClass}`} title="Carrito">
               {cart.items.length === 0 ? (
                 <ShoppingCart className="w-6 h-6" />
               ) : (
@@ -390,12 +407,80 @@ export default function Header({
                 </span>
               )}
             </Link>
-            <div className={iconClass}>
+            <div ref={notifRef} className="relative">
+              <button
+                onClick={() => setNotifOpen((v) => !v)}
+                className={`relative ${iconClass}`}
+                title="Notificaciones"
+              >
+                <Bell className="w-6 h-6" />
+                <span className={navTextClass}>Notificaciones</span>
+                {newCount > 0 && (
+                  <span className="absolute top-1 right-2 bg-rose-500 text-white text-[9px] font-black h-4 w-4 flex items-center justify-center rounded-full border border-white animate-pulse">
+                    {newCount > 9 ? "9+" : newCount}
+                  </span>
+                )}
+              </button>
+
+              {notifOpen && (
+                <div className="absolute right-0 top-full mt-2 w-80 max-w-[90vw] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden z-[110] text-slate-900 dark:text-white">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300">
+                      Notificaciones
+                    </span>
+                    {newCount > 0 && (
+                      <button
+                        onClick={clearNotifications}
+                        className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
+                      >
+                        Limpiar
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700">
+                    {newAnswers.length === 0 ? (
+                      <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 text-center py-8">
+                        No tienes notificaciones
+                      </p>
+                    ) : (
+                      newAnswers.map((q) => (
+                        <Link
+                          key={q.id}
+                          href={q.product?.slug ? `/product/${q.product.slug}` : "/"}
+                          onClick={() => { removeAnswer(q.id); setNotifOpen(false); }}
+                          className="flex items-start gap-3 px-4 py-3 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition-colors"
+                        >
+                          <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                            <MessageCircleQuestion size={15} className="text-emerald-600 dark:text-emerald-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                              Respondieron tu pregunta
+                            </p>
+                            <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
+                              {q.product?.productName || "Producto"}
+                            </p>
+                            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                              {q.answerText}
+                            </p>
+                          </div>
+                        </Link>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className={iconClass} title="Soporte">
               <SupportMenu />
               <span className={navTextClass}>Soporte</span>
             </div>
             {SHOW_THEME_TOGGLE && (
-              <button onClick={onToggleTheme} className={iconClass}>
+              <button
+                onClick={onToggleTheme}
+                className={iconClass}
+                title={isDark ? "Modo claro" : "Modo oscuro"}
+              >
                 {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
                 <span className={navTextClass}>{isDark ? "Claro" : "Oscuro"}</span>
               </button>
@@ -513,6 +598,20 @@ export default function Header({
                   </span>
                 )}
               </Link>
+              <button
+                onClick={() => setNotifOpen((v) => !v)}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm relative"
+              >
+                <Bell className="w-6 h-6 text-sky-950 dark:text-sky-400" />
+                <span className="text-[10px] font-black uppercase italic dark:text-white">
+                  Notificaciones
+                </span>
+                {newCount > 0 && (
+                  <span className="absolute top-3 right-8 bg-rose-500 text-white text-[9px] font-black h-4 w-4 flex items-center justify-center rounded-full">
+                    {newCount > 9 ? "9+" : newCount}
+                  </span>
+                )}
+              </button>
               {SHOW_THEME_TOGGLE && (
                 <button
                   onClick={() => { onToggleTheme(); setOpen(false); }}
@@ -527,6 +626,56 @@ export default function Header({
                 </button>
               )}
             </div>
+
+            {/* AVISOS MOBILE (inline, ya que el desplegable de escritorio esta oculto aqui) */}
+            {notifOpen && (
+              <div className="rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300">
+                    Tus preguntas respondidas
+                  </span>
+                  {newCount > 0 && (
+                    <button
+                      onClick={clearNotifications}
+                      className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
+                    >
+                      Limpiar
+                    </button>
+                  )}
+                </div>
+                <div className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+                  {newAnswers.length === 0 ? (
+                    <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 text-center py-6">
+                      Sin novedades por ahora
+                    </p>
+                  ) : (
+                    newAnswers.map((q) => (
+                      <Link
+                        key={q.id}
+                        href={q.product?.slug ? `/product/${q.product.slug}` : "/"}
+                        onClick={() => { removeAnswer(q.id); setNotifOpen(false); setOpen(false); }}
+                        className="flex items-start gap-3 px-4 py-3"
+                      >
+                        <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                          <MessageCircleQuestion size={15} className="text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                            Respondieron tu pregunta
+                          </p>
+                          <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
+                            {q.product?.productName || "Producto"}
+                          </p>
+                          <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                            {q.answerText}
+                          </p>
+                        </div>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* FILTROS MOBILE */}
             <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">

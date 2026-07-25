@@ -17,8 +17,10 @@ import {
   X,
   Bell,
   Home,
+  MessageCircleQuestion,
 } from "lucide-react";
 import { useOrderNotifications } from "@/hooks/use-order-notifications";
+import { useQuestionNotifications } from "@/hooks/use-question-notifications";
 import { AdminThemeToggle } from "@/components/admin-theme-toggle";
 
 const THEME_KEY = "admin-theme";
@@ -52,6 +54,7 @@ const navItems = [
   { href: "/admin/products",      label: "Productos",      icon: Package,         exact: false },
   { href: "/admin/users",         label: "Usuarios",       icon: Users,           exact: false },
   { href: "/admin/categories",    label: "Categorías",     icon: Tag,             exact: false },
+  { href: "/admin/questions",     label: "Preguntas",      icon: MessageCircleQuestion, exact: false },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -74,6 +77,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     });
   };
   const { newOrders, newCount, clearNotifications, removeOrder } = useOrderNotifications();
+  const { newQuestions, newQuestionCount, clearNotifications: clearQuestionNotifications, removeQuestion } = useQuestionNotifications();
+  const totalNewCount = newCount + newQuestionCount;
 
   useEffect(() => { setSidebarOpen(false); }, [pathname]);
   useEffect(() => { setNotifOpen(false); }, [pathname]);
@@ -127,17 +132,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80">
               <div className="flex items-center gap-2">
-                <Bell size={14} className={newCount > 0 ? "text-sky-500" : "text-slate-400"} />
+                <Bell size={14} className={totalNewCount > 0 ? "text-sky-500" : "text-slate-400"} />
                 <span className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
-                  {newCount > 0
-                    ? `${newCount} nueva${newCount !== 1 ? "s" : ""} orden${newCount !== 1 ? "es" : ""}`
+                  {totalNewCount > 0
+                    ? `${totalNewCount} notificación${totalNewCount !== 1 ? "es" : ""} nueva${totalNewCount !== 1 ? "s" : ""}`
                     : "Notificaciones"}
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                {newCount > 0 && (
+                {totalNewCount > 0 && (
                   <button
-                    onClick={clearNotifications}
+                    onClick={() => { clearNotifications(); clearQuestionNotifications(); }}
                     className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                   >
                     Limpiar todo
@@ -153,24 +158,53 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Body */}
-            {newOrders.length === 0 ? (
+            {newOrders.length === 0 && newQuestions.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
                   <Bell size={22} className="text-slate-300 dark:text-slate-500" />
                 </div>
                 <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                  Sin nuevas órdenes
+                  Sin novedades
                 </p>
               </div>
             ) : (
               <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700">
+                {newQuestions.map((q) => {
+                  const time = q.createdAt
+                    ? new Date(q.createdAt).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })
+                    : null;
+                  return (
+                    <Link
+                      key={`q-${q.id}`}
+                      href="/admin/questions"
+                      onClick={() => { removeQuestion(q.id); setNotifOpen(false); }}
+                      className="flex items-center gap-4 px-5 py-4 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                        <MessageCircleQuestion size={16} className="text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                          Nueva pregunta
+                        </p>
+                        <p className="text-slate-900 dark:text-white font-black text-sm leading-tight mt-0.5 truncate">
+                          {q.product?.productName || "Producto"}
+                        </p>
+                        <p className="text-slate-400 dark:text-slate-500 text-[11px] font-bold truncate mt-0.5">
+                          {q.questionText}{time ? ` · ${time}` : ""}
+                        </p>
+                      </div>
+                      <ChevronRight size={15} className="text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 transition-colors shrink-0" />
+                    </Link>
+                  );
+                })}
                 {newOrders.map((order) => {
                   const time = order.createdAt
                     ? new Date(order.createdAt).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })
                     : null;
                   return (
                     <Link
-                      key={order.id}
+                      key={`o-${order.id}`}
                       href={`/admin/orders/${order.documentId || order.id}`}
                       onClick={() => { removeOrder(order.id); setNotifOpen(false); }}
                       className="flex items-center gap-4 px-5 py-4 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition-colors group"
@@ -223,9 +257,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               }`}
             >
               <Bell size={17} />
-              {newCount > 0 && (
+              {totalNewCount > 0 && (
                 <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center leading-none">
-                  {newCount > 9 ? "9+" : newCount}
+                  {totalNewCount > 9 ? "9+" : totalNewCount}
                 </span>
               )}
             </button>
@@ -308,9 +342,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className="relative p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <Bell size={20} />
-              {newCount > 0 && (
+              {totalNewCount > 0 && (
                 <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center leading-none">
-                  {newCount > 9 ? "9+" : newCount}
+                  {totalNewCount > 9 ? "9+" : totalNewCount}
                 </span>
               )}
             </button>

@@ -44,7 +44,7 @@ export default function Footer() {
 
     try {
       const res = await fetch(
-        `https://ixoye-backend-production.up.railway.app/api/${type}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/${type}`,
       );
       if (!res.ok) throw new Error(`Error ${res.status}`);
 

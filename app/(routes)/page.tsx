@@ -5,10 +5,12 @@ import ChooseCategory from "@/components/choose-category";
 import InfoCards from "@/components/info-cards";
 import ShipmentSection from "@/components/shipment";
 import RecentlyViewedSection from "@/components/recently-viewed/section";
+import ShippingNoticeModal from "@/components/shipping-notice-modal";
 
 export default function Home() {
   return (
     <main>
+      <ShippingNoticeModal />
       <CarouselTextBanner />
       <InfoCards />
       <FeaturedProducts />

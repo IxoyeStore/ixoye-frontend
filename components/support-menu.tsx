@@ -19,8 +19,8 @@ const SupportMenu = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  const iconClass = `p-2 text-white/90 rounded-xl transition-all duration-300 transform hover:scale-110 
-    ${isOpen ? " text-white scale-110 shadow-lg" : "text-slate-800"}`;
+  const iconClass = `text-white/90 transition-all duration-300 transform hover:scale-110
+    ${isOpen ? " text-white scale-110" : ""}`;
 
   return (
     <div className="relative" ref={menuRef}>
@@ -29,7 +29,7 @@ const SupportMenu = () => {
         className={iconClass}
         aria-label="Soporte"
       >
-        <Headset className="w-7 h-7" />
+        <Headset className="w-6 h-6" />
       </button>
 
       {/* Menú Desplegable */}

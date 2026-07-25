@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, Package, Users, Tag, Clock, AlertTriangle, TrendingUp } from "lucide-react";
+import { ShoppingCart, Package, Users, Tag, Clock, AlertTriangle, TrendingUp, MessageCircleQuestion, ChevronRight } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -34,12 +34,13 @@ export default function AdminDashboard() {
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [lowStock, setLowStock]         = useState<any[]>([]);
   const [topProducts, setTopProducts]   = useState<any[]>([]);
+  const [pendingQuestions, setPendingQuestions] = useState(0);
   const [loading, setLoading]           = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const [ordersRes, productsRes, usersRes, categoriesRes, lowStockRes, topRes] =
+        const [ordersRes, productsRes, usersRes, categoriesRes, lowStockRes, topRes, questionsRes] =
           await Promise.all([
             fetch("/api/admin/orders?page=1"),
             fetch("/api/admin/products?page=1"),
@@ -47,9 +48,10 @@ export default function AdminDashboard() {
             fetch("/api/admin/categories?page=1"),
             fetch("/api/admin/products?sort=stock:asc&pageSize=6"),
             fetch("/api/admin/products?sort=views:desc&pageSize=5"),
+            fetch("/api/admin/questions?status=pending&pageSize=1"),
           ]);
 
-        const [orders, products, users, categories, lowStockData, topData] =
+        const [orders, products, users, categories, lowStockData, topData, questionsData] =
           await Promise.all([
             ordersRes.json(),
             productsRes.json(),
@@ -57,6 +59,7 @@ export default function AdminDashboard() {
             categoriesRes.json(),
             lowStockRes.json(),
             topRes.json(),
+            questionsRes.json(),
           ]);
 
         setStats({
@@ -69,6 +72,7 @@ export default function AdminDashboard() {
         setRecentOrders((orders.data || []).slice(0, 8));
         setLowStock((lowStockData.data || []).filter((p: any) => (p.stock ?? 0) <= 5));
         setTopProducts((topData.data || []).filter((p: any) => (p.views ?? 0) > 0));
+        setPendingQuestions(questionsData.meta?.pagination?.total || 0);
       } finally {
         setLoading(false);
       }
@@ -117,6 +121,29 @@ export default function AdminDashboard() {
           </Link>
         ))}
       </div>
+
+      {/* Pending Questions Banner */}
+      {!loading && pendingQuestions > 0 && (
+        <Link
+          href="/admin/questions"
+          className="flex items-center gap-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50 rounded-2xl px-5 py-4 md:px-6 hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-lg transition-all group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+            <MessageCircleQuestion size={18} className="text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-black text-slate-900 dark:text-white">
+              {pendingQuestions} pregunta{pendingQuestions !== 1 ? "s" : ""} sin responder
+            </p>
+            <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 mt-0.5">
+              Los clientes están esperando una respuesta
+            </p>
+          </div>
+          <span className="hidden sm:flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 shrink-0">
+            Responder <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          </span>
+        </Link>
+      )}
 
       {/* Orders + Low Stock */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

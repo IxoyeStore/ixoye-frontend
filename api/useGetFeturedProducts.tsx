@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export function useGetFeaturedProducts() {
-  const url = `https://ixoye-backend-production.up.railway.app/api/products?filters[isFeatured][$eq]=true&`;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/products?filters[isFeatured][$eq]=true&`;
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

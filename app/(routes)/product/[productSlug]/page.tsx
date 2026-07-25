@@ -5,6 +5,7 @@ import { ProductType } from "@/types/product";
 import ProductGallery from "./components/product-gallery";
 import InfoProduct from "./components/info-product";
 import ProductDescription from "./components/product-description";
+import ProductQuestions from "./components/product-questions";
 import TrackView from "./components/track-view";
 import TrackRecentlyViewed from "@/components/recently-viewed/track";
 import RecentlyViewedSection from "@/components/recently-viewed/section";
@@ -95,25 +96,38 @@ export default async function ProductPage({
         <ChevronRight size={15} className="text-slate-300 dark:text-slate-600 shrink-0" />
         <Link href="/category" className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">Tienda</Link>
         <ChevronRight size={15} className="text-slate-300 dark:text-slate-600 shrink-0" />
-        {product.category && (
+        {product.category ? (
           <>
             <Link href={`/category/${product.category.slug}`} className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
               {product.category.categoryName}
             </Link>
             <ChevronRight size={15} className="text-slate-300 dark:text-slate-600 shrink-0" />
           </>
-        )}
+        ) : product.brand ? (
+          <>
+            <Link href={`/category?brand=${encodeURIComponent(product.brand.toLowerCase())}`} className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+              {product.brand}
+            </Link>
+            <ChevronRight size={15} className="text-slate-300 dark:text-slate-600 shrink-0" />
+          </>
+        ) : null}
         <span className="text-slate-600 dark:text-slate-300 truncate max-w-[280px]">{product.productName}</span>
       </nav>
 
       {/* ── Mobile back link ─────────────────────────────────────────────── */}
       <div className="sm:hidden flex items-center gap-1 px-3">
         <Link
-          href={product.category ? `/category/${product.category.slug}` : "/category"}
+          href={
+            product.category
+              ? `/category/${product.category.slug}`
+              : product.brand
+              ? `/category?brand=${encodeURIComponent(product.brand.toLowerCase())}`
+              : "/category"
+          }
           className="flex items-center gap-1 text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
         >
           <ChevronRight size={12} className="rotate-180" />
-          {product.category ? product.category.categoryName : "Tienda"}
+          {product.category ? product.category.categoryName : product.brand ? product.brand : "Tienda"}
         </Link>
       </div>
 
@@ -193,6 +207,12 @@ export default async function ProductPage({
         </div>
 
       </div>
+
+      {product.documentId && (
+        <div className="px-3 sm:px-0">
+          <ProductQuestions productDocumentId={product.documentId} />
+        </div>
+      )}
 
     </div>
 

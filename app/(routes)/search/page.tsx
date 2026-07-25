@@ -65,7 +65,7 @@ function SearchContent() {
         params.append("pagination[pageSize]", "60");
 
         const response = await fetch(
-          `https://ixoye-backend-production.up.railway.app/api/products?${params.toString()}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/products?${params.toString()}`,
         );
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);

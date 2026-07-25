@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 export function useGetCategories() {
   const url =
-    `https://ixoye-backend-production.up.railway.app/api/categories` +
+    `${process.env.NEXT_PUBLIC_API_URL}/api/categories` +
     `?filters[isFeatured][$eq]=true` +
     `&populate=mainImage`;
   const [result, setResult] = useState(null);

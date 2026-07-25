@@ -15,9 +15,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  env: {
-    NEXT_PUBLIC_API_URL: "https://ixoye-backend-production.up.railway.app",
-  },
 };
 
 export default nextConfig;

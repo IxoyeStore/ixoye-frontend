@@ -9,7 +9,7 @@ export function useGetCategoryProduct(slug?: string) {
     if (!slug) return;
 
     const url =
-      `https://ixoye-backend-production.up.railway.app/api/products` +
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products` +
       `?` +
       `&filters[category][slug][$eq]=${slug}`;
     const fetchData = async () => {

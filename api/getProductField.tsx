@@ -2,7 +2,7 @@ import { ResultFiltersTypes } from "@/types/filters";
 import { useEffect, useState } from "react";
 
 export function useGetProductField() {
-  const url = `https://ixoye-backend-production.up.railway.app/api/content-type-builder/content-types/api::product.product`;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/content-type-builder/content-types/api::product.product`;
   const [result, setResult] = useState<ResultFiltersTypes | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

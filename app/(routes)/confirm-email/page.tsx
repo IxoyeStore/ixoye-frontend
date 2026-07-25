@@ -23,7 +23,7 @@ function ConfirmEmailContent() {
 
       try {
         const res = await fetch(
-          `https://ixoye-backend-production.up.railway.app/api/auth/email-confirmation?confirmation=${code}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/email-confirmation?confirmation=${code}`,
         );
 
         if (res.ok) {
