@@ -87,22 +87,22 @@ export default function SecurityPage() {
   ] as const;
 
   return (
-    <div className="flex justify-center items-center py-10 px-4 bg-gray-50/50 min-h-[calc(100vh-80px)]">
+    <div className="flex justify-center items-center py-10 px-4 bg-gray-50/50 dark:bg-slate-900 min-h-[calc(100vh-80px)]">
       <div className="w-full max-w-md space-y-4">
         <Link
           href="/profile"
-          className="inline-flex items-center text-sm font-semibold text-[#0071b1] hover:text-[#012849] group"
+          className="inline-flex items-center text-sm font-semibold text-[#0071b1] dark:text-sky-400 hover:text-[#012849] dark:hover:text-sky-300 group"
         >
           <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
           Volver al perfil
         </Link>
 
-        <Card className="shadow-xl border-none ring-1 ring-gray-100">
-          <CardHeader className="text-center pt-8 border-b border-gray-100">
-            <CardTitle className="text-2xl font-extrabold text-[#012849]">
+        <Card className="shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700">
+          <CardHeader className="text-center pt-8 border-b border-gray-100 dark:border-slate-700">
+            <CardTitle className="text-2xl font-extrabold text-[#012849] dark:text-sky-300">
               Cambiar contraseña
             </CardTitle>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
               Elige una contraseña segura de al menos 8 caracteres.
             </p>
           </CardHeader>
@@ -111,7 +111,7 @@ export default function SecurityPage() {
             {success ? (
               <div className="flex flex-col items-center gap-4 py-6 text-center">
                 <CheckCircle2 className="w-12 h-12 text-emerald-500" />
-                <p className="font-bold text-[#012849]">
+                <p className="font-bold text-[#012849] dark:text-sky-300">
                   ¡Contraseña actualizada correctamente!
                 </p>
                 <Link href="/profile">
@@ -124,7 +124,7 @@ export default function SecurityPage() {
               <form onSubmit={handleSubmit} className="space-y-5">
                 {fields.map(({ key, label }) => (
                   <div key={key} className="space-y-1.5">
-                    <Label className="text-sm font-bold text-[#012849]">
+                    <Label className="text-sm font-bold text-[#012849] dark:text-sky-300">
                       {label}
                     </Label>
                     <div className="relative">
@@ -135,13 +135,13 @@ export default function SecurityPage() {
                           setForm((prev) => ({ ...prev, [key]: e.target.value }))
                         }
                         placeholder="••••••••"
-                        className="border-gray-200 focus-visible:ring-[#0071b1] h-11 bg-gray-50/30 pr-11"
+                        className="border-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white focus-visible:ring-[#0071b1] h-11 bg-gray-50/30 pr-11"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => toggleShow(key)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0071b1] transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-[#0071b1] dark:hover:text-sky-400 transition-colors"
                         tabIndex={-1}
                       >
                         {show[key] ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -151,7 +151,7 @@ export default function SecurityPage() {
                 ))}
 
                 {error && (
-                  <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg text-center font-medium border border-red-100">
+                  <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 p-3 rounded-lg text-center font-medium border border-red-100 dark:border-red-900">
                     {error}
                   </p>
                 )}

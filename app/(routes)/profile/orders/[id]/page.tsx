@@ -12,31 +12,31 @@ import QRCode from "react-qr-code";
 const statusMap: Record<string, { label: string; class: string }> = {
   pending: {
     label: "Pendiente",
-    class: "border-amber-200 text-amber-700 bg-amber-50",
+    class: "border-amber-200 dark:border-amber-900 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40",
   },
   paid: {
     label: "Pagado",
-    class: "border-emerald-200 text-emerald-700 bg-emerald-50",
+    class: "border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40",
   },
   processing: {
     label: "En Preparación",
-    class: "border-sky-200 text-sky-700 bg-sky-50",
+    class: "border-sky-200 dark:border-sky-900 text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40",
   },
   shipped: {
     label: "En Camino",
-    class: "border-violet-200 text-violet-700 bg-violet-50",
+    class: "border-violet-200 dark:border-violet-900 text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40",
   },
   delivered: {
     label: "Entregado",
-    class: "border-emerald-200 text-emerald-700 bg-emerald-50",
+    class: "border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40",
   },
   completed: {
     label: "Entregado",
-    class: "border-emerald-200 text-emerald-700 bg-emerald-50",
+    class: "border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40",
   },
   cancelled: {
     label: "Cancelado",
-    class: "border-red-200 text-red-700 bg-red-50",
+    class: "border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/40",
   },
 };
 
@@ -86,7 +86,7 @@ export default function OrderDetailPage() {
 
   if (loading)
     return (
-      <div className="p-20 text-center font-bold text-slate-400 animate-pulse uppercase tracking-widest text-[10px]">
+      <div className="p-20 text-center font-bold text-slate-400 dark:text-slate-500 animate-pulse uppercase tracking-widest text-[10px]">
         Verificando credenciales...
       </div>
     );
@@ -95,10 +95,10 @@ export default function OrderDetailPage() {
     return (
       <div className="p-20 text-center space-y-4">
         <ShieldAlert className="mx-auto text-red-500" size={48} />
-        <h2 className="font-black text-slate-900 uppercase tracking-tighter text-xl">
+        <h2 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter text-xl">
           Acceso Denegado
         </h2>
-        <p className="text-slate-500 text-sm max-w-xs mx-auto">
+        <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mx-auto">
           No tienes permisos para ver esta orden o el documento no existe.
         </p>
         <Link
@@ -124,7 +124,7 @@ export default function OrderDetailPage() {
   const qrUrl = typeof window !== "undefined" ? window.location.href : "";
   const currentStatus = statusMap[data.orderStatus?.toLowerCase()] || {
     label: "Procesado",
-    class: "border-slate-200 text-slate-600 bg-slate-50",
+    class: "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800",
   };
   const date = data.createdAt
     ? new Date(data.createdAt).toLocaleDateString("es-MX", {
@@ -160,38 +160,38 @@ export default function OrderDetailPage() {
 
       <div className="p-4 md:p-12 max-w-4xl mx-auto space-y-8 print-container">
         {/* Acciones Web */}
-        <div className="flex justify-between items-center print-hidden border-b border-slate-100 pb-4">
+        <div className="flex justify-between items-center print-hidden border-b border-slate-100 dark:border-slate-700 pb-4">
           <Link
             href="/profile?tab=orders"
-            className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-2"
+            className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-2"
           >
             <ChevronLeft size={14} />
             Regresar
           </Link>
           <button
             onClick={handlePrint}
-            className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 flex items-center gap-2"
+            className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-2"
           >
             <Printer size={14} /> Imprimir Comprobante
           </button>
         </div>
 
         {/* Encabezado */}
-        <div className="flex justify-between items-start border-b-2 border-slate-900 pb-8">
+        <div className="flex justify-between items-start border-b-2 border-slate-900 dark:border-slate-100 pb-8">
           <div className="flex items-center gap-4">
             <img
               src="/logo.png"
               alt="Logo Ixoye"
-              className="w-16 h-16 object-contain print:grayscale "
+              className="w-16 h-16 object-contain print:grayscale dark:brightness-0 dark:invert"
             />
             <div className="space-y-1">
-              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-slate-900 leading-none">
-                <span className="text-[#0055a4] print:grayscale">
+              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-slate-900 dark:text-white leading-none">
+                <span className="text-[#0055a4] dark:text-sky-400 print:grayscale">
                   Refacciones Diésel <br className="md:hidden" /> y Agrícola
                   Ixoye
                 </span>
               </h1>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+              <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
                 Nota de Remisión
               </p>
             </div>
@@ -202,7 +202,7 @@ export default function OrderDetailPage() {
             >
               {currentStatus.label}
             </div>
-            <p className="text-[14px] font-mono font-bold text-slate-950 block mt-2">
+            <p className="text-[14px] font-mono font-bold text-slate-950 dark:text-white block mt-2">
               FOLIO: #ORD-{orderId}
             </p>
           </div>
@@ -211,28 +211,28 @@ export default function OrderDetailPage() {
         {/* Datos de la Transacción */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-[11px]">
           <div className="space-y-4">
-            <h3 className="font-bold uppercase tracking-widest text-slate-400 border-b pb-1 text-[9px]">
+            <h3 className="font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 border-b dark:border-slate-700 pb-1 text-[9px]">
               Detalles de Venta
             </h3>
             <div className="grid grid-cols-2 gap-y-2">
-              <span className="text-slate-500 uppercase font-medium">
+              <span className="text-slate-500 dark:text-slate-400 uppercase font-medium">
                 Fecha de Emisión:
               </span>
-              <span className="text-slate-950 font-bold text-right md:text-left">
+              <span className="text-slate-950 dark:text-white font-bold text-right md:text-left">
                 {date}
               </span>
-              <span className="text-slate-500 uppercase font-medium">
+              <span className="text-slate-500 dark:text-slate-400 uppercase font-medium">
                 Hora de Registro:
               </span>
-              <span className="text-slate-950 font-bold text-right md:text-left">
+              <span className="text-slate-950 dark:text-white font-bold text-right md:text-left">
                 {data.createdAt
                   ? new Date(data.createdAt).toLocaleTimeString()
                   : "--:--"}
               </span>
-              <span className="text-slate-500 uppercase font-medium">
+              <span className="text-slate-500 dark:text-slate-400 uppercase font-medium">
                 Método de Pago:
               </span>
-              <span className="text-slate-950 font-bold text-right md:text-left italic">
+              <span className="text-slate-950 dark:text-white font-bold text-right md:text-left italic">
                 <span className="capitalize">
                   {data.cardBrand || "Tarjeta"}
                 </span>{" "}
@@ -242,11 +242,11 @@ export default function OrderDetailPage() {
           </div>
 
           <div className="space-y-4">
-            <h3 className="font-bold uppercase tracking-widest text-slate-400 border-b pb-1 text-[9px]">
+            <h3 className="font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 border-b dark:border-slate-700 pb-1 text-[9px]">
               Validación Digital
             </h3>
             <div className="flex items-center gap-4">
-              <div className="bg-white p-1 border border-slate-100 rounded-lg shadow-sm">
+              <div className="bg-white p-1 border border-slate-100 dark:border-slate-700 rounded-lg shadow-sm">
                 <QRCode
                   size={80}
                   style={{ height: "auto", maxWidth: "100%", width: "100%" }}
@@ -256,10 +256,10 @@ export default function OrderDetailPage() {
                 />
               </div>
               <div className="space-y-1">
-                <p className="text-slate-400 text-[8px] leading-tight uppercase font-bold tracking-tighter">
+                <p className="text-slate-400 dark:text-slate-500 text-[8px] leading-tight uppercase font-bold tracking-tighter">
                   Referencia de rastreo:
                 </p>
-                <p className="font-mono text-slate-600 text-[9px] break-all">
+                <p className="font-mono text-slate-600 dark:text-slate-300 text-[9px] break-all">
                   {data.stripeId || "ST-ONLINE-TRANS"}
                 </p>
               </div>
@@ -269,21 +269,21 @@ export default function OrderDetailPage() {
 
         {/* Tabla de Artículos */}
         <div className="space-y-4">
-          <h3 className="font-bold uppercase tracking-widest text-slate-400 text-[9px]">
+          <h3 className="font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 text-[9px]">
             Descripción de Productos
           </h3>
-          <div className="border border-slate-200 rounded-lg overflow-hidden">
+          <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
             <table className="w-full text-[11px]">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr className="text-slate-500 uppercase font-bold italic">
+              <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                <tr className="text-slate-500 dark:text-slate-400 uppercase font-bold italic">
                   <th className="p-4 text-left">Concepto</th>
                   <th className="p-4 text-center w-24">Cant.</th>
                   <th className="p-4 text-right w-32">Importe</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {data.products?.map((item: any, idx: number) => (
-                  <tr key={idx} className="text-slate-900">
+                  <tr key={idx} className="text-slate-900 dark:text-white">
                     <td className="p-4 font-bold uppercase tracking-tight">
                       {item.productName || item.name}
                     </td>
@@ -302,20 +302,20 @@ export default function OrderDetailPage() {
 
         {/* Totales */}
         <div className="flex justify-end print:grayscale">
-          <div className="w-full md:w-64 space-y-2 border-t-2 border-slate-900 pt-4">
-            <div className="flex justify-between text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+          <div className="w-full md:w-64 space-y-2 border-t-2 border-slate-900 dark:border-slate-100 pt-4">
+            <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">
               <span>Subtotal</span>
               <span>{formatPrice(data.total)}</span>
             </div>
-            <div className="flex justify-between text-[11px] font-medium text-slate-500 uppercase tracking-widest">
+            <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">
               <span>Envío </span>
-              <span className="text-emerald-600 font-bold">Sin Costo</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Sin Costo</span>
             </div>
             <div className="flex justify-between items-center pt-2">
-              <span className="text-[12px] font-black uppercase text-slate-950 tracking-tighter">
+              <span className="text-[12px] font-black uppercase text-slate-950 dark:text-white tracking-tighter">
                 Total
               </span>
-              <span className="text-2xl font-black text-slate-950 tracking-tighter">
+              <span className="text-2xl font-black text-slate-950 dark:text-white tracking-tighter">
                 {formatPrice(data.total)}
               </span>
             </div>
@@ -323,12 +323,12 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Footer del Ticket */}
-        <div className="pt-12 border-t border-slate-100 space-y-6 text-center">
-          <div className="bg-slate-50 p-4 rounded text-[9px] text-slate-400 uppercase font-medium leading-relaxed tracking-widest print:bg-white print:border print:border-slate-100">
+        <div className="pt-12 border-t border-slate-100 dark:border-slate-700 space-y-6 text-center">
+          <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded text-[9px] text-slate-400 dark:text-slate-500 uppercase font-medium leading-relaxed tracking-widest print:bg-white print:border print:border-slate-100">
             <p>Este documento no tiene validez como comprobante fiscal.</p>
             <p className="mt-2">
               Gracias por comprar en{" "}
-              <span className="text-slate-900 font-black">
+              <span className="text-slate-900 dark:text-white font-black">
                 refaccionesixoye.mx
               </span>
             </p>
