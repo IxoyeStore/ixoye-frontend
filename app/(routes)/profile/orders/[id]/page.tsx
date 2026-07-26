@@ -233,10 +233,9 @@ export default function OrderDetailPage() {
                 Método de Pago:
               </span>
               <span className="text-slate-950 dark:text-white font-bold text-right md:text-left italic">
-                <span className="capitalize">
-                  {data.cardBrand || "Tarjeta"}
-                </span>{" "}
-                termina en {data.cardLast4 || "4242"}
+                {data.paymentMethod
+                  ? `${data.paymentMethod}${data.cardLast4 ? ` terminación ${data.cardLast4}` : ""}`
+                  : "No disponible"}
               </span>
             </div>
           </div>

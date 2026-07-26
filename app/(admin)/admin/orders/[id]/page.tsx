@@ -126,6 +126,11 @@ export default function AdminOrderDetailPage() {
         </span>
         <div className="ml-auto hidden sm:flex flex-col items-end gap-0.5">
           <p className="text-xs text-slate-400 dark:text-slate-500 font-bold">{date}</p>
+          {order.paymentMethod && (
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
+              {order.paymentMethod}{order.cardLast4 ? ` ···· ${order.cardLast4}` : ""}
+            </p>
+          )}
           {order.stripeId && (
             <p className="text-[10px] font-mono text-slate-300 dark:text-slate-600">{order.stripeId}</p>
           )}
