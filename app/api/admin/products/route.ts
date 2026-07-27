@@ -40,7 +40,8 @@ export async function GET(request: NextRequest) {
       `&filters[$or][2][brand][$containsi]=${encodeURIComponent(search)}` +
       `&filters[$or][3][oemCode][$containsi]=${encodeURIComponent(search)}`;
   }
-  if (category) url += `&filters[category][slug][$eq]=${category}`;
+  if (category === "__uncategorized__") url += `&filters[category][$null]=true`;
+  else if (category) url += `&filters[category][slug][$eq]=${category}`;
   if (active !== null && active !== "") url += `&filters[active][$eq]=${active}`;
   if (priceMin) url += `&filters[price][$gte]=${priceMin}`;
   if (priceMax) url += `&filters[price][$lte]=${priceMax}`;

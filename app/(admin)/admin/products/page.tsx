@@ -476,6 +476,7 @@ export default function AdminProductsPage() {
                 className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-sky-400 bg-white dark:bg-slate-700 dark:text-white min-w-[10rem]"
               >
                 <option value="">Todas</option>
+                <option value="__uncategorized__">Sin clasificar</option>
                 {categories.map((c: any) => (
                   <option key={c.documentId} value={c.slug}>{c.categoryName}</option>
                 ))}
