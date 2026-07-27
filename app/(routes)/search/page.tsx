@@ -45,21 +45,18 @@ function SearchContent() {
         const keywords = cleanQuery.split(/\s+/).filter((w) => w.length >= 1);
 
         const params = new URLSearchParams();
-        let i = 0;
+        const searchableFields = [
+          "productName", "code", "brand", "productType", "series", "oemCode", "motors", "description",
+        ];
 
-        // Full query against name, code, series, oemCode, motors and description first
-        params.append(`filters[$or][${i}][productName][$containsi]`, cleanQuery); i++;
-        params.append(`filters[$or][${i}][code][$containsi]`, cleanQuery); i++;
-        params.append(`filters[$or][${i}][series][$containsi]`, cleanQuery); i++;
-        params.append(`filters[$or][${i}][oemCode][$containsi]`, cleanQuery); i++;
-        params.append(`filters[$or][${i}][motors][$containsi]`, cleanQuery); i++;
-        params.append(`filters[$or][${i}][description][$containsi]`, cleanQuery); i++;
-
-        // Per-keyword against all searchable fields
-        keywords.forEach((word) => {
-          ["productName", "code", "brand", "productType", "series", "oemCode", "motors", "description"].forEach((field) => {
-            params.append(`filters[$or][${i}][${field}][$containsi]`, word);
-            i++;
+        // Cada palabra debe aparecer en AL MENOS uno de los campos (AND entre
+        // palabras, OR entre campos). Antes era un solo OR gigante entre
+        // palabras y campos, asi que una palabra generica como "filtro" o
+        // "aceite" (cientos de coincidencias) enterraba resultados exactos
+        // mas alla del limite de 60, aunque el producto exacto si existiera.
+        keywords.forEach((word, wIdx) => {
+          searchableFields.forEach((field, fIdx) => {
+            params.append(`filters[$and][${wIdx}][$or][${fIdx}][${field}][$containsi]`, word);
           });
         });
 
