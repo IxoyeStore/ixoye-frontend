@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/formatPrice";
-import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown, Eye, TrendingUp } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ChevronDown, X, Loader2, SlidersHorizontal, ArrowUpDown, Eye, TrendingUp, Star, Truck } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
 import { CopyableCode } from "@/components/copyable-code";
 import { toast } from "sonner";
@@ -94,6 +94,9 @@ export default function AdminProductsPage() {
   const [sort, setSort] = useState("productName:asc");
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
+  const [category, setCategory] = useState("");
+  const [stockStatus, setStockStatus] = useState("");
+  const [categories, setCategories] = useState<any[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -117,6 +120,8 @@ export default function AdminProductsPage() {
     if (sort) params.set("sort", sort);
     if (priceMin) params.set("priceMin", priceMin);
     if (priceMax) params.set("priceMax", priceMax);
+    if (category) params.set("category", category);
+    if (stockStatus) params.set("stockStatus", stockStatus);
     const res = await fetch(`/api/admin/products?${params}`);
     const data = await res.json();
     setProducts(data.data || []);
@@ -136,10 +141,15 @@ export default function AdminProductsPage() {
       .catch((err) => console.error("No se pudieron cargar las metricas:", err));
 
     setLoading(false);
-  }, [page, query, active, sort, priceMin, priceMax]);
+  }, [page, query, active, sort, priceMin, priceMax, category, stockStatus]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
+  useEffect(() => {
+    fetch("/api/admin/categories?page=1")
+      .then((r) => r.json())
+      .then((d) => setCategories(d.data || []));
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,11 +159,15 @@ export default function AdminProductsPage() {
 
   const clearFilters = () => {
     setSearch(""); setQuery(""); setActive(""); setSort("productName:asc");
-    setPriceMin(""); setPriceMax(""); setPage(1);
+    setPriceMin(""); setPriceMax(""); setCategory(""); setStockStatus(""); setPage(1);
     setSelectAllPages(false);
   };
 
-  const hasActiveFilters = query || active || sort !== "productName:asc" || priceMin || priceMax;
+  const filterByCategory = (slug: string) => {
+    setCategory(slug); setPage(1); setShowFilters(true);
+  };
+
+  const hasActiveFilters = query || active || sort !== "productName:asc" || priceMin || priceMax || category || stockStatus;
 
   // --- Selection ---
   const allDocIds = products.map((p) => p.documentId || String(p.id));
@@ -184,11 +198,13 @@ export default function AdminProductsPage() {
     let hasMore = true;
     while (hasMore) {
       const params = new URLSearchParams({ page: String(p), pageSize: "100" });
-      if (query)    params.set("search",   query);
-      if (active)   params.set("active",   active);
-      if (sort)     params.set("sort",     sort);
-      if (priceMin) params.set("priceMin", priceMin);
-      if (priceMax) params.set("priceMax", priceMax);
+      if (query)       params.set("search",      query);
+      if (active)      params.set("active",      active);
+      if (sort)        params.set("sort",        sort);
+      if (priceMin)    params.set("priceMin",    priceMin);
+      if (priceMax)    params.set("priceMax",    priceMax);
+      if (category)    params.set("category",    category);
+      if (stockStatus) params.set("stockStatus", stockStatus);
       const res  = await fetch(`/api/admin/products?${params}`);
       const data = await res.json();
       all.push(...(data.data || []));
@@ -358,7 +374,7 @@ export default function AdminProductsPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Nombre, código, marca..."
+                placeholder="Nombre, código, marca, OEM..."
                 className="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-sky-400 w-full bg-white dark:bg-slate-800 dark:text-white dark:placeholder-slate-500"
               />
               {search && (
@@ -386,10 +402,10 @@ export default function AdminProductsPage() {
             >
               <option value="productName:asc">Nombre A → Z</option>
               <option value="productName:desc">Nombre Z → A</option>
-              <option value="price:asc">Precio menor primero</option>
-              <option value="price:desc">Precio mayor primero</option>
-              <option value="stock:asc">Stock menor primero</option>
-              <option value="stock:desc">Stock mayor primero</option>
+              <option value="price:asc">Precio menor</option>
+              <option value="price:desc">Precio mayor</option>
+              <option value="stock:asc">Stock menor</option>
+              <option value="stock:desc">Stock mayor</option>
               <option value="createdAt:desc">Más recientes</option>
               <option value="createdAt:asc">Más antiguos</option>
             </select>
@@ -448,6 +464,38 @@ export default function AdminProductsPage() {
                   onChange={(e) => { setPriceMax(e.target.value); setPage(1); }}
                   className="w-28 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-sky-400 bg-white dark:bg-slate-700 dark:text-white"
                 />
+              </div>
+            </div>
+
+            {/* Categoría */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Categoría</label>
+              <select
+                value={category}
+                onChange={(e) => { setCategory(e.target.value); setPage(1); }}
+                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 text-sm focus:outline-none focus:border-sky-400 bg-white dark:bg-slate-700 dark:text-white min-w-[10rem]"
+              >
+                <option value="">Todas</option>
+                {categories.map((c: any) => (
+                  <option key={c.documentId} value={c.slug}>{c.categoryName}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Stock */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Stock</label>
+              <div className="flex gap-2">
+                {[["", "Todos"], ["low", "Stock bajo"], ["out", "Agotados"]].map(([val, lbl]) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => { setStockStatus(val); setPage(1); }}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${stockStatus === val ? "bg-sky-600 text-white shadow-sm" : "border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-sky-400 hover:text-sky-600"}`}
+                  >
+                    {lbl}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -605,8 +653,14 @@ export default function AdminProductsPage() {
                         <span className="font-mono font-semibold text-slate-700 dark:text-slate-300 text-sm shrink-0">—</span>
                       )}
                     </div>
-                    <div className="flex items-baseline gap-2 mt-0.5">
+                    <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="text-slate-700 dark:text-slate-300 text-xs font-semibold truncate">{p.productName}</span>
+                      {p.isFeatured && (
+                        <span title="Destacado" className="shrink-0"><Star size={11} className="text-amber-400 fill-amber-400" /></span>
+                      )}
+                      {p.freeShipping && (
+                        <span title="Envío gratis" className="shrink-0"><Truck size={11} className="text-emerald-500" /></span>
+                      )}
                     </div>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-sm font-bold text-slate-900 dark:text-white">{formatPrice(p.price)}</span>
@@ -700,12 +754,20 @@ export default function AdminProductsPage() {
                               className="w-full h-full"
                             />
                           </div>
-                          <Link
-                            href={`/admin/products/${docId}`}
-                            className="font-bold text-sm text-slate-800 dark:text-white max-w-[200px] leading-snug hover:text-sky-600 dark:hover:text-sky-400 hover:underline transition-colors"
-                          >
-                            {p.productName}
-                          </Link>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <Link
+                              href={`/admin/products/${docId}`}
+                              className="font-bold text-sm text-slate-800 dark:text-white max-w-[200px] leading-snug hover:text-sky-600 dark:hover:text-sky-400 hover:underline transition-colors"
+                            >
+                              {p.productName}
+                            </Link>
+                            {p.isFeatured && (
+                              <span title="Destacado" className="shrink-0"><Star size={13} className="text-amber-400 fill-amber-400" /></span>
+                            )}
+                            {p.freeShipping && (
+                              <span title="Envío gratis" className="shrink-0"><Truck size={13} className="text-emerald-500" /></span>
+                            )}
+                          </div>
                         </div>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
@@ -717,7 +779,20 @@ export default function AdminProductsPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 hidden lg:table-cell">{p.category?.categoryName || "—"}</td>
+                      <td className="px-4 py-3 text-sm hidden lg:table-cell">
+                        {p.category?.slug ? (
+                          <button
+                            type="button"
+                            onClick={() => filterByCategory(p.category.slug)}
+                            title="Filtrar por esta categoría"
+                            className="text-slate-600 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:underline transition-colors"
+                          >
+                            {p.category.categoryName}
+                          </button>
+                        ) : (
+                          <span className="text-slate-600 dark:text-slate-400">—</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-right">
                         <EditableCell docId={docId} field="price" value={p.price} format={formatPrice} onSave={handleCellSave} />
                       </td>

@@ -29,14 +29,23 @@ export async function GET(request: NextRequest) {
   const active = searchParams.get("active");
   const priceMin = searchParams.get("priceMin") || "";
   const priceMax = searchParams.get("priceMax") || "";
+  const stockStatus = searchParams.get("stockStatus") || "";
   const sort     = searchParams.get("sort") || "productName:asc";
 
   let url = `${API}/api/products?populate[category][fields][0]=categoryName&populate[category][fields][1]=slug&sort=${sort}&pagination[page]=${page}&pagination[pageSize]=${pageSize}`;
-  if (search) url += `&filters[$or][0][productName][$containsi]=${encodeURIComponent(search)}&filters[$or][1][code][$containsi]=${encodeURIComponent(search)}`;
+  if (search) {
+    url +=
+      `&filters[$or][0][productName][$containsi]=${encodeURIComponent(search)}` +
+      `&filters[$or][1][code][$containsi]=${encodeURIComponent(search)}` +
+      `&filters[$or][2][brand][$containsi]=${encodeURIComponent(search)}` +
+      `&filters[$or][3][oemCode][$containsi]=${encodeURIComponent(search)}`;
+  }
   if (category) url += `&filters[category][slug][$eq]=${category}`;
   if (active !== null && active !== "") url += `&filters[active][$eq]=${active}`;
   if (priceMin) url += `&filters[price][$gte]=${priceMin}`;
   if (priceMax) url += `&filters[price][$lte]=${priceMax}`;
+  if (stockStatus === "low") url += `&filters[stock][$gt]=0&filters[stock][$lte]=5`;
+  else if (stockStatus === "out") url += `&filters[stock][$lte]=0`;
 
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${jwt}` },
