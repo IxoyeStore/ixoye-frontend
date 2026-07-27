@@ -47,15 +47,17 @@ function SearchContent() {
         const params = new URLSearchParams();
         let i = 0;
 
-        // Full query against name, code, series and oemCode first
+        // Full query against name, code, series, oemCode, motors and description first
         params.append(`filters[$or][${i}][productName][$containsi]`, cleanQuery); i++;
         params.append(`filters[$or][${i}][code][$containsi]`, cleanQuery); i++;
         params.append(`filters[$or][${i}][series][$containsi]`, cleanQuery); i++;
         params.append(`filters[$or][${i}][oemCode][$containsi]`, cleanQuery); i++;
+        params.append(`filters[$or][${i}][motors][$containsi]`, cleanQuery); i++;
+        params.append(`filters[$or][${i}][description][$containsi]`, cleanQuery); i++;
 
         // Per-keyword against all searchable fields
         keywords.forEach((word) => {
-          ["productName", "code", "brand", "productType", "series", "oemCode"].forEach((field) => {
+          ["productName", "code", "brand", "productType", "series", "oemCode", "motors", "description"].forEach((field) => {
             params.append(`filters[$or][${i}][${field}][$containsi]`, word);
             i++;
           });

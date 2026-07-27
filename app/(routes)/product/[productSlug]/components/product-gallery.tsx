@@ -54,7 +54,7 @@ export default function ProductGallery({ images, productName }: Props) {
       }`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={images[idx]} alt={`Miniatura ${idx + 1}`} draggable={false} className="w-full h-full object-contain" />
+      <img src={images[idx]} alt={`${productName} - vista ${idx + 1}`} draggable={false} className="w-full h-full object-contain" />
     </button>
   );
 
@@ -187,7 +187,7 @@ export default function ProductGallery({ images, productName }: Props) {
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={images[i]} alt={`Miniatura ${i + 1}`} className="w-full h-full object-contain" />
+                <img src={images[i]} alt={`${productName} - vista ${i + 1}`} className="w-full h-full object-contain" />
               </button>
             ))}
           </div>

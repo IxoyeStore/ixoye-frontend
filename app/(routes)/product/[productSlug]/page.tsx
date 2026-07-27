@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import { SITE_URL } from "@/lib/site";
 import { ChevronRight, Hash } from "lucide-react";
 import { ProductType } from "@/types/product";
 import ProductGallery from "./components/product-gallery";
@@ -43,6 +44,7 @@ export async function generateMetadata({
   return {
     title: `${product.productName} | Ixoye`,
     description: desc,
+    alternates: { canonical: `${SITE_URL}/product/${productSlug}` },
     openGraph: {
       title: product.productName,
       description: desc,
@@ -76,8 +78,58 @@ export default async function ProductPage({
   const images: string[] =
     Array.isArray(product.images) && product.images.length > 0 ? product.images : [];
 
+  const breadcrumbItems = [
+    { name: "Inicio", url: `${SITE_URL}/` },
+    { name: "Tienda", url: `${SITE_URL}/category` },
+    ...(product.category
+      ? [{ name: product.category.categoryName, url: `${SITE_URL}/category/${product.category.slug}` }]
+      : []),
+    { name: product.productName, url: `${SITE_URL}/product/${product.slug}` },
+  ];
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.productName,
+    description: product.description || `${product.productName} — Código: ${product.code}.`,
+    sku: product.code,
+    ...(product.oemCode ? { mpn: product.oemCode } : {}),
+    brand: { "@type": "Brand", name: product.brand || "Genérico" },
+    image: images,
+    offers: {
+      "@type": "Offer",
+      url: `${SITE_URL}/product/${product.slug}`,
+      priceCurrency: "MXN",
+      price: product.price,
+      availability:
+        product.stock > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  };
+
   return (
     <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+    />
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+    />
     <div className="max-w-6xl py-6 mx-auto sm:py-12 sm:px-16 space-y-8">
       <TrackView productId={product.id} />
       <TrackRecentlyViewed product={{
