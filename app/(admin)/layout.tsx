@@ -18,6 +18,7 @@ import {
   Bell,
   Home,
   MessageCircleQuestion,
+  Search,
 } from "lucide-react";
 import { useOrderNotifications } from "@/hooks/use-order-notifications";
 import { useQuestionNotifications } from "@/hooks/use-question-notifications";
@@ -55,6 +56,7 @@ const navItems = [
   { href: "/admin/users",         label: "Usuarios",       icon: Users,           exact: false },
   { href: "/admin/categories",    label: "Categorías",     icon: Tag,             exact: false },
   { href: "/admin/questions",     label: "Preguntas",      icon: MessageCircleQuestion, exact: false },
+  { href: "/admin/seo",           label: "SEO",             icon: Search,          exact: false },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
