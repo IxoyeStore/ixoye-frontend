@@ -3,28 +3,130 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { useCart } from "@/hooks/use-cart";
-import { Package, ShoppingBag, CheckCircle2 } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
+import { Package, ShoppingBag, CheckCircle2, Loader2, Clock } from "lucide-react";
+
+type Status = "checking" | "paid" | "pending" | "invalid";
+
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLLS = 12; // ~36s cubriendo el tiempo normal en que llega el webhook
 
 const SuccessContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { removeAll } = useCart();
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const { user, loading: authLoading } = useAuth();
+  const [status, setStatus] = useState<Status>("checking");
+  const pollsRef = useRef(0);
+  const removedCartRef = useRef(false);
+
+  const orderId = searchParams.get("order");
 
   useEffect(() => {
-    const openpayId = searchParams.get("id");
-
-    if (openpayId) {
-      setIsAuthorized(true);
-      removeAll();
-    } else {
+    if (!orderId) {
       router.replace("/");
+      return;
     }
-  }, [searchParams, router, removeAll]);
+    if (authLoading) return; // esperando a que cargue la sesion
 
-  if (!isAuthorized) return null;
+    if (!user?.jwt) {
+      // Sesion no disponible (pudo expirar entre el checkout y el regreso):
+      // no podemos verificar el pago desde aqui, pero tampoco afirmamos
+      // exito sin confirmarlo.
+      setStatus("pending");
+      return;
+    }
+
+    let cancelled = false;
+
+    const checkStatus = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/orders/status/${orderId}`,
+          { headers: { Authorization: `Bearer ${user.jwt}` } },
+        );
+
+        if (!res.ok) {
+          if (!cancelled) setStatus("invalid");
+          return;
+        }
+
+        const { data } = await res.json();
+
+        if (cancelled) return;
+
+        if (data?.orderStatus === "paid") {
+          setStatus("paid");
+          if (!removedCartRef.current) {
+            removedCartRef.current = true;
+            removeAll();
+          }
+          return;
+        }
+
+        pollsRef.current += 1;
+        if (pollsRef.current >= MAX_POLLS) {
+          setStatus("pending");
+          return;
+        }
+
+        setTimeout(checkStatus, POLL_INTERVAL_MS);
+      } catch {
+        if (!cancelled) setStatus("invalid");
+      }
+    };
+
+    checkStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId, user?.jwt, authLoading, router, removeAll]);
+
+  if (status === "invalid") {
+    router.replace("/");
+    return null;
+  }
+
+  if (status === "checking") {
+    return (
+      <div className="max-w-2xl p-4 mx-auto py-24 sm:py-32 text-center animate-in fade-in duration-500">
+        <Loader2 size={40} className="mx-auto text-sky-500 animate-spin mb-6" />
+        <p className="font-black uppercase tracking-widest text-sm text-sky-950 dark:text-sky-300">
+          Confirmando tu pago...
+        </p>
+        <p className="text-slate-400 dark:text-slate-500 text-xs mt-2 font-medium">
+          Esto puede tardar unos segundos, no cierres esta página.
+        </p>
+      </div>
+    );
+  }
+
+  if (status === "pending") {
+    return (
+      <div className="max-w-2xl p-4 mx-auto py-24 sm:py-32 text-center animate-in fade-in duration-500">
+        <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center mx-auto mb-6">
+          <Clock size={28} className="text-amber-500 dark:text-amber-400" />
+        </div>
+        <h1 className="text-2xl font-black uppercase italic tracking-tighter text-sky-950 dark:text-sky-300 mb-3">
+          Tu pago sigue en proceso
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 font-medium max-w-md mx-auto mb-8">
+          Aún no recibimos la confirmación. Si pagaste por transferencia o en
+          banco, puede tardar más en confirmarse — te avisaremos por correo en
+          cuanto se acredite. Si algo salió mal, tu pedido no se procesará.
+        </p>
+        <Button
+          onClick={() => router.push("/profile?tab=orders")}
+          className="px-8 py-6 rounded-2xl bg-sky-900 hover:bg-sky-950 text-white font-black uppercase text-[11px] tracking-[0.2em]"
+        >
+          <Package className="mr-2 w-4 h-4" /> Ver estado de mis pedidos
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl p-4 mx-auto sm:py-24 sm:px-24 animate-in fade-in duration-700">
