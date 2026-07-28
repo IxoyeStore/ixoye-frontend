@@ -58,7 +58,7 @@ export default function AdminOrderDetailPage() {
         if (o?.user?.id) {
           const addrRes = await fetch(`/api/admin/user-address?userId=${o.user.id}`);
           const addrJson = await addrRes.json();
-          const raw = addrJson._raw?.data?.[0] ?? null;
+          const raw = addrJson.data?.[0] ?? null;
           setAddress(raw ? (raw.attributes ?? raw) : null);
         }
 
