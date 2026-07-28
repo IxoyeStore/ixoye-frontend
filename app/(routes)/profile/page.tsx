@@ -26,6 +26,7 @@ import {
 import Link from "next/link";
 import { useCart } from "@/hooks/use-cart";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 export default function ProfilePage() {
   const { user, loading, logout } = useAuth();
@@ -438,11 +439,71 @@ function OrderCard({ order }: { order: any }) {
   };
 
   const handleReorder = async () => {
-    if (!data.products) return;
+    if (!data.products || data.products.length === 0) return;
     setIsReordering(true);
-    cart.removeAll();
-    data.products.forEach((p: any) => cart.addItem({ ...p, id: p.id }));
-    router.push("/cart");
+
+    try {
+      // El snapshot guardado en el pedido no trae "stock" (ni precio
+      // actualizado): usarlo tal cual rompia la validacion de existencias
+      // (Number(undefined) => NaN, y "NaN <= 0" siempre es false) y podia
+      // agregar al carrito productos ya agotados con el precio viejo. Se
+      // vuelve a consultar cada producto por su id para tener datos reales.
+      const ids: number[] = data.products
+        .map((p: any) => p.id)
+        .filter((id: any) => typeof id === "number");
+
+      if (ids.length === 0) {
+        toast.error("No se pudo identificar los productos de este pedido.");
+        return;
+      }
+
+      const idFilters = ids
+        .map((id, i) => `&filters[id][$in][${i}]=${id}`)
+        .join("");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products?populate=category${idFilters}&pagination[pageSize]=${ids.length}`,
+      );
+      const json = await res.json();
+      const currentById = new Map(
+        (json.data || []).map((item: any) => [item.id, item]),
+      );
+
+      cart.removeAll();
+
+      let addedCount = 0;
+      let skippedCount = 0;
+
+      for (const p of data.products) {
+        const current: any = currentById.get(p.id);
+        const stock = Number(current?.stock) || 0;
+
+        if (!current || !current.active || stock <= 0) {
+          skippedCount++;
+          continue;
+        }
+
+        const quantityToAdd = Math.min(Number(p.quantity) || 1, stock);
+        cart.addItem(current);
+        if (quantityToAdd > 1) cart.updateQuantity(current.id, quantityToAdd);
+        addedCount++;
+      }
+
+      if (addedCount === 0) {
+        toast.error("Ninguno de estos productos está disponible actualmente.");
+        return;
+      }
+      if (skippedCount > 0) {
+        toast.warning(
+          `${skippedCount} producto(s) ya no están disponibles y no se agregaron.`,
+        );
+      }
+
+      router.push("/cart");
+    } catch {
+      toast.error("No se pudo volver a comprar, intenta de nuevo.");
+    } finally {
+      setIsReordering(false);
+    }
   };
 
   return (
