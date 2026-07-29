@@ -55,6 +55,7 @@ export default function AddressSection({
   const [showColonias, setShowColonias] = useState(false);
   const [shippingQuote, setShippingQuote] = useState<{ cost: number; label: string } | null>(null);
   const [currentAddressId, setCurrentAddressId] = useState<string | null>(addressId);
+  const [forceDefault, setForceDefault] = useState(false);
 
   const [form, setForm] = useState<AddressForm>(EMPTY);
   const [original, setOriginal] = useState<AddressForm>(EMPTY);
@@ -67,24 +68,17 @@ export default function AddressSection({
     let cancelled = false;
 
     const fetchData = async () => {
-      if (isNewAddress) {
-        setForm(EMPTY);
-        setOriginal(EMPTY);
-        setLoading(false);
-        return;
-      }
-
       try {
         let addrData = null;
 
-        if (addressId) {
+        if (!isNewAddress && addressId) {
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/addresses/${addressId}`,
             { headers: { Authorization: `Bearer ${user.jwt}` } },
           );
           const json = await res.json();
           addrData = json.data;
-        } else {
+        } else if (!isNewAddress) {
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/addresses?filters[users_permissions_user][id][$eq]=${user.id}&filters[isDefault][$eq]=true`,
             { headers: { Authorization: `Bearer ${user.jwt}` } },
@@ -109,13 +103,32 @@ export default function AddressSection({
           setForm(initial);
           setOriginal(initial);
           setCurrentAddressId(addrData.documentId || null);
-        } else {
+          setLoading(false);
+          return;
+        }
+
+        // No hay una direccion existente que mostrar: estamos a punto de
+        // crear una (ya sea porque el cliente pidio "nueva" o porque
+        // simplemente no tiene ninguna todavia). Si es su primera
+        // direccion, se marca como principal sin dejarla desmarcar - de lo
+        // contrario el pedido/envio puede quedar sin una direccion
+        // "default" que mostrar en ningun lado.
+        const countRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/addresses?pagination[pageSize]=1`,
+          { headers: { Authorization: `Bearer ${user.jwt}` } },
+        );
+        const countJson = await countRes.json();
+        const hasNone = (countJson.meta?.pagination?.total ?? 0) === 0;
+
+        if (cancelled) return;
+        setForceDefault(hasNone);
+        setForm({ ...EMPTY, isDefault: hasNone });
+        setOriginal({ ...EMPTY, isDefault: hasNone });
+      } catch {
+        if (!cancelled) {
           setForm(EMPTY);
           setOriginal(EMPTY);
         }
-      } catch {
-        setForm(EMPTY);
-        setOriginal(EMPTY);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -439,8 +452,8 @@ export default function AddressSection({
           </div>
 
           <div
-            onClick={() => handleChange("isDefault", !form.isDefault)}
-            className={`flex items-center space-x-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+            onClick={() => !forceDefault && handleChange("isDefault", !form.isDefault)}
+            className={`flex items-center space-x-3 p-4 rounded-xl border-2 transition-all ${forceDefault ? "cursor-not-allowed" : "cursor-pointer"} ${
               form.isDefault
                 ? "border-[#0071b1] bg-blue-50/50 dark:bg-sky-950/30"
                 : "border-gray-100 dark:border-slate-700 bg-gray-50/30 dark:bg-slate-800 hover:border-gray-200 dark:hover:border-slate-600"
@@ -448,15 +461,18 @@ export default function AddressSection({
           >
             <Checkbox
               checked={form.isDefault}
+              disabled={forceDefault}
               onCheckedChange={(checked) => handleChange("isDefault", checked)}
               className="data-[state=checked]:bg-[#0071b1] data-[state=checked]:border-[#0071b1]"
             />
-            <div className="space-y-0.5 cursor-pointer">
-              <Label className="text-sm font-bold text-[#012849] dark:text-sky-300 cursor-pointer">
+            <div className={forceDefault ? "space-y-0.5" : "space-y-0.5 cursor-pointer"}>
+              <Label className={`text-sm font-bold text-[#012849] dark:text-sky-300 ${forceDefault ? "" : "cursor-pointer"}`}>
                 Establecer como dirección principal
               </Label>
               <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
-                Usar esta dirección por defecto para mis pedidos.
+                {forceDefault
+                  ? "Es tu primera dirección, se marca como principal automáticamente."
+                  : "Usar esta dirección por defecto para mis pedidos."}
               </p>
             </div>
           </div>

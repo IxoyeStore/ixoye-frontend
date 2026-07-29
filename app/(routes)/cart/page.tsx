@@ -51,6 +51,17 @@ export default function Page() {
       )}`;
       return;
     }
+    const profileIncomplete =
+      !user.profile?.firstName?.trim() ||
+      !user.profile?.lastName?.trim() ||
+      !user.profile?.phone?.trim();
+    if (profileIncomplete) {
+      toast.error(
+        "Completa tu nombre, apellido y teléfono en tu perfil antes de pagar.",
+      );
+      router.push("/profile/edit");
+      return;
+    }
     if (!userCP) {
       toast.error(
         "Por favor, configura una dirección de envío en tu perfil antes de pagar.",

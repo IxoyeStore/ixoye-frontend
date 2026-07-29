@@ -55,7 +55,15 @@ export default function AdminOrderDetailPage() {
         setOrder(o);
         setStatus(o?.orderStatus ?? "pending");
 
-        if (o?.user?.id) {
+        // La direccion real usada en el pedido es la que se guardo como
+        // "foto" al momento de comprar (order.shippingAddress). No hay que
+        // depender de la direccion ACTUAL del cliente: pudo cambiarla o
+        // borrarla despues, y el pedido debe seguir mostrando la que se usо
+        // para envviar ese pedido en concreto.
+        if (o?.shippingAddress) {
+          setAddress(o.shippingAddress);
+        } else if (o?.user?.id) {
+          // Respaldo para pedidos muy viejos que no guardaron la foto.
           const addrRes = await fetch(`/api/admin/user-address?userId=${o.user.id}`);
           const addrJson = await addrRes.json();
           const raw = addrJson.data?.[0] ?? null;
@@ -172,8 +180,8 @@ export default function AdminOrderDetailPage() {
             <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Cliente</h2>
           </div>
           <div className="space-y-3">
-            <Row label="Nombre" value={order.user?.username || "—"} />
-            <Row label="Correo" value={order.user?.email || "—"} />
+            <Row label="Nombre" value={order.customerName || order.user?.username || "—"} />
+            <Row label="Correo" value={order.email || order.user?.email || "—"} />
             {order.phone && <Row label="Teléfono" value={order.phone} />}
           </div>
         </div>
