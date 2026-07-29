@@ -27,10 +27,20 @@ import {
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
 import { useCustomerQuestionNotifications } from "@/hooks/use-customer-question-notifications";
+import { useCustomerOrderNotifications } from "@/hooks/use-customer-order-notifications";
 import SupportMenu from "./support-menu";
 import TechnicalFilterModal from "./technical-filter-modal";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
+
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  pending: "Pendiente",
+  paid: "Pagado",
+  processing: "En Preparación",
+  shipped: "En Camino",
+  delivered: "Entregado",
+  cancelled: "Cancelado",
+};
 
 const STATIC_BRANDS = [
   { name: "EMMARK",    logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323338/EMMARK.png" },
@@ -145,7 +155,10 @@ export default function Header({
   const pathname = usePathname();
   const cart = useCart();
   const { lovedItems } = useLovedProducts();
-  const { newAnswers, newCount, clearNotifications, removeAnswer } = useCustomerQuestionNotifications();
+  const { newAnswers, newCount: newAnswerCount, clearNotifications: clearAnswerNotifications, removeAnswer } = useCustomerQuestionNotifications();
+  const { orderChanges, newOrderCount, clearNotifications: clearOrderNotifications, removeChange } = useCustomerOrderNotifications();
+  const newCount = newAnswerCount + newOrderCount;
+  const clearNotifications = () => { clearAnswerNotifications(); clearOrderNotifications(); };
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const desktopRef  = useRef<HTMLDivElement>(null);
@@ -436,34 +449,59 @@ export default function Header({
                     )}
                   </div>
                   <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700">
-                    {newAnswers.length === 0 ? (
+                    {newAnswers.length === 0 && orderChanges.length === 0 ? (
                       <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 text-center py-8">
                         No tienes notificaciones
                       </p>
                     ) : (
-                      newAnswers.map((q) => (
-                        <Link
-                          key={q.id}
-                          href={q.product?.slug ? `/product/${q.product.slug}` : "/"}
-                          onClick={() => { removeAnswer(q.id); setNotifOpen(false); }}
-                          className="flex items-start gap-3 px-4 py-3 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition-colors"
-                        >
-                          <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
-                            <MessageCircleQuestion size={15} className="text-emerald-600 dark:text-emerald-400" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-                              Respondieron tu pregunta
-                            </p>
-                            <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
-                              {q.product?.productName || "Producto"}
-                            </p>
-                            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
-                              {q.answerText}
-                            </p>
-                          </div>
-                        </Link>
-                      ))
+                      <>
+                        {orderChanges.map((o) => (
+                          <Link
+                            key={`order-${o.id}`}
+                            href={`/profile/orders/${o.documentId || o.id}`}
+                            onClick={() => { removeChange(o.id); setNotifOpen(false); }}
+                            className="flex items-start gap-3 px-4 py-3 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center shrink-0">
+                              <Package size={15} className="text-sky-600 dark:text-sky-400" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
+                                Actualización de tu pedido
+                              </p>
+                              <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
+                                Pedido #{o.id}
+                              </p>
+                              <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                                Ahora: {ORDER_STATUS_LABELS[o.orderStatus] || o.orderStatus}
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                        {newAnswers.map((q) => (
+                          <Link
+                            key={q.id}
+                            href={q.product?.slug ? `/product/${q.product.slug}` : "/"}
+                            onClick={() => { removeAnswer(q.id); setNotifOpen(false); }}
+                            className="flex items-start gap-3 px-4 py-3 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition-colors"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                              <MessageCircleQuestion size={15} className="text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                                Respondieron tu pregunta
+                              </p>
+                              <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
+                                {q.product?.productName || "Producto"}
+                              </p>
+                              <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                                {q.answerText}
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                      </>
                     )}
                   </div>
                 </div>
@@ -632,7 +670,7 @@ export default function Header({
               <div className="rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300">
-                    Tus preguntas respondidas
+                    Notificaciones
                   </span>
                   {newCount > 0 && (
                     <button
@@ -644,12 +682,36 @@ export default function Header({
                   )}
                 </div>
                 <div className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
-                  {newAnswers.length === 0 ? (
+                  {newAnswers.length === 0 && orderChanges.length === 0 ? (
                     <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 text-center py-6">
                       Sin novedades por ahora
                     </p>
                   ) : (
-                    newAnswers.map((q) => (
+                    <>
+                    {orderChanges.map((o) => (
+                      <Link
+                        key={`order-${o.id}`}
+                        href={`/profile/orders/${o.documentId || o.id}`}
+                        onClick={() => { removeChange(o.id); setNotifOpen(false); setOpen(false); }}
+                        className="flex items-start gap-3 px-4 py-3"
+                      >
+                        <div className="w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center shrink-0">
+                          <Package size={15} className="text-sky-600 dark:text-sky-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">
+                            Actualización de tu pedido
+                          </p>
+                          <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
+                            Pedido #{o.id}
+                          </p>
+                          <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                            Ahora: {ORDER_STATUS_LABELS[o.orderStatus] || o.orderStatus}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                    {newAnswers.map((q) => (
                       <Link
                         key={q.id}
                         href={q.product?.slug ? `/product/${q.product.slug}` : "/"}
@@ -671,7 +733,8 @@ export default function Header({
                           </p>
                         </div>
                       </Link>
-                    ))
+                    ))}
+                    </>
                   )}
                 </div>
               </div>

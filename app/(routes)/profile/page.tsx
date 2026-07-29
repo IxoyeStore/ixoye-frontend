@@ -22,11 +22,22 @@ import {
   Plus,
   Trash2,
   Pencil,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/hooks/use-cart";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
+
+const ORDER_STATUS_FILTERS = [
+  { value: "all", label: "Todos" },
+  { value: "pending", label: "Pendiente" },
+  { value: "paid", label: "Pagado" },
+  { value: "processing", label: "En Preparación" },
+  { value: "shipped", label: "En Camino" },
+  { value: "delivered", label: "Entregado" },
+  { value: "cancelled", label: "Cancelado" },
+];
 
 export default function ProfilePage() {
   const { user, loading, logout } = useAuth();
@@ -39,6 +50,8 @@ export default function ProfilePage() {
   const searchParams = useSearchParams();
   const [visibleOrders, setVisibleOrders] = useState(5);
   const ITEMS_PER_PAGE = 5;
+  const [orderStatusFilter, setOrderStatusFilter] = useState("all");
+  const [orderSearchQuery, setOrderSearchQuery] = useState("");
 
   const activeTab = searchParams.get("tab") || "info";
 
@@ -50,6 +63,28 @@ export default function ProfilePage() {
       return aDefault === bDefault ? 0 : aDefault ? -1 : 1;
     });
   }, [addresses]);
+
+  const filteredOrders = useMemo(() => {
+    const query = orderSearchQuery.trim().toLowerCase();
+    return orders.filter((order) => {
+      const data = order.attributes || order;
+      if (orderStatusFilter !== "all" && data.orderStatus !== orderStatusFilter) {
+        return false;
+      }
+      if (query) {
+        const matchesId = String(order.id).includes(query);
+        const matchesProduct = (data.products || []).some((p: any) =>
+          (p.productName || p.name || "").toLowerCase().includes(query),
+        );
+        if (!matchesId && !matchesProduct) return false;
+      }
+      return true;
+    });
+  }, [orders, orderStatusFilter, orderSearchQuery]);
+
+  useEffect(() => {
+    setVisibleOrders(ITEMS_PER_PAGE);
+  }, [orderStatusFilter, orderSearchQuery]);
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -318,6 +353,35 @@ export default function ProfilePage() {
           value="orders"
           className="animate-in fade-in slide-in-from-bottom-4 duration-500"
         >
+          {!loadingOrders && orders.length > 0 && (
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <div className="flex flex-wrap gap-2">
+                {ORDER_STATUS_FILTERS.map((f) => (
+                  <button
+                    key={f.value}
+                    onClick={() => setOrderStatusFilter(f.value)}
+                    className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                      orderStatusFilter === f.value
+                        ? "bg-sky-600 text-white shadow-sm"
+                        : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-sky-300 dark:hover:border-sky-700"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+              <div className="relative sm:ml-auto sm:w-64">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                <input
+                  value={orderSearchQuery}
+                  onChange={(e) => setOrderSearchQuery(e.target.value)}
+                  placeholder="Buscar # de pedido o producto..."
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-sky-400"
+                />
+              </div>
+            </div>
+          )}
+
           {loadingOrders ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
@@ -327,13 +391,15 @@ export default function ProfilePage() {
                 />
               ))}
             </div>
-          ) : orders.length > 0 ? (
+          ) : orders.length === 0 ? (
+            <EmptyOrders />
+          ) : filteredOrders.length > 0 ? (
             <div className="grid gap-6">
-              {orders.slice(0, visibleOrders).map((order) => (
+              {filteredOrders.slice(0, visibleOrders).map((order) => (
                 <OrderCard key={order.id} order={order} />
               ))}
 
-              {visibleOrders < orders.length && (
+              {visibleOrders < filteredOrders.length && (
                 <div className="flex justify-center pt-4">
                   <Button
                     onClick={handleLoadMore}
@@ -346,7 +412,11 @@ export default function ProfilePage() {
               )}
             </div>
           ) : (
-            <EmptyOrders />
+            <div className="text-center py-16 sm:py-24 bg-slate-50 dark:bg-slate-800 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-700">
+              <p className="text-slate-400 dark:text-slate-500 font-black uppercase text-xs tracking-widest">
+                Ningún pedido coincide con el filtro
+              </p>
+            </div>
           )}
         </TabsContent>
       </Tabs>
