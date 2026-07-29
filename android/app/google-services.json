@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "945465976909",
+    "project_id": "refaccionesixoyeapp",
+    "storage_bucket": "refaccionesixoyeapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945465976909:android:40a99e9a39e4e0f5451404",
+        "android_client_info": {
+          "package_name": "mx.refaccionesixoye.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkys0oE8ZXNTse6fTWCt0_KDhnJMEccIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
