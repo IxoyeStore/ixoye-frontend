@@ -19,6 +19,7 @@ import {
   Home,
   MessageCircleQuestion,
   Search,
+  MapPin,
 } from "lucide-react";
 import { useOrderNotifications } from "@/hooks/use-order-notifications";
 import { useQuestionNotifications } from "@/hooks/use-question-notifications";
@@ -57,6 +58,7 @@ const navItems = [
   { href: "/admin/categories",    label: "Categorías",     icon: Tag,             exact: false },
   { href: "/admin/questions",     label: "Preguntas",      icon: MessageCircleQuestion, exact: false },
   { href: "/admin/seo",           label: "SEO",             icon: Search,          exact: false },
+  { href: "/admin/sucursales",    label: "Sucursales",     icon: MapPin,          exact: false },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
