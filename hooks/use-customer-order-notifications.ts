@@ -18,6 +18,14 @@ export function useCustomerOrderNotifications() {
 
   const poll = useCallback(async () => {
     if (!lsKey || !user?.jwt) return;
+    // GET /api/orders sin filtros devuelve TODOS los pedidos del sistema
+    // cuando quien pregunta es Admin (asi debe ser para /admin/orders).
+    // Este hook es exclusivamente para que un CLIENTE vea cambios en SUS
+    // propios pedidos - si se ejecutara para un Admin, tomaria pedidos de
+    // cualquier cliente como si fueran suyos y se los mostraria como
+    // notificacion personal. El admin ya tiene su propio hook
+    // (useOrderNotifications) para pedidos nuevos.
+    if (user.role?.name === "Admin") return;
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
         headers: { Authorization: `Bearer ${user.jwt}` },

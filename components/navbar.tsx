@@ -70,7 +70,7 @@ const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
         <span className="text-[10px] font-black uppercase tracking-[0.15em]">{label}</span>
         <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
       </button>
-      <div className="absolute top-full left-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+      <div className="absolute top-full left-0 mt-2 w-96 max-w-[90vw] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
         <div className="p-2 max-h-[400px] overflow-y-auto">
           {items.length === 0 ? (
             <div className="p-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase italic">Cargando...</div>
@@ -101,7 +101,7 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
         <span className="text-[10px] font-black uppercase tracking-[0.15em]">Marcas</span>
         <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
       </button>
-      <div className="absolute top-full left-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+      <div className="absolute top-full right-0 mt-2 w-96 max-w-[90vw] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
         <div className="p-3 grid grid-cols-2 gap-1.5 max-h-[480px] overflow-y-auto">
           {STATIC_BRANDS.map(({ name, logo }) => (
             <button

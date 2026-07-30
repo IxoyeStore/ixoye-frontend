@@ -245,7 +245,7 @@ function CategoryContent() {
     <div className="w-full max-w-[1440px] py-8 mx-auto px-4 md:px-8">
 
       {/* ── Header row ───────────────────────────────────────────────────── */}
-      <div className="flex items-start justify-between gap-4 mb-4">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
         <div>
           <h1 className="text-3xl sm:text-4xl font-black text-sky-900 dark:text-sky-300 uppercase tracking-tighter italic leading-none">
             Tienda Principal

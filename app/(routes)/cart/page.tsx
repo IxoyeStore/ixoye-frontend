@@ -15,14 +15,32 @@ import Link from "next/link";
 import router from "next/router";
 import cpMexico from "@/lib/cp-mexico.json";
 
+// Envio gratis solo a partir de este monto; por debajo siempre se cobra
+// la tarifa fija. Ambos valores deben coincidir siempre con
+// calculateShippingServerSide() en ixoye-backend/src/api/order/controllers/order.ts,
+// que es quien realmente cobra - esto aqui es solo para mostrarle el
+// costo al cliente antes de pagar.
+const FREE_SHIPPING_MIN_TOTAL = 499;
+const SHIPPING_FLAT_COST = 150;
+
+type ShippingZone = { available: boolean; label: string };
+
+function resolveShippingZone(cp: string): ShippingZone {
+  const entry = (cpMexico as Record<string, { e: string; m: string }>)[cp];
+  // Solo hacemos envios dentro de Nayarit; fuera de esa zona (o un CP que
+  // ni siquiera existe en el catalogo) el cliente debe comunicarse con
+  // nosotros - no existe una tarifa nacional generica.
+  if (!entry || entry.e !== "Nayarit") {
+    return { available: false, label: "No disponible" };
+  }
+  return { available: true, label: "Entrega Local" };
+}
+
 export default function Page() {
   const { items, removeAll } = useCart();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [shippingQuote, setShippingQuote] = useState<{
-    cost: number;
-    label: string;
-  } | null>(null);
+  const [shippingZone, setShippingZone] = useState<ShippingZone | null>(null);
   const [userCP, setUserCP] = useState("");
 
   const validItems = items.filter(Boolean);
@@ -150,42 +168,35 @@ export default function Page() {
   const calculateShipping = (cp: string) => {
     if (cp.length !== 5) return;
 
-    const cacheKey = "shipping_cache";
+    const cacheKey = "shipping_zone_cache";
     const cache = localStorage.getItem(cacheKey);
 
     if (cache) {
-      const parsedCache = JSON.parse(cache);
-      if (parsedCache.cp === cp) {
-        setShippingQuote({ cost: parsedCache.cost, label: parsedCache.label });
+      const parsed = JSON.parse(cache);
+      if (parsed.cp === cp) {
+        setShippingZone({ available: parsed.available, label: parsed.label });
         return;
       }
     }
 
-    const entry = (cpMexico as Record<string, { e: string; m: string }>)[cp];
-    if (!entry) {
-      setShippingQuote({ cost: 250, label: "Envío Nacional" });
-      return;
-    }
-
-    let cost = 0;
-    let label = "Entrega Local";
-
-    if (entry.e !== "Nayarit") {
-      cost = -1;
-      label = "No disponible";
-    }
-
-    const newQuote = { cost, label };
-    setShippingQuote(newQuote);
-
-    localStorage.setItem(
-      cacheKey,
-      JSON.stringify({ cp, ...newQuote }),
-    );
+    const zone = resolveShippingZone(cp);
+    setShippingZone(zone);
+    localStorage.setItem(cacheKey, JSON.stringify({ cp, ...zone }));
   };
 
-  const shippingUnavailable = shippingQuote?.cost === -1;
-  const shippingCost = shippingQuote && shippingQuote.cost > 0 ? shippingQuote.cost : 0;
+  // El costo NUNCA se guarda en estado: se recalcula contra el total
+  // actual del carrito en cada render, para que agregar/quitar productos
+  // active o desactive el envio gratis al instante (nunca quedar pegado
+  // al valor que tenia cuando se cargo la direccion).
+  const shippingUnavailable = shippingZone ? !shippingZone.available : false;
+  const shippingCost = shippingZone?.available
+    ? totalPrice >= FREE_SHIPPING_MIN_TOTAL
+      ? 0
+      : SHIPPING_FLAT_COST
+    : 0;
+  const shippingQuote = shippingZone
+    ? { cost: shippingUnavailable ? -1 : shippingCost, label: shippingZone.label }
+    : null;
   const finalTotal = totalPrice + shippingCost;
 
   return (
