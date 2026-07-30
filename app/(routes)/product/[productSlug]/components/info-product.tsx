@@ -134,10 +134,6 @@ const InfoProduct = ({ product }: InfoProductProps) => {
       >
         {stock <= 0 ? "Sin Existencias" : "Añadir al carrito"}
       </Button>
-
-      <p className="text-center text-[18px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">
-        ¡Envíos gratis a todo Nayarit!
-      </p>
     </div>
   );
 
