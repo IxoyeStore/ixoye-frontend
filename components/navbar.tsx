@@ -29,6 +29,7 @@ import { useLovedProducts } from "@/hooks/use-loved-products";
 import { useCustomerQuestionNotifications } from "@/hooks/use-customer-question-notifications";
 import { useCustomerOrderNotifications } from "@/hooks/use-customer-order-notifications";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { useAdminAutoRedirect } from "@/hooks/use-admin-auto-redirect";
 import SupportMenu from "./support-menu";
 import TechnicalFilterModal from "./technical-filter-modal";
 
@@ -159,6 +160,7 @@ export default function Header({
   const { newAnswers, newCount: newAnswerCount, clearNotifications: clearAnswerNotifications, removeAnswer } = useCustomerQuestionNotifications();
   const { orderChanges, newOrderCount, clearNotifications: clearOrderNotifications, removeChange } = useCustomerOrderNotifications();
   usePushNotifications();
+  useAdminAutoRedirect();
   const newCount = newAnswerCount + newOrderCount;
   const clearNotifications = () => { clearAnswerNotifications(); clearOrderNotifications(); };
 
@@ -509,9 +511,9 @@ export default function Header({
                 </div>
               )}
             </div>
-            <div className={`${iconClass} relative z-10`} title="Soporte">
+            <div className={`${iconClass} relative z-10`} title="Contacto">
               <SupportMenu />
-              <span className={navTextClass}>Soporte</span>
+              <span className={navTextClass}>Contacto</span>
             </div>
           </nav>
 

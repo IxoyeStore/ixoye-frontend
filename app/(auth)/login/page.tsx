@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { ADMIN_AUTO_REDIRECT_FLAG } from "@/hooks/use-admin-auto-redirect";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -133,6 +134,7 @@ function LoginFormContent() {
       await refreshUser();
 
       const isAdmin = result.user?.role?.name === "Admin";
+      if (isAdmin) sessionStorage.setItem(ADMIN_AUTO_REDIRECT_FLAG, "1");
       router.push(callbackUrl || (isAdmin ? "/admin" : "/profile"));
       router.refresh();
     } catch (error) {

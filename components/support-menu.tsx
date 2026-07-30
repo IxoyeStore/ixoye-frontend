@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, Mail, Headset } from "lucide-react";
+import { MessageCircle, Mail } from "lucide-react";
 
 const SupportMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,9 +27,9 @@ const SupportMenu = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={iconClass}
-        aria-label="Soporte"
+        aria-label="Contacto"
       >
-        <Headset className="w-6 h-6" />
+        <MessageCircle className="w-6 h-6" />
       </button>
 
       {/* Menú Desplegable */}
