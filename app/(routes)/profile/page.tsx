@@ -31,7 +31,6 @@ import { toast } from "sonner";
 
 const ORDER_STATUS_FILTERS = [
   { value: "all", label: "Todos" },
-  { value: "pending", label: "Pendiente" },
   { value: "paid", label: "Pagado" },
   { value: "processing", label: "En Preparación" },
   { value: "shipped", label: "En Camino" },
@@ -68,6 +67,12 @@ export default function ProfilePage() {
     const query = orderSearchQuery.trim().toLowerCase();
     return orders.filter((order) => {
       const data = order.attributes || order;
+      // Un pedido "pendiente" es un intento de compra que nunca se pagó
+      // (el cliente abandonó el checkout de Openpay) - no es un pedido
+      // real, así que nunca debe aparecer en la lista del cliente, sin
+      // importar el filtro seleccionado. La pantalla de "gracias por tu
+      // compra" ya maneja por su cuenta la espera de confirmación de pago.
+      if (data.orderStatus === "pending") return false;
       if (orderStatusFilter !== "all" && data.orderStatus !== orderStatusFilter) {
         return false;
       }
