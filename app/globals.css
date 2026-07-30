@@ -139,6 +139,19 @@
   background: #cbd5e1;
 }
 
+/* Banner de envio gratis: texto en loop continuo de derecha a izquierda */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee-scroll 24s linear infinite;
+}
+
 /* Ocultar flechas nativas de <input type="number">: no siguen el diseño del sitio */
 input[type="number"] {
   -moz-appearance: textfield;

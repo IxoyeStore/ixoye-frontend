@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/context/auth-context";
+import MobileBackButtonHandler from "@/components/mobile-back-button-handler";
 import "./globals.css";
 import { Toaster } from "sonner";
 import Script from "next/script";
@@ -80,6 +81,7 @@ export default function RootLayout({
           src="https://openpay.s3.amazonaws.com/openpay-data.v1.min.js"
           strategy="beforeInteractive"
         />
+        <MobileBackButtonHandler />
         <AuthProvider>{children}</AuthProvider>
         <Toaster
 

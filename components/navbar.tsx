@@ -23,6 +23,7 @@ import {
   Moon,
   Bell,
   MessageCircleQuestion,
+  Truck,
 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
@@ -122,6 +123,38 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
     </div>
   );
 };
+
+const SHIPPING_BANNER_TEXT = "Envío gratis en todo Nayarit en compras mínimas de $499";
+
+// Tira de texto en loop continuo (marquee). El truco de duplicar el
+// mismo bloque de items dos veces y animar translateX de 0 a -50% hace
+// que el loop se vea perfectamente continuo sin importar el ancho real
+// del texto, siempre y cuando ambas mitades sean identicas.
+function FreeShippingBanner() {
+  const items = Array.from({ length: 6 });
+  const track = (keyPrefix: string) => (
+    <div className="flex shrink-0" aria-hidden={keyPrefix === "b"}>
+      {items.map((_, i) => (
+        <span
+          key={`${keyPrefix}-${i}`}
+          className="mx-6 flex items-center gap-2 text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-white whitespace-nowrap"
+        >
+          <Truck size={13} className="shrink-0" />
+          {SHIPPING_BANNER_TEXT}
+        </span>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="w-full bg-emerald-600 dark:bg-emerald-700 overflow-hidden py-1.5 select-none">
+      <div className="flex w-max animate-marquee">
+        {track("a")}
+        {track("b")}
+      </div>
+    </div>
+  );
+}
 
 const SHOW_THEME_TOGGLE = true;
 
@@ -558,6 +591,8 @@ export default function Header({
           </button>
         )}
       </div>
+
+      <FreeShippingBanner />
 
       <TechnicalFilterModal
         isOpen={modalConfig.isOpen}
