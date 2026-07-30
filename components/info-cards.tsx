@@ -60,7 +60,7 @@ const InfoCards = () => {
           <div>
             <h3 className="text-lg font-bold text-sky-900 dark:text-sky-300">Envíos en Nayarit</h3>
             <p className="text-sm text-sky-600 dark:text-sky-400">
-              Consulta la disponibilidad de envíos{" "}
+              A partir de $499 de compra, el envío es gratis en todo Nayarit. Consulta la disponibilidad de envíos{" "}
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="font-bold underline text-sky-800 dark:text-sky-300 hover:text-sky-500 dark:hover:text-sky-200 transition-colors"
@@ -68,6 +68,9 @@ const InfoCards = () => {
                 aquí
               </button>
               .
+            </p>
+            <p className="text-xs text-sky-500/70 dark:text-sky-400/60 mt-1">
+              Aplican restricciones, sujeto a disponibilidad de reparto.
             </p>
           </div>
         </div>
