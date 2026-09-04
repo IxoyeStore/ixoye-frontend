@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import AuthLogo from "@/components/auth-logo";
+import { Eye, EyeOff } from "lucide-react";
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
@@ -34,6 +35,9 @@ export default function RegisterPage() {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -161,6 +165,9 @@ export default function RegisterPage() {
     return (
       <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700">
         <CardContent className="px-8 py-10 text-center space-y-4">
+          <div className="flex justify-center mb-1">
+            <AuthLogo />
+          </div>
           <CardTitle className="text-2xl font-extrabold text-[#012849] dark:text-sky-300">
             Confirma tu correo
           </CardTitle>
@@ -228,12 +235,22 @@ export default function RegisterPage() {
 
               <div className="space-y-1.5">
                 <RequiredLabel>Contraseña</RequiredLabel>
-                <Input
-                  type="password"
-                  placeholder="Mínimo 8 caracteres"
-                  {...register("password")}
-                  className="h-11 bg-gray-50/30 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Mínimo 8 caracteres"
+                    {...register("password")}
+                    className="h-11 bg-gray-50/30 dark:bg-slate-800 dark:border-slate-600 dark:text-white pr-11"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-[#0071b1] dark:hover:text-sky-400 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </div>
                 {errors.password && (
                   <p className="text-xs text-red-500 dark:text-red-400">
                     {errors.password.message}
@@ -243,12 +260,22 @@ export default function RegisterPage() {
 
               <div className="space-y-1.5">
                 <RequiredLabel>Confirmar contraseña</RequiredLabel>
-                <Input
-                  type="password"
-                  placeholder="Repite tu contraseña"
-                  {...register("confirmPassword")}
-                  className="h-11 bg-gray-50/30 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
-                />
+                <div className="relative">
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Repite tu contraseña"
+                    {...register("confirmPassword")}
+                    className="h-11 bg-gray-50/30 dark:bg-slate-800 dark:border-slate-600 dark:text-white pr-11"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-[#0071b1] dark:hover:text-sky-400 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </div>
                 {errors.confirmPassword && (
                   <p className="text-xs text-red-500 dark:text-red-400">
                     {errors.confirmPassword.message}
