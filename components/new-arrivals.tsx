@@ -3,7 +3,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGetFeaturedProducts } from "@/api/useGetFeturedProducts";
+import { useGetNewestProducts } from "@/api/useGetNewestProducts";
 import { ResponeType } from "@/types/response";
 import {
   Carousel,
@@ -16,7 +16,7 @@ import {
 import FeaturedSkeleton from "./featuredSkeleton";
 import { ProductType } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
-import { ShoppingCart, Heart, PackageX } from "lucide-react";
+import { ShoppingCart, Heart, PackageX, ArrowRight } from "lucide-react";
 import IconButton from "./ui/icon-button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,8 +28,8 @@ import { formatPrice } from "@/lib/formatPrice";
 
 const AUTOPLAY_MS = 5000;
 
-const FeaturedProducts = () => {
-  const { result, loading, error }: ResponeType = useGetFeaturedProducts();
+const NewArrivals = () => {
+  const { result, loading, error }: ResponeType = useGetNewestProducts();
   const router = useRouter();
   const { addItem } = useCart();
   const { lovedItems, addLovedItem, removeLovedItem } = useLovedProducts();
@@ -49,26 +49,24 @@ const FeaturedProducts = () => {
   const hasFailed = !loading && (error || !result || (Array.isArray(result) && result.length === 0));
 
   if (hasFailed) {
-    return (
-      <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
-        <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 mb-4 sm:pb-8 uppercase tracking-tighter text-center">
-          Productos destacados
-        </h3>
-        <div className="flex flex-col items-center justify-center gap-4 py-14 border border-dashed border-sky-100 dark:border-sky-900/50 rounded-2xl bg-sky-50/40 dark:bg-sky-950/20">
-          <PackageX className="w-10 h-10 text-sky-300 dark:text-sky-700" strokeWidth={1.5} />
-          <p className="text-2xl font-black uppercase tracking-tighter italic text-slate-300 dark:text-slate-600 text-center px-4">
-            No se pudieron cargar los productos
-          </p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
     <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24 px-2">
-      <h3 className="px-4 text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 mb-4 sm:pb-8 italic uppercase tracking-tighter text-center">
-        Productos destacados
-      </h3>
+      <div className="flex flex-col items-center gap-2 mb-4 px-4 sm:pb-8 sm:flex-row sm:justify-between">
+        <h3 className="text-2xl sm:text-3xl font-bold text-[#003366] dark:text-sky-400 italic uppercase tracking-tighter">
+          Novedades
+        </h3>
+
+        <Link
+          href="/novedades"
+          className="flex items-center gap-1 text-xs font-black uppercase tracking-widest text-sky-700 dark:text-sky-400 hover:text-sky-500 dark:hover:text-sky-300 transition-colors"
+        >
+          Ver más
+          <ArrowRight size={14} />
+        </Link>
+      </div>
 
       <Carousel
         className="w-full"
@@ -99,13 +97,17 @@ const FeaturedProducts = () => {
                 >
                   <div className="h-full">
                     <Card className="group relative flex h-full flex-col py-3 sm:py-4 border border-sky-100 dark:border-slate-700 shadow-sm hover:shadow-lg hover:shadow-sky-100/50 dark:hover:shadow-none transition-all duration-300 bg-white dark:bg-slate-800 rounded-2xl">
-                      {outOfStock && (
-                        <div className="absolute left-0 top-0 z-20 h-20 w-20 overflow-hidden pointer-events-none">
-                          <span className="absolute left-[-38px] top-[15px] block w-[150px] -rotate-45 bg-red-600 dark:bg-red-500 py-1 text-center text-[10px] sm:text-xs font-black uppercase tracking-wider text-white shadow-md ring-1 ring-white/40">
-                            Agotado
-                          </span>
-                        </div>
-                      )}
+                      <div className="absolute left-0 top-0 z-20 h-20 w-20 overflow-hidden pointer-events-none">
+                        <span
+                          className={`absolute left-[-38px] top-[15px] block w-[150px] -rotate-45 py-1 text-center text-[10px] sm:text-xs font-black uppercase tracking-wider text-white shadow-md ring-1 ring-white/40 ${
+                            outOfStock
+                              ? "bg-red-600 dark:bg-red-500"
+                              : "bg-gradient-to-r from-orange-500 to-amber-500"
+                          }`}
+                        >
+                          {outOfStock ? "Agotado" : "Nuevo"}
+                        </span>
+                      </div>
 
                       <CardContent className="relative flex items-center justify-center px-2 sm:px-6 py-2">
                         <div
@@ -161,7 +163,6 @@ const FeaturedProducts = () => {
                         <h3 className="text-xs sm:text-lg font-bold text-sky-900 dark:text-sky-300 line-clamp-2 min-h-[2rem] sm:min-h-[3rem]">
                           {productName}
                         </h3>
-                        {/* Sección de Precio Dinámico */}
                         <div className="flex flex-col mb-2">
                           {isB2B && wholesalePrice && (
                             <p className="text-[10px] text-slate-400 dark:text-slate-500 line-through leading-none">
@@ -194,4 +195,4 @@ const FeaturedProducts = () => {
   );
 };
 
-export default FeaturedProducts;
+export default NewArrivals;

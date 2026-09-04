@@ -12,6 +12,7 @@ import { useAuth } from "@/context/auth-context";
 import { ADMIN_AUTO_REDIRECT_FLAG } from "@/hooks/use-admin-auto-redirect";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import AuthLogo from "@/components/auth-logo";
 
 const loginSchema = z.object({
   email: z.string().email("Correo inválido"),
@@ -157,6 +158,9 @@ function LoginFormContent() {
   return (
     <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700 animate-in fade-in duration-500">
       <CardHeader className="space-y-1 text-center pt-8 pb-4">
+        <div className="flex justify-center mb-3">
+          <AuthLogo />
+        </div>
         <CardTitle className="text-3xl font-extrabold text-[#012849] dark:text-sky-300 tracking-tight">
           Iniciar sesión
         </CardTitle>
@@ -310,19 +314,17 @@ function LoginFormContent() {
 
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center p-4 py-12 min-h-[calc(100vh-80px)] bg-gray-50/50 dark:bg-slate-900">
-      <Suspense
-        fallback={
-          <div className="flex flex-col items-center justify-center">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0071b1] border-t-transparent mb-4"></div>
-            <p className="text-sm font-semibold text-[#012849] dark:text-sky-300 animate-pulse">
-              Cargando...
-            </p>
-          </div>
-        }
-      >
-        <LoginFormContent />
-      </Suspense>
-    </div>
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0071b1] border-t-transparent mb-4"></div>
+          <p className="text-sm font-semibold text-[#012849] dark:text-sky-300 animate-pulse">
+            Cargando...
+          </p>
+        </div>
+      }
+    >
+      <LoginFormContent />
+    </Suspense>
   );
 }

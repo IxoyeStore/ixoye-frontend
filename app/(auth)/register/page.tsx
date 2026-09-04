@@ -21,6 +21,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { TurnstileWidget } from "@/components/turnstile-widget";
+import AuthLogo from "@/components/auth-logo";
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
@@ -158,34 +159,35 @@ export default function RegisterPage() {
 
   if (awaitingConfirmation) {
     return (
-      <div className="flex justify-center items-center py-12 px-4 bg-gray-50/50 dark:bg-slate-900 min-h-[calc(100vh-80px)]">
-        <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700">
-          <CardContent className="px-8 py-10 text-center space-y-4">
-            <CardTitle className="text-2xl font-extrabold text-[#012849] dark:text-sky-300">
-              Confirma tu correo
-            </CardTitle>
-            <p className="text-sm text-gray-600 dark:text-slate-400">
-              Te enviamos un enlace de confirmación a{" "}
-              <span className="font-bold text-[#012849] dark:text-sky-300">{submittedEmail}</span>.
-              Revisa tu bandeja de entrada (y la carpeta de spam) y haz clic en el enlace para
-              poder iniciar sesión.
-            </p>
-            <a
-              href="/login"
-              className="inline-block font-bold text-[#0071b1] dark:text-sky-400 hover:underline text-sm"
-            >
-              Ir a iniciar sesión
-            </a>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700">
+        <CardContent className="px-8 py-10 text-center space-y-4">
+          <CardTitle className="text-2xl font-extrabold text-[#012849] dark:text-sky-300">
+            Confirma tu correo
+          </CardTitle>
+          <p className="text-sm text-gray-600 dark:text-slate-400">
+            Te enviamos un enlace de confirmación a{" "}
+            <span className="font-bold text-[#012849] dark:text-sky-300">{submittedEmail}</span>.
+            Revisa tu bandeja de entrada (y la carpeta de spam) y haz clic en el enlace para
+            poder iniciar sesión.
+          </p>
+          <a
+            href="/login"
+            className="inline-block font-bold text-[#0071b1] dark:text-sky-400 hover:underline text-sm"
+          >
+            Ir a iniciar sesión
+          </a>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="flex justify-center items-center py-12 px-4 bg-gray-50/50 dark:bg-slate-900 min-h-[calc(100vh-80px)]">
+    <>
       <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700">
         <CardHeader className="text-center pt-8 pb-4">
+          <div className="flex justify-center mb-3">
+            <AuthLogo />
+          </div>
           <CardTitle className="text-3xl font-extrabold text-[#012849] dark:text-sky-300">
             Crear cuenta
           </CardTitle>
@@ -357,6 +359,6 @@ export default function RegisterPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

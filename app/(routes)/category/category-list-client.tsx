@@ -9,7 +9,7 @@ import { CategoryType } from "@/types/category";
 import { ResponeType } from "@/types/response";
 import { useEffect, useState } from "react";
 import ProductCard from "./[categorySlug]/components/product-card";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { SlidersHorizontal, X, ChevronLeft, ChevronRight, LayoutGrid, List, ShoppingCart, Heart } from "lucide-react";
 import { useGetCategories } from "@/api/getProducts";
 import { formatPrice } from "@/lib/formatPrice";
@@ -105,8 +105,9 @@ function ProductListItem({ product }: { product: ProductType }) {
   );
 }
 
-function CategoryContent() {
+function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [result, setResult]           = useState<ProductType[]>([]);
@@ -139,7 +140,7 @@ function CategoryContent() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  const clearAll = () => router.push("/category", { scroll: false });
+  const clearAll = () => router.push(pathname, { scroll: false });
 
   const activeFilters = [
     brand       && { key: "brand",    label: `Marca: ${brand}` },
@@ -248,7 +249,7 @@ function CategoryContent() {
       <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
         <div>
           <h1 className="text-3xl sm:text-4xl font-black text-sky-900 dark:text-sky-300 uppercase tracking-tighter italic leading-none">
-            Tienda Principal
+            {title}
           </h1>
           {!loading && (
             <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
@@ -489,7 +490,7 @@ function CategoryContent() {
   );
 }
 
-export default function Page() {
+export default function Page({ title }: { title?: string }) {
   return (
     <Suspense
       fallback={
@@ -498,7 +499,7 @@ export default function Page() {
         </div>
       }
     >
-      <CategoryContent />
+      <CategoryContent title={title} />
     </Suspense>
   );
 }

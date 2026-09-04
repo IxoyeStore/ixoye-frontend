@@ -6,6 +6,7 @@ import { ProductType } from "@/types/product";
 import ProductGallery from "./components/product-gallery";
 import InfoProduct from "./components/info-product";
 import ProductDescription from "./components/product-description";
+import ProductSeries from "./components/product-series";
 import ProductQuestions from "./components/product-questions";
 import TrackView from "./components/track-view";
 import TrackRecentlyViewed from "@/components/recently-viewed/track";
@@ -240,14 +241,14 @@ export default async function ProductPage({
               </p>
             </div>
 
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Serie / Modelo</span>
-              {product.series ? (
-                <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">{product.series}</p>
-              ) : (
+            {product.series ? (
+              <ProductSeries text={product.series} />
+            ) : (
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Serie / Modelo</span>
                 <p className="text-sm font-black text-slate-300 dark:text-slate-600 uppercase">N/A</p>
-              )}
-            </div>
+              </div>
+            )}
 
             {product.motors && (
               <div className="flex flex-col gap-1">

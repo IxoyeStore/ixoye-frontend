@@ -50,16 +50,26 @@ const ProductCard = ({ product }: ProductCardProps) => {
     ? product.wholesalePrice
     : product.price;
 
+  const outOfStock = !product.stock || product.stock <= 0;
+
   return (
     <div className="relative p-2 transition-all duration-200 rounded-lg hover:shadow-md group border border-transparent hover:border-slate-100 dark:hover:border-slate-700 flex flex-col h-full">
       <div className="relative rounded-xl overflow-hidden">
-        {/* CÓDIGO */}
-        {product.code && (
-          <div className="absolute top-2 left-2 z-20">
-            <span className="bg-slate-900/70 backdrop-blur-md text-white text-[8px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wider">
-              REF: {product.code}
+        {/* AGOTADO (reemplaza el badge de código cuando no hay existencias) */}
+        {outOfStock ? (
+          <div className="absolute left-0 top-0 z-20 h-20 w-20 overflow-hidden pointer-events-none">
+            <span className="absolute left-[-38px] top-[15px] block w-[150px] -rotate-45 bg-red-600 dark:bg-red-500 py-1 text-center text-[10px] sm:text-xs font-black uppercase tracking-wider text-white shadow-md ring-1 ring-white/40">
+              Agotado
             </span>
           </div>
+        ) : (
+          product.code && (
+            <div className="absolute top-2 left-2 z-20">
+              <span className="bg-slate-900/70 backdrop-blur-md text-white text-[8px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wider">
+                REF: {product.code}
+              </span>
+            </div>
+          )
         )}
 
         {/* MARCA */}

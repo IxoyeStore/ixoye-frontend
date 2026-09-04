@@ -1,5 +1,6 @@
 import CarouselTextBanner from "@/components/carousel-text-banner";
 import FeaturedProducts from "@/components/featured-products";
+import NewArrivals from "@/components/new-arrivals";
 import BannerDiscount from "@/components/banner-discount";
 import ChooseCategory from "@/components/choose-category";
 import InfoCards from "@/components/info-cards";
@@ -14,6 +15,7 @@ export default function Home() {
       <CarouselTextBanner />
       <InfoCards />
       <FeaturedProducts />
+      <NewArrivals />
       <ChooseCategory />
       <RecentlyViewedSection />
       <ShipmentSection />

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Truck, BadgePercent, Store, Search, X } from "lucide-react";
+import { Truck, BadgePercent, Store, Search, X, MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
 import cpMexico from "@/lib/cp-mexico.json";
 
@@ -22,6 +22,10 @@ const MUNICIPIOS_CON_ENVIO = new Set([
   "Ruíz",
   "Tuxpan",
 ]);
+
+const WHATSAPP_NUMBER = "3112377582";
+const PHONE_DISPLAY = "+52 311 237 7582";
+const PHONE_HREF = "tel:+523112377582";
 
 const InfoCards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -151,6 +155,32 @@ const InfoCards = () => {
                     : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                 }`}>
                   {resultado}
+                </div>
+              )}
+
+              {disponible === false && (
+                <div className="flex flex-col gap-2 animate-in slide-in-from-top-1">
+                  <p className="text-xs text-gray-500 dark:text-slate-400">
+                    Escríbenos y con gusto te decimos cómo hacerte llegar tu pedido.
+                  </p>
+                  <a
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                      `Hola, quisiera saber si tienen servicio de envío a mi código postal ${cp}.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-100 dark:shadow-none"
+                  >
+                    <MessageCircle size={18} />
+                    Preguntar por WhatsApp
+                  </a>
+                  <a
+                    href={PHONE_HREF}
+                    className="w-full flex items-center justify-center gap-2 text-sky-700 dark:text-sky-400 font-bold py-2 text-sm hover:text-sky-500 dark:hover:text-sky-300 transition-colors"
+                  >
+                    <Phone size={16} />
+                    {PHONE_DISPLAY}
+                  </a>
                 </div>
               )}
             </div>

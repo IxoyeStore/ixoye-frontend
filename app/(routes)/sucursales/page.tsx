@@ -1,8 +1,8 @@
-import { MapPin, Navigation } from "lucide-react";
+import { MapPin, Navigation, MessageCircle } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
-type Sucursal = { id: number; name: string; address: string; mapsUrl: string };
+type Sucursal = { id: number; name: string; address: string; mapsUrl: string; phone?: string };
 
 async function fetchSucursales(): Promise<Sucursal[]> {
   try {
@@ -56,15 +56,29 @@ export default async function SucursalesPage() {
               </div>
             </div>
 
-            <a
-              href={s.mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-auto flex items-center justify-center gap-2 w-full py-3 rounded-xl border-2 border-[#0055a4] dark:border-sky-500 text-[#0055a4] dark:text-sky-400 text-xs font-black uppercase tracking-widest hover:bg-[#0055a4] hover:text-white transition-all duration-200"
-            >
-              <Navigation size={13} strokeWidth={2.5} />
-              Ver en Maps
-            </a>
+            <div className="mt-auto flex flex-col sm:flex-row gap-2">
+              <a
+                href={s.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-[#0055a4] dark:border-sky-500 text-[#0055a4] dark:text-sky-400 text-xs font-black uppercase tracking-widest hover:bg-[#0055a4] hover:text-white transition-all duration-200"
+              >
+                <Navigation size={13} strokeWidth={2.5} />
+                Ver en Maps
+              </a>
+
+              {s.phone && (
+                <a
+                  href={`https://wa.me/${s.phone.replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-green-600 dark:border-green-500 text-green-700 dark:text-green-400 text-xs font-black uppercase tracking-widest hover:bg-green-600 hover:text-white dark:hover:bg-green-600 transition-all duration-200"
+                >
+                  <MessageCircle size={13} strokeWidth={2.5} />
+                  WhatsApp
+                </a>
+              )}
+            </div>
           </div>
         ))}
       </div>

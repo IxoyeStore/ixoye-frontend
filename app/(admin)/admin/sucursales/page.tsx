@@ -4,9 +4,9 @@ import { useEffect, useState, useCallback } from "react";
 import { Plus, Pencil, Trash2, X, Save, Loader2, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
-type SucursalForm = { name: string; address: string; mapsUrl: string };
+type SucursalForm = { name: string; address: string; mapsUrl: string; phone: string };
 
-const EMPTY_FORM: SucursalForm = { name: "", address: "", mapsUrl: "" };
+const EMPTY_FORM: SucursalForm = { name: "", address: "", mapsUrl: "", phone: "" };
 
 const inputCls = "w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3 py-2.5 text-[12px] font-bold bg-white dark:bg-slate-700 dark:text-white focus:outline-none focus:border-sky-400 transition-colors";
 
@@ -35,7 +35,7 @@ export default function AdminSucursalesPage() {
   };
 
   const openEdit = (s: any) => {
-    setForm({ name: s.name || "", address: s.address || "", mapsUrl: s.mapsUrl || "" });
+    setForm({ name: s.name || "", address: s.address || "", mapsUrl: s.mapsUrl || "", phone: s.phone || "" });
     setEditing(s);
     setShowForm(true);
   };
@@ -145,6 +145,18 @@ export default function AdminSucursalesPage() {
                 placeholder="https://maps.app.goo.gl/..."
               />
             </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                Teléfono (WhatsApp)
+              </label>
+              <input
+                type="tel"
+                value={form.phone}
+                onChange={setField("phone")}
+                className={inputCls}
+                placeholder="Ej: 3112377582"
+              />
+            </div>
             <div className="flex justify-end gap-3 pt-2">
               <button type="button" onClick={closeForm} className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500 transition-all">
                 Cancelar
@@ -168,6 +180,7 @@ export default function AdminSucursalesPage() {
             <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 uppercase font-black tracking-widest bg-slate-200 dark:bg-slate-700/50">
               <th className="text-left px-4 md:px-6 py-5">Nombre</th>
               <th className="text-left px-4 md:px-6 py-5 hidden sm:table-cell">Dirección</th>
+              <th className="text-left px-4 md:px-6 py-5 hidden md:table-cell">Teléfono</th>
               <th className="px-4 md:px-6 py-5" />
             </tr>
           </thead>
@@ -175,14 +188,14 @@ export default function AdminSucursalesPage() {
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <tr key={i}>
-                  <td colSpan={3} className="px-6 py-5">
+                  <td colSpan={4} className="px-6 py-5">
                     <div className="h-5 bg-slate-100 dark:bg-slate-700 rounded animate-pulse" />
                   </td>
                 </tr>
               ))
             ) : sucursales.length === 0 ? (
               <tr>
-                <td colSpan={3} className="text-center py-20 text-slate-400 dark:text-slate-500 font-black uppercase text-[11px] tracking-widest">
+                <td colSpan={4} className="text-center py-20 text-slate-400 dark:text-slate-500 font-black uppercase text-[11px] tracking-widest">
                   Sin sucursales
                 </td>
               </tr>
@@ -196,6 +209,7 @@ export default function AdminSucursalesPage() {
                     </div>
                   </td>
                   <td className="px-4 md:px-6 py-5 text-slate-500 dark:text-slate-400 hidden sm:table-cell">{s.address}</td>
+                  <td className="px-4 md:px-6 py-5 text-slate-500 dark:text-slate-400 hidden md:table-cell">{s.phone || "—"}</td>
                   <td className="px-4 md:px-6 py-5">
                     <div className="flex items-center gap-1 justify-end">
                       <button
