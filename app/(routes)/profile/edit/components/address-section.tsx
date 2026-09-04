@@ -166,7 +166,7 @@ export default function AddressSection({
     if (nombreEstado === "Distrito Federal") nombreEstado = "Ciudad de México";
 
     let cost = 0;
-    let label = "Entrega Local Gratis";
+    let label = "Entrega Local: Habilitada";
     if (entry.e !== "Nayarit") {
       cost = -1;
       label = "Envío no disponible";
@@ -355,7 +355,7 @@ export default function AddressSection({
                 <div className="flex items-center gap-1.5 mt-1 animate-in fade-in duration-300">
                   <div className={`h-1.5 w-1.5 rounded-full ${shippingQuote.cost === 0 ? "bg-green-500" : "bg-amber-500"}`} />
                   <p className={`text-xs font-medium ${shippingQuote.cost === 0 ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-400"}`}>
-                    {shippingQuote.cost === 0 ? "Entrega Local: ¡Gratis!" : "Envío no disponible — comunícate con nosotros"}
+                    {shippingQuote.cost === 0 ? "Entrega Local: Habilitada" : "Envío no disponible — comunícate con nosotros"}
                   </p>
                 </div>
               )}

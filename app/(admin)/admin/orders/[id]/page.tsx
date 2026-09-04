@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Save, User, MapPin, Truck } from "lucide-react";
+import { ChevronLeft, Save, User, MapPin, Truck, CreditCard } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 import { toast } from "sonner";
 import { ProductImage } from "@/components/product-image";
@@ -44,6 +44,8 @@ export default function AdminOrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
+  const [paymentCheck, setPaymentCheck] = useState<any>(null);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -105,6 +107,33 @@ export default function AdminOrderDetailPage() {
       toast.error("Error al actualizar el estado");
     }
     setSaving(false);
+  };
+
+  const handleVerifyPayment = async () => {
+    setVerifying(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${id}/verify-payment`, { method: "POST" });
+      const json = await res.json();
+      if (!res.ok) {
+        toast.error(json?.error?.message || "Error al consultar Openpay");
+        return;
+      }
+      const data = json.data;
+      setPaymentCheck(data);
+      if (data.reconciled) {
+        toast.success("Pago confirmado: stock descontado y correo enviado.");
+        setStatus("paid");
+        setOrder((prev: any) => ({ ...prev, orderStatus: "paid" }));
+      } else if (data.found) {
+        toast(`Openpay reporta el cargo como "${data.openpayStatus}".`);
+      } else {
+        toast(data.message || "No se encontró el cargo todavía en Openpay.");
+      }
+    } catch (e) {
+      toast.error("Error al consultar Openpay");
+    } finally {
+      setVerifying(false);
+    }
   };
 
   if (loading) return (
@@ -217,6 +246,50 @@ export default function AdminOrderDetailPage() {
               <MapPin size={14} className="text-slate-300 dark:text-slate-600 shrink-0" />
               <p className="text-sm font-bold text-slate-400 dark:text-slate-500">CP {order.postalCode || "—"}</p>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Datos de pago */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+            <CreditCard size={13} className="text-emerald-500" />
+          </div>
+          <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Datos de pago</h2>
+        </div>
+
+        <div className="space-y-3">
+          {order.stripeId && <Row label="ID de pedido (Openpay)" value={order.stripeId} mono />}
+
+          {status === "paid" ? (
+            <>
+              <Row
+                label="Método"
+                value={`${order.paymentMethod || "No especificado"}${order.cardLast4 ? ` ···· ${order.cardLast4}` : ""}`}
+              />
+              {order.openpayChargeId && <Row label="ID de cargo" value={order.openpayChargeId} mono />}
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-bold text-amber-600 dark:text-amber-400">
+                Sin confirmar todavía por Openpay.
+              </p>
+              {paymentCheck && !paymentCheck.reconciled && (
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-bold">
+                  {paymentCheck.found
+                    ? `Openpay reporta el cargo como "${paymentCheck.openpayStatus}"${paymentCheck.paymentMethod ? ` (${paymentCheck.paymentMethod})` : ""}.`
+                    : paymentCheck.message}
+                </p>
+              )}
+              <button
+                onClick={handleVerifyPayment}
+                disabled={verifying}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-700 disabled:opacity-50 transition-all"
+              >
+                {verifying ? "Consultando..." : "Consultar en Openpay"}
+              </button>
+            </>
           )}
         </div>
       </div>

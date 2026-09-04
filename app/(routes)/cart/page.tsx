@@ -10,7 +10,7 @@ import CartItem from "./components/cart-item";
 import { makePaymentReques } from "@/api/payment";
 import { useAuth } from "@/context/auth-context";
 import { toast } from "sonner";
-import { ShoppingBasket, ArrowRight } from "lucide-react";
+import { ShoppingBasket, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import router from "next/router";
 import cpMexico from "@/lib/cp-mexico.json";
@@ -300,7 +300,7 @@ export default function Page() {
                   </p>
                 </div>
 
-                <Separator className="bg-slate-100 dark:bg-slate-700" />
+                <Separator className="bg-slate-200 dark:bg-slate-700" />
 
                 <div className="flex justify-between items-center">
                   <p className="text-sky-950 dark:text-sky-300 font-black uppercase text-[10px]">
@@ -329,9 +329,17 @@ export default function Page() {
                     : "Realizar pedido y pagar"}
               </Button>
 
-              <p className="mt-4 text-center text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                🔒 Pago seguro con Openpay by BBVA
+              <p className="mt-4 flex items-center justify-center gap-2 text-center text-[15px] text-slate-600 dark:text-slate-300 uppercase tracking-widest">
+                <ShieldCheck className="h-5 w-5 text-amber-500 dark:text-amber-400" />
+                Pago 100% seguro con Openpay por BBVA
               </p>
+              <Separator className="bg-slate-200 dark:bg-slate-700 mt-4" />
+
+              <img
+                src="/pagos-tiendas.jpg"
+                alt="Tiendas donde puedes pagar tu pedido en efectivo: Soriana, Walmart, Sam's Club, Bodega Aurrera, 7-Eleven, Farmacias del Ahorro, Waldo's, SyS Tienda, Kiosko y Circle K"
+                className="mt-4 w-full rounded-2xl border border-slate-100 dark:border-slate-700"
+              />
             </div>
           </div>
         </div>

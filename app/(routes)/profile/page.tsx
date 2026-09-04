@@ -65,14 +65,42 @@ export default function ProfilePage() {
 
   const filteredOrders = useMemo(() => {
     const query = orderSearchQuery.trim().toLowerCase();
+    const now = Date.now();
+
+    // Un pedido "pending" es un intento de compra mientras el banco aun
+    // no confirma el pago (o que el cliente abandonó). Se deja ver solo
+    // el mas reciente, y solo durante las primeras 24h desde que se creó,
+    // para que el cliente tenga la tranquilidad de ver que su pedido
+    // quedó registrado sin llenarle la lista de reintentos o intentos
+    // viejos que nunca se pagaron.
+    const recentPending = orders
+      .filter((order) => (order.attributes || order).orderStatus === "pending")
+      .filter((order) => {
+        const createdAt = (order.attributes || order).createdAt;
+        if (!createdAt) return false;
+        return now - new Date(createdAt).getTime() < 24 * 60 * 60 * 1000;
+      })
+      .sort(
+        (a, b) =>
+          new Date((b.attributes || b).createdAt).getTime() -
+          new Date((a.attributes || a).createdAt).getTime(),
+      );
+    const visiblePendingId = recentPending[0]?.id;
+
     return orders.filter((order) => {
       const data = order.attributes || order;
-      // Un pedido "pendiente" es un intento de compra que nunca se pagó
-      // (el cliente abandonó el checkout de Openpay) - no es un pedido
-      // real, así que nunca debe aparecer en la lista del cliente, sin
-      // importar el filtro seleccionado. La pantalla de "gracias por tu
-      // compra" ya maneja por su cuenta la espera de confirmación de pago.
-      if (data.orderStatus === "pending") return false;
+      if (data.orderStatus === "pending" && order.id !== visiblePendingId) {
+        return false;
+      }
+      // Un pedido "cancelled" ya no es accionable para el cliente: se
+      // deja de mostrar 7 días después de creado para no dejarle la
+      // lista llena de pedidos viejos que no van a ningún lado.
+      if (data.orderStatus === "cancelled") {
+        const createdAt = data.createdAt;
+        if (!createdAt || now - new Date(createdAt).getTime() >= 7 * 24 * 60 * 60 * 1000) {
+          return false;
+        }
+      }
       if (orderStatusFilter !== "all" && data.orderStatus !== orderStatusFilter) {
         return false;
       }
