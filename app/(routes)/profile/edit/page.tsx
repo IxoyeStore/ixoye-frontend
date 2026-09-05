@@ -42,20 +42,30 @@ export default function EditProfilePage() {
     };
   }, [user?.jwt, isAddressFocused]);
 
-  if (authLoading || !user || hasAnyAddress === null) {
+  const profileIncomplete =
+    !user?.profile?.firstName?.trim() ||
+    !user?.profile?.lastName?.trim() ||
+    !user?.profile?.phone?.trim();
+  const addressMissing = hasAnyAddress === false;
+  const needsSetup = profileIncomplete || addressMissing;
+  const ready = !authLoading && !!user && hasAnyAddress !== null;
+
+  useEffect(() => {
+    if (!ready || !needsSetup || isAddressFocused) return;
+    const targetId = profileIncomplete ? "personal-data-section" : "address-section";
+    const timer = setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [ready, needsSetup, profileIncomplete, isAddressFocused]);
+
+  if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="animate-spin h-8 w-8 text-[#0071b1]" />
       </div>
     );
   }
-
-  const profileIncomplete =
-    !user.profile?.firstName?.trim() ||
-    !user.profile?.lastName?.trim() ||
-    !user.profile?.phone?.trim();
-  const addressMissing = hasAnyAddress === false;
-  const needsSetup = profileIncomplete || addressMissing;
 
   return (
     <div className="flex justify-center items-center py-10 px-4 bg-gray-50/50 dark:bg-slate-900 min-h-[calc(100vh-80px)] text-black dark:text-white">
@@ -99,18 +109,22 @@ export default function EditProfilePage() {
               </div>
             )}
 
-            <PersonalDataSection
-              user={user}
-              defaultExpanded={!isAddressFocused || profileIncomplete}
-            />
+            <div id="personal-data-section">
+              <PersonalDataSection
+                user={user}
+                defaultExpanded={!isAddressFocused || profileIncomplete}
+              />
+            </div>
 
-            <AddressSection
-              key={addressId || (isNewAddress ? "new" : "default")}
-              user={user}
-              addressId={addressId}
-              isNewAddress={isNewAddress}
-              defaultExpanded={isAddressFocused || addressMissing}
-            />
+            <div id="address-section">
+              <AddressSection
+                key={addressId || (isNewAddress ? "new" : "default")}
+                user={user}
+                addressId={addressId}
+                isNewAddress={isNewAddress}
+                defaultExpanded={isAddressFocused || addressMissing}
+              />
+            </div>
 
             <div className="pt-2 border-t border-gray-100 dark:border-slate-700 text-center">
               <Link

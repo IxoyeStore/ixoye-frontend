@@ -214,6 +214,11 @@ export default function ProfilePage() {
 
   const profileData = user.profile;
   const isProfileComplete = !!profileData?.firstName;
+  const profileIncomplete =
+    !profileData?.firstName?.trim() ||
+    !profileData?.lastName?.trim() ||
+    !profileData?.phone?.trim();
+  const addressMissing = !loadingAddresses && addresses.length === 0;
 
   return (
     <div className="p-4 md:p-12 max-w-5xl mx-auto space-y-8 md:space-y-10">
@@ -331,21 +336,38 @@ export default function ProfilePage() {
               </div>
             </CardHeader>
             <CardContent className="p-8 md:p-12 bg-white dark:bg-slate-900">
-              {!isProfileComplete ? (
-                <NoProfileBox />
+              {profileIncomplete ? (
+                <NoProfileBox
+                  profileIncomplete={profileIncomplete}
+                  addressMissing={addressMissing}
+                />
               ) : (
-                <div className="divide-y divide-slate-300 dark:divide-slate-700">
-                  <InfoRow label="Nombre(s)" value={profileData.firstName} />
-                  <InfoRow label="Apellido Paterno" value={profileData.lastName} />
-                  <InfoRow label="Apellido Materno" value={profileData.motherLastName} />
-                  <InfoRow label="Teléfono" value={profileData.phone} />
-                  <InfoRow
-                    label="Fecha de nacimiento"
-                    value={profileData.birthDate
-                      ? (() => { const [y, m, d] = profileData.birthDate.split("T")[0].split("-"); return new Date(+y, +m - 1, +d).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" }); })()
-                      : null}
-                  />
-                </div>
+                <>
+                  <div className="divide-y divide-slate-300 dark:divide-slate-700">
+                    <InfoRow label="Nombre(s)" value={profileData.firstName} />
+                    <InfoRow label="Apellido Paterno" value={profileData.lastName} />
+                    <InfoRow label="Apellido Materno" value={profileData.motherLastName} />
+                    <InfoRow label="Teléfono" value={profileData.phone} />
+                    <InfoRow
+                      label="Fecha de nacimiento"
+                      value={profileData.birthDate
+                        ? (() => { const [y, m, d] = profileData.birthDate.split("T")[0].split("-"); return new Date(+y, +m - 1, +d).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" }); })()
+                        : null}
+                    />
+                  </div>
+                  {addressMissing && (
+                    <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl border-2 border-dashed border-sky-200 dark:border-sky-800 bg-sky-50/50 dark:bg-sky-950/20">
+                      <p className="text-sm text-sky-900 dark:text-sky-300 font-bold text-center sm:text-left">
+                        Te falta registrar una dirección de envío para poder realizar pedidos.
+                      </p>
+                      <Link href="/profile/edit?new=true" className="shrink-0">
+                        <Button className="rounded-full bg-sky-800 text-white font-black uppercase text-[10px] tracking-widest px-8 h-11 shadow-lg shadow-sky-900/20 dark:shadow-none">
+                          Agregar Dirección
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
@@ -816,12 +838,28 @@ function EmptyOrders() {
   );
 }
 
-function NoProfileBox() {
+function NoProfileBox({
+  profileIncomplete,
+  addressMissing,
+}: {
+  profileIncomplete: boolean;
+  addressMissing: boolean;
+}) {
+  const missingText =
+    profileIncomplete && addressMissing
+      ? "tus datos personales y una dirección de envío"
+      : profileIncomplete
+        ? "tus datos personales"
+        : "una dirección de envío";
+
   return (
     <div className="text-center py-16 px-6 rounded-[2.5rem] border-2 border-dashed border-sky-200 dark:border-sky-800 bg-sky-50/50 dark:bg-sky-950/20">
       <AlertCircle size={40} className="mx-auto text-sky-400 dark:text-sky-500 mb-4" />
-      <p className="text-sky-900 dark:text-sky-300 font-bold mb-8 italic">
-        Información de perfil incompleta.
+      <p className="text-sky-900 dark:text-sky-300 font-black mb-2">
+        Información de perfil incompleta
+      </p>
+      <p className="text-sky-700 dark:text-sky-400 font-medium text-sm mb-8 max-w-xs mx-auto">
+        Rellena {missingText} para poder realizar pedidos.
       </p>
       <Link href="/profile/edit">
         <Button className="rounded-full bg-sky-800 text-white font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl shadow-sky-900/20 dark:shadow-none">

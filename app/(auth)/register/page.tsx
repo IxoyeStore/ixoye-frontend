@@ -35,11 +35,6 @@ export default function RegisterPage() {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
-  const [isResending, setIsResending] = useState(false);
-  const [resendStatus, setResendStatus] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -95,39 +90,6 @@ export default function RegisterPage() {
       setModalContent("Error al cargar la información.");
     } finally {
       setIsLoadingLegal(false);
-    }
-  };
-
-  const onResendConfirmation = async () => {
-    setIsResending(true);
-    setResendStatus(null);
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/send-email-confirmation`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: submittedEmail }),
-        },
-      );
-
-      if (res.ok) {
-        setResendStatus({
-          type: "success",
-          message: "Te enviamos un nuevo enlace de confirmación.",
-        });
-      } else {
-        const data = await res.json();
-        setResendStatus({
-          type: "error",
-          message: data.error?.message || "Error al solicitar el reenvío",
-        });
-      }
-    } catch (error) {
-      setResendStatus({ type: "error", message: "Error de conexión" });
-    } finally {
-      setIsResending(false);
     }
   };
 
@@ -215,28 +177,6 @@ export default function RegisterPage() {
             Revisa tu bandeja de entrada (y la carpeta de spam) y haz clic en el enlace para
             poder iniciar sesión.
           </p>
-
-          {resendStatus && (
-            <p
-              className={`text-xs p-2 rounded text-center font-medium ${
-                resendStatus.type === "success"
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
-                  : "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400"
-              }`}
-            >
-              {resendStatus.message}
-            </p>
-          )}
-
-          <button
-            type="button"
-            onClick={onResendConfirmation}
-            disabled={isResending}
-            className="w-full text-xs font-bold text-[#0071b1] dark:text-sky-400 hover:text-[#012849] dark:hover:text-sky-300 transition-colors disabled:opacity-50"
-          >
-            {isResending ? "Enviando..." : "¿No recibiste el correo? Reenviar confirmación"}
-          </button>
-
           <a
             href="/login"
             className="inline-block font-bold text-[#0071b1] dark:text-sky-400 hover:underline text-sm"
