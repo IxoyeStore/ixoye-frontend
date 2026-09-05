@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   Package,
   AlertCircle,
+  AlertTriangle,
   Loader2,
   Printer,
   MapPin,
@@ -44,7 +45,7 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
-  const [loadingAddresses, setLoadingAddresses] = useState(false);
+  const [loadingAddresses, setLoadingAddresses] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -268,6 +269,28 @@ export default function ProfilePage() {
           </Button>
         </div>
       </div>
+
+      {(profileIncomplete || addressMissing) && (
+        <div className="sticky top-20 md:top-24 z-30 flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl border-2 border-amber-300 dark:border-amber-700 bg-amber-100 dark:bg-amber-950/90 shadow-xl backdrop-blur">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <AlertTriangle size={22} className="text-amber-600 dark:text-amber-400 shrink-0" />
+            <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
+              Falta completar{" "}
+              {profileIncomplete && addressMissing
+                ? "tus datos personales y una dirección de envío"
+                : profileIncomplete
+                  ? "tus datos personales"
+                  : "una dirección de envío"}
+              . Es indispensable para poder enviar tus pedidos.
+            </p>
+          </div>
+          <Link href="/profile/edit" className="shrink-0">
+            <Button className="rounded-full bg-amber-600 hover:bg-amber-700 text-white font-black uppercase text-[10px] tracking-widest px-8 h-11 shadow-lg">
+              Completar Datos
+            </Button>
+          </Link>
+        </div>
+      )}
 
       <Tabs
         value={activeTab}
