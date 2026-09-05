@@ -23,6 +23,7 @@ import {
   Trash2,
   Pencil,
   Search,
+  MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/hooks/use-cart";
@@ -386,6 +387,23 @@ export default function ProfilePage() {
           value="orders"
           className="animate-in fade-in slide-in-from-bottom-4 duration-500"
         >
+          {!loadingOrders && orders.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4 p-4 rounded-2xl border-2 border-dashed border-sky-200 dark:border-sky-800 bg-sky-50/50 dark:bg-sky-950/20">
+              <p className="text-sm text-center sm:text-left">
+                <span className="font-black text-sky-900 dark:text-sky-300">¿Necesitas factura?</span>{" "}
+                <span className="font-medium text-slate-600 dark:text-slate-400">¡Comunícate con nosotros!</span>
+              </p>
+              <a
+                href={`https://wa.me/3112377582?text=${encodeURIComponent("Hola, quisiera solicitar factura de mi pedido.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-green-600 hover:bg-green-700 text-white text-xs font-black uppercase tracking-widest transition-colors"
+              >
+                <MessageCircle size={14} /> Solicitar por WhatsApp
+              </a>
+            </div>
+          )}
+
           {!loadingOrders && orders.length > 0 && (
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <div className="flex flex-wrap gap-2">
@@ -786,9 +804,14 @@ function EmptyOrders() {
       <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">
         No se encontraron pedidos
       </p>
-      <p className="text-slate-400 dark:text-slate-500 text-sm italic">
+      <p className="text-slate-400 dark:text-slate-500 text-sm italic mb-6">
         Comienza a explorar nuestro catálogo ahora.
       </p>
+      <Link href="/category">
+        <Button className="rounded-full bg-sky-600 hover:bg-sky-700 text-white font-black uppercase text-[10px] tracking-widest px-8 py-6 shadow-lg shadow-sky-200 dark:shadow-none transition-all">
+          Explorar productos
+        </Button>
+      </Link>
     </div>
   );
 }

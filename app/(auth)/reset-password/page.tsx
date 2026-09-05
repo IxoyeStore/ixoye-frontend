@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { registerSchema } from "@/schemas/register-schema";
+import AuthLogo from "@/components/auth-logo";
 
 const resetSchema = z
   .object({
@@ -98,6 +99,9 @@ function ResetPasswordContent() {
     return (
       <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700 animate-in zoom-in-95 duration-500">
         <CardContent className="px-8 py-12 text-center space-y-6">
+          <div className="flex justify-center mb-1">
+            <AuthLogo />
+          </div>
           <div className="flex justify-center">
             <div className="bg-green-100 dark:bg-green-900/40 p-3 rounded-full">
               <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
@@ -126,6 +130,9 @@ function ResetPasswordContent() {
   return (
     <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700 animate-in fade-in duration-500">
       <CardHeader className="text-center pt-8 pb-4">
+        <div className="flex justify-center mb-3">
+          <AuthLogo />
+        </div>
         <CardTitle className="text-2xl font-extrabold text-[#012849] dark:text-sky-300 tracking-tight">
           Nueva contraseña
         </CardTitle>

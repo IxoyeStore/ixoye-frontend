@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2, Pencil, User, X } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
+import { toast } from "sonner";
 
 type FormState = {
   firstName: string;
@@ -109,6 +110,8 @@ export default function PersonalDataSection({
       await refreshUser?.();
       setOriginal(form);
       setExpanded(false);
+      toast.success("Datos actualizados");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e: any) {
       setError(e.message);
     } finally {

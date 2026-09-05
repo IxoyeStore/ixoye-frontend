@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, MapPin, Pencil, X } from "lucide-react";
 import { ubicaciones } from "@/constants/cities-and-states";
 import cpMexico from "@/lib/cp-mexico.json";
+import { toast } from "sonner";
 
 const MEXICO_STATES = Object.keys(ubicaciones) as (keyof typeof ubicaciones)[];
 
@@ -271,6 +272,8 @@ export default function AddressSection({
       setCurrentAddressId(savedDocId);
       setOriginal(form);
       setExpanded(false);
+      toast.success("Datos actualizados");
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
       if (!addressId && savedDocId) {
         router.replace(`/profile/edit?addressId=${savedDocId}`, { scroll: false });

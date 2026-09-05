@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CheckCircle2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import AuthLogo from "@/components/auth-logo";
 
 const forgotSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),
@@ -72,6 +73,9 @@ export default function ForgotPasswordPage() {
         {!isSubmitted ? (
           <>
             <CardHeader className="text-center pt-8 pb-4">
+              <div className="flex justify-center mb-3">
+                <AuthLogo />
+              </div>
               <CardTitle className="text-2xl font-extrabold text-[#012849] dark:text-sky-300 tracking-tight">
                 ¿Olvidaste tu contraseña?
               </CardTitle>
@@ -128,6 +132,9 @@ export default function ForgotPasswordPage() {
           </>
         ) : (
           <CardContent className="px-8 py-12 text-center space-y-6">
+            <div className="flex justify-center mb-1">
+              <AuthLogo />
+            </div>
             <div className="flex justify-center">
               <div className="bg-green-100 dark:bg-green-900/40 p-3 rounded-full">
                 <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />

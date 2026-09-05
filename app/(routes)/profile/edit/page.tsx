@@ -71,20 +71,31 @@ export default function EditProfilePage() {
         <Card className="shadow-xl border-none ring-1 ring-gray-100 dark:ring-slate-700">
           <CardHeader className="text-center pt-8 border-b border-gray-100 dark:border-slate-700">
             <CardTitle className="text-3xl font-extrabold text-[#012849] dark:text-sky-300">
-              Editar Perfil
+              {needsSetup ? "¡Bienvenido! Completa tu perfil" : "Editar Perfil"}
             </CardTitle>
             <p className="text-sm text-slate-400 dark:text-slate-500">
-              Edita solo lo que necesites, cada sección se guarda por separado.
+              {needsSetup
+                ? "Necesitamos estos datos antes de que puedas comprar."
+                : "Edita solo lo que necesites, cada sección se guarda por separado."}
             </p>
           </CardHeader>
 
           <CardContent className="px-4 sm:px-8 py-8 space-y-4">
             {needsSetup && (
-              <div className="flex items-start gap-3 p-4 rounded-xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/30">
-                <AlertTriangle size={18} className="text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
-                <p className="text-sm font-bold text-amber-800 dark:text-amber-300">
-                  Necesitas completar tus datos para comprar.
-                </p>
+              <div className="flex items-start gap-3 p-5 rounded-xl border-2 border-amber-300 dark:border-amber-700 bg-amber-100 dark:bg-amber-950/50 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
+                <AlertTriangle size={24} className="text-amber-600 dark:text-amber-400 shrink-0" />
+                <div>
+                  <p className="text-base font-black text-amber-900 dark:text-amber-200">
+                    Faltan datos por completar
+                  </p>
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                    Rellena {profileIncomplete && addressMissing
+                      ? "tus datos personales y una dirección de envío"
+                      : profileIncomplete
+                        ? "tus datos personales"
+                        : "una dirección de envío"} para poder realizar pedidos.
+                  </p>
+                </div>
               </div>
             )}
 
