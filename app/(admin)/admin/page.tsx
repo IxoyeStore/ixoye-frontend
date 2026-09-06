@@ -17,7 +17,7 @@ const STATUS_COLORS: Record<string, string> = {
 const STATUS_LABELS: Record<string, string> = {
   pending:    "Pendiente",
   paid:       "Pagado",
-  processing: "En Preparación",
+  processing: "En Proceso",
   shipped:    "En Camino",
   delivered:  "Entregado",
   cancelled:  "Cancelado",

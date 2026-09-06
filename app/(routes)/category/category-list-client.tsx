@@ -119,6 +119,29 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
   const [viewMode, setViewMode]       = useState<"grid" | "list">("grid");
   const [priceMinInput, setPriceMinInput] = useState("");
   const [priceMaxInput, setPriceMaxInput] = useState("");
+  const [stickyTop, setStickyTop]     = useState(0);
+
+  // En escritorio el panel de filtros arranca abierto (hay espacio de
+  // sobra); en mobile se queda colapsado como ya era. Se decide una sola
+  // vez al montar via matchMedia, no con un breakpoint de Tailwind, porque
+  // es el estado INICIAL de un boolean en JS, no algo que CSS pueda decidir.
+  useEffect(() => {
+    if (window.matchMedia("(min-width: 768px)").matches) setShowFilters(true);
+  }, []);
+
+  // La barra de filtros se pega justo debajo del navbar (que tambien es
+  // sticky) en vez de tapar contenido debajo de el. Se mide en vivo en vez
+  // de hardcodear un alto de navbar, porque el navbar cambia de tamano
+  // entre mobile/desktop y ademas puede llevar el banner de envio gratis.
+  useEffect(() => {
+    const updateStickyTop = () => {
+      const header = document.querySelector("header");
+      setStickyTop(header?.getBoundingClientRect().height ?? 0);
+    };
+    updateStickyTop();
+    window.addEventListener("resize", updateStickyTop);
+    return () => window.removeEventListener("resize", updateStickyTop);
+  }, []);
 
   const page         = parseInt(searchParams.get("page") || "1", 10) || 1;
   const currentSort  = searchParams.get("sort")        || "createdAt:desc";
@@ -245,63 +268,72 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
   return (
     <div className="w-full max-w-[1440px] py-8 mx-auto px-4 md:px-8">
 
-      {/* ── Header row ───────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-black text-sky-900 dark:text-sky-300 uppercase tracking-tighter italic leading-none">
-            {title}
-          </h1>
-          {!loading && (
-            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
-              {totalCount} {totalCount === 1 ? "producto" : "productos"}
-            </p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          {/* View toggle */}
-          <div className="flex border border-slate-200 dark:border-slate-600 rounded-xl overflow-hidden">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`w-9 h-9 flex items-center justify-center transition-colors ${
-                viewMode === "grid" ? "bg-sky-600 text-white" : "bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-sky-600 dark:hover:text-sky-400"
-              }`}
-            >
-              <LayoutGrid size={15} />
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`w-9 h-9 flex items-center justify-center border-l border-slate-200 dark:border-slate-600 transition-colors ${
-                viewMode === "list" ? "bg-sky-600 text-white" : "bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-sky-600 dark:hover:text-sky-400"
-              }`}
-            >
-              <List size={15} />
-            </button>
+      {/* ── Barra sticky: header row + chips + panel de filtros ─────────────
+          Los tres viven en el MISMO contenedor sticky (no solo el header
+          row) para que, si el panel esta abierto (por defecto en desktop),
+          flote junto con la barra al hacer scroll en vez de quedarse
+          tapado debajo de ella. */}
+      <div
+        className="sticky z-30 bg-background/95 backdrop-blur-sm mb-4 py-3 -mx-4 px-4 md:-mx-8 md:px-8 border-b border-slate-100 dark:border-slate-800"
+        style={{ top: stickyTop }}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-black text-sky-900 dark:text-sky-300 uppercase tracking-tighter italic leading-none">
+              {title}
+            </h1>
+            {!loading && (
+              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
+                Mostrando {result.length} de {totalCount} {totalCount === 1 ? "producto" : "productos"}
+                {totalPages > 1 ? ` · Página ${page} de ${totalPages}` : ""}
+              </p>
+            )}
           </div>
 
-          {/* Filters + Sort toggle */}
-          <button
-            onClick={() => setShowFilters(o => !o)}
-            className={`flex items-center gap-2 h-9 px-3 rounded-xl border text-xs font-bold transition-all ${
-              showFilters || activeFilters.length > 0
-                ? "bg-sky-600 border-sky-600 text-white"
-                : "border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-sky-300 dark:hover:border-sky-700 hover:text-sky-700 dark:hover:text-sky-400"
-            }`}
-          >
-            <SlidersHorizontal size={13} />
-            <span>Filtros</span>
-            {activeFilters.length > 0 && (
-              <span className="w-4 h-4 bg-white text-sky-600 rounded-full text-[9px] font-black flex items-center justify-center">
-                {activeFilters.length}
-              </span>
-            )}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {/* View toggle */}
+            <div className="flex border border-slate-200 dark:border-slate-600 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`w-9 h-9 flex items-center justify-center transition-colors ${
+                  viewMode === "grid" ? "bg-sky-600 text-white" : "bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-sky-600 dark:hover:text-sky-400"
+                }`}
+              >
+                <LayoutGrid size={15} />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`w-9 h-9 flex items-center justify-center border-l border-slate-200 dark:border-slate-600 transition-colors ${
+                  viewMode === "list" ? "bg-sky-600 text-white" : "bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-sky-600 dark:hover:text-sky-400"
+                }`}
+              >
+                <List size={15} />
+              </button>
+            </div>
+
+            {/* Filters + Sort toggle */}
+            <button
+              onClick={() => setShowFilters(o => !o)}
+              className={`flex items-center gap-2 h-9 px-3 rounded-xl border text-xs font-bold transition-all ${
+                showFilters || activeFilters.length > 0
+                  ? "bg-sky-600 border-sky-600 text-white"
+                  : "border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-sky-300 dark:hover:border-sky-700 hover:text-sky-700 dark:hover:text-sky-400"
+              }`}
+            >
+              <SlidersHorizontal size={13} />
+              <span>Filtros</span>
+              {activeFilters.length > 0 && (
+                <span className="w-4 h-4 bg-white text-sky-600 rounded-full text-[9px] font-black flex items-center justify-center">
+                  {activeFilters.length}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* ── Active filter chips ───────────────────────────────────────────── */}
       {activeFilters.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="flex flex-wrap gap-2 mt-3">
           {activeFilters.map(f => (
             <button
               key={f.key}
@@ -323,7 +355,7 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
 
       {/* ── Filter panel ─────────────────────────────────────────────────── */}
       {showFilters && (
-        <div className="mb-4 p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl">
+        <div className="mt-3 p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl">
           <div className="flex flex-wrap items-end gap-3">
 
             {/* Sort */}
@@ -412,6 +444,7 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
           </div>
         </div>
       )}
+      </div>
 
       <Separator className="my-4 bg-sky-100 dark:bg-slate-700" />
 

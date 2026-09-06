@@ -50,15 +50,6 @@ export default function EditProfilePage() {
   const needsSetup = profileIncomplete || addressMissing;
   const ready = !authLoading && !!user && hasAnyAddress !== null;
 
-  useEffect(() => {
-    if (!ready || !needsSetup || isAddressFocused) return;
-    const targetId = profileIncomplete ? "personal-data-section" : "address-section";
-    const timer = setTimeout(() => {
-      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [ready, needsSetup, profileIncomplete, isAddressFocused]);
-
   if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center">

@@ -19,7 +19,7 @@ const statusMap: Record<string, { label: string; class: string }> = {
     class: "border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40",
   },
   processing: {
-    label: "En Preparación",
+    label: "En Proceso",
     class: "border-sky-200 dark:border-sky-900 text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40",
   },
   shipped: {
@@ -163,16 +163,16 @@ export default function OrderDetailPage() {
         <div className="flex justify-between items-center print-hidden border-b border-slate-100 dark:border-slate-700 pb-4">
           <Link
             href="/profile?tab=orders"
-            className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-2"
+            className="text-sm font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-2"
           >
-            <ChevronLeft size={14} />
-            Regresar
+            <ChevronLeft size={18} />
+            Volver
           </Link>
           <button
             onClick={handlePrint}
-            className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-2"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold uppercase tracking-widest shadow-sm transition-all active:scale-[0.97]"
           >
-            <Printer size={14} /> Imprimir Comprobante
+            <Printer size={16} /> Imprimir Comprobante
           </button>
         </div>
 
@@ -202,8 +202,11 @@ export default function OrderDetailPage() {
             >
               {currentStatus.label}
             </div>
-            <p className="text-[14px] font-mono font-bold text-slate-950 dark:text-white block mt-2">
-              FOLIO: #ORD-{orderId}
+            <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-2">
+              Folio
+            </p>
+            <p className="text-xl md:text-2xl font-mono font-black text-slate-950 dark:text-white block leading-none tracking-tight">
+              #ORD-{orderId}
             </p>
           </div>
         </div>
