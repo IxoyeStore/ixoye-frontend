@@ -302,7 +302,7 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
           flote junto con la barra al hacer scroll en vez de quedarse
           tapado debajo de ella. */}
       <div
-        className="sticky z-30 bg-background/95 backdrop-blur-sm mb-4 py-3 -mx-4 px-4 md:-mx-8 md:px-8 border-b border-slate-100 dark:border-slate-800"
+        className="sticky z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm mb-4 py-3 -mx-4 px-4 md:-mx-8 md:px-8 border-b border-slate-100 dark:border-slate-800"
         style={{ top: stickyTop }}
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
