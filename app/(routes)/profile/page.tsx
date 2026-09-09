@@ -34,7 +34,7 @@ import { toast } from "sonner";
 const ORDER_STATUS_FILTERS = [
   { value: "all", label: "Todos" },
   { value: "paid", label: "Pagado" },
-  { value: "processing", label: "En Preparación" },
+  { value: "processing", label: "En Proceso" },
   { value: "shipped", label: "En Camino" },
   { value: "delivered", label: "Entregado" },
   { value: "cancelled", label: "Cancelado" },
@@ -524,6 +524,7 @@ function OrderStepper({ currentStatus }: { currentStatus: string }) {
   const steps = [
     { id: "pending", label: "Pendiente" },
     { id: "paid", label: "Pagado" },
+    { id: "processing", label: "En Proceso" },
     { id: "shipped", label: "En Camino" },
     { id: "delivered", label: "Entregado" },
   ];
@@ -585,9 +586,13 @@ function OrderCard({ order }: { order: any }) {
       label: "Pendiente",
       color: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900",
     },
+    processing: {
+      label: "En Proceso",
+      color: "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-400 border-sky-100 dark:border-sky-900",
+    },
     shipped: {
       label: "En Camino",
-      color: "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-400 border-sky-100 dark:border-sky-900",
+      color: "bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400 border-violet-100 dark:border-violet-900",
     },
     delivered: {
       label: "Entregado",
@@ -685,7 +690,7 @@ function OrderCard({ order }: { order: any }) {
               <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                 Pedido
               </span>
-              <h3 className="text-2xl font-black text-sky-950 dark:text-sky-300 italic">
+              <h3 className="text-[21px] font-black text-sky-950 dark:text-sky-300 italic">
                 #{order.id}
               </h3>
             </div>
@@ -726,7 +731,7 @@ function OrderCard({ order }: { order: any }) {
             <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               Total del Pedido
             </p>
-            <p className="text-3xl font-black text-sky-950 dark:text-sky-300 tracking-tighter">
+            <p className="text-[27px] font-black text-sky-950 dark:text-sky-300 tracking-tighter">
               {formatPrice(data.total)}
             </p>
           </div>

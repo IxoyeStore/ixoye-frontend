@@ -42,6 +42,15 @@ export default function PersonalDataSection({
   const [form, setForm] = useState<FormState>(EMPTY);
   const [original, setOriginal] = useState<FormState>(EMPTY);
 
+  // Este componente no se remonta al navegar entre "editar direccion X" /
+  // "agregar direccion nueva" (solo cambia el query param, mismo key), asi
+  // que sin esto se queda pegado en el "expanded" con el que abrio la
+  // primera vez, ignorando que el padre ahora quiere que este colapsado
+  // (p.ej. al dar clic en "Agregar Direccion" con el perfil ya completo).
+  useEffect(() => {
+    setExpanded(defaultExpanded);
+  }, [defaultExpanded]);
+
   useEffect(() => {
     const profile = user?.profile || user?.users_permissions_user?.profile;
     const initial: FormState = {
@@ -111,7 +120,6 @@ export default function PersonalDataSection({
       setOriginal(form);
       setExpanded(false);
       toast.success("Datos actualizados");
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e: any) {
       setError(e.message);
     } finally {

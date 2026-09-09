@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, MapPin, Pencil, X } from "lucide-react";
+import { Loader2, MapPin, Pencil, Plus, X } from "lucide-react";
 import { ubicaciones } from "@/constants/cities-and-states";
 import cpMexico from "@/lib/cp-mexico.json";
 import { toast } from "sonner";
@@ -46,7 +46,6 @@ export default function AddressSection({
   isNewAddress: boolean;
   defaultExpanded: boolean;
 }) {
-  const router = useRouter();
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -254,7 +253,12 @@ export default function AddressSection({
         }
       }
 
-      const isUpdating = !!currentAddressId && !isNewAddress;
+      // No depende de la prop "isNewAddress": una vez guardada la primera
+      // vez, currentAddressId ya trae el id real, y esta misma instancia
+      // sigue montada (ya no se fuerza un remount por URL despues de
+      // guardar), asi que la prop original se quedaria obsoleta y un
+      // segundo guardado volveria a crear (POST) en vez de actualizar (PUT).
+      const isUpdating = !!currentAddressId;
       const url = isUpdating
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/addresses/${currentAddressId}`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/addresses`;
@@ -274,10 +278,6 @@ export default function AddressSection({
       setExpanded(false);
       toast.success("Datos actualizados");
       window.scrollTo({ top: 0, behavior: "smooth" });
-
-      if (!addressId && savedDocId) {
-        router.replace(`/profile/edit?addressId=${savedDocId}`, { scroll: false });
-      }
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -307,16 +307,27 @@ export default function AddressSection({
             )}
           </div>
         </div>
-        {!expanded && !loading && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setExpanded(true)}
-            className="shrink-0 rounded-xl border-[#0071b1]/30 dark:border-sky-700 text-[#0071b1] dark:text-sky-400"
-          >
-            <Pencil size={13} className="mr-1.5" /> Editar
-          </Button>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          <Link href="/profile/edit?new=true">
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-xl border-[#0071b1]/30 dark:border-sky-700 text-[#0071b1] dark:text-sky-400"
+            >
+              <Plus size={13} className="mr-1.5" /> Agregar Dirección
+            </Button>
+          </Link>
+          {!expanded && !loading && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setExpanded(true)}
+              className="rounded-xl border-[#0071b1]/30 dark:border-sky-700 text-[#0071b1] dark:text-sky-400"
+            >
+              <Pencil size={13} className="mr-1.5" /> Editar
+            </Button>
+          )}
+        </div>
       </div>
 
       {loading && (

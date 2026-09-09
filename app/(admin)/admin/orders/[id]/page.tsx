@@ -12,7 +12,7 @@ import { CopyableCode } from "@/components/copyable-code";
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pendiente" },
   { value: "paid", label: "Pagado" },
-  { value: "processing", label: "En Preparación" },
+  { value: "processing", label: "En Proceso" },
   { value: "shipped", label: "En Camino" },
   { value: "delivered", label: "Entregado" },
   { value: "cancelled", label: "Cancelado" },
