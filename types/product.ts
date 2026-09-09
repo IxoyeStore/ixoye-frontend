@@ -22,6 +22,7 @@ export type ProductType = {
   department: string;
   subDepartment: string;
   productType: string;
+  vehicleType?: string | null;
   category?: CategoryType | null;
 
   // Especificaciones

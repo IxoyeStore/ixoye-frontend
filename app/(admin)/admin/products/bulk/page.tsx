@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { VEHICLE_TYPES } from "@/constants/vehicle-types";
 
 // ── Column map (must match export route) ────────────────────────────────────
 const COLUMNS = [
@@ -18,6 +19,7 @@ const COLUMNS = [
   { key: "department",     label: "departamento"     },
   { key: "subDepartment",  label: "subDepartamento"  },
   { key: "productType",    label: "tipoProducto"     },
+  { key: "vehicleType",    label: "tipoVehiculo"     },
   { key: "brand",          label: "marca"            },
   { key: "series",         label: "series"           },
   { key: "motors",         label: "motores"          },
@@ -261,7 +263,7 @@ export default function BulkProductsPage() {
       const res: ImportResult = { total: products.length, success: 0, failed: 0, errors: [] };
       const CONCURRENCY = 10;
 
-      const buildPayload = async (fields: Record<string, any>) => {
+      const buildPayload = async (fields: Record<string, any>, isCreate: boolean) => {
         const payload: Record<string, any> = {};
         if (fields.productName    !== undefined) payload.productName    = String(fields.productName);
         if (fields.code           !== undefined) payload.code           = String(fields.code).trim();
@@ -270,6 +272,20 @@ export default function BulkProductsPage() {
         if (fields.department     !== undefined) payload.department     = String(fields.department);
         if (fields.subDepartment  !== undefined) payload.subDepartment  = String(fields.subDepartment);
         if (fields.productType    !== undefined) payload.productType    = String(fields.productType);
+        if (isCreate || fields.vehicleType !== undefined) {
+          const vehicleType = fields.vehicleType !== undefined ? String(fields.vehicleType).trim() : "";
+          if (isCreate && !vehicleType) {
+            throw new Error(
+              `tipoVehiculo es obligatorio para productos nuevos. Debe ser uno de: ${VEHICLE_TYPES.join(", ")}.`
+            );
+          }
+          if (vehicleType && !(VEHICLE_TYPES as readonly string[]).includes(vehicleType)) {
+            throw new Error(
+              `tipoVehiculo inválido: "${vehicleType}". Debe ser exactamente uno de: ${VEHICLE_TYPES.join(", ")}${isCreate ? "" : " (o dejarse vacío)"}.`
+            );
+          }
+          payload.vehicleType = vehicleType;
+        }
         if (fields.brand          !== undefined) payload.brand          = String(fields.brand);
         if (fields.series         !== undefined) payload.series         = String(fields.series);
         if (fields.motors         !== undefined) payload.motors         = fields.motors ? String(fields.motors) : null;
@@ -300,9 +316,9 @@ export default function BulkProductsPage() {
         await Promise.all(batch.map(async (product) => {
           const { documentId, ...fields } = product;
           const isCreate = !documentId;
-          const payload = await buildPayload(fields);
           const label = String(fields.productName ?? fields.code ?? documentId);
           try {
+            const payload = await buildPayload(fields, isCreate);
             const upd = await fetch(
               isCreate ? "/api/admin/products" : `/api/admin/products/${documentId}`,
               {
@@ -318,9 +334,9 @@ export default function BulkProductsPage() {
               res.failed++;
               res.errors.push({ name: label, error: err?.error?.message || `HTTP ${upd.status}` });
             }
-          } catch {
+          } catch (e: any) {
             res.failed++;
-            res.errors.push({ name: label, error: "Error de red" });
+            res.errors.push({ name: label, error: e?.message || "Error de red" });
           }
           completed++;
           setProgress(Math.round((completed / products.length) * 100));

@@ -165,6 +165,7 @@ export default function EditProductPage() {
         department: p.department || "",
         subDepartment: p.subDepartment || "",
         productType: p.productType || "",
+        vehicleType: p.vehicleType || "",
         brand: p.brand || "",
         series: p.series || "",
         motors: p.motors || "",

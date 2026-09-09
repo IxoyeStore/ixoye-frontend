@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, Save, Loader2, Upload, X, ImageIcon } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { VEHICLE_TYPES } from "@/constants/vehicle-types";
 
 type ProductFormData = {
   productName: string;
@@ -14,6 +15,7 @@ type ProductFormData = {
   department: string;
   subDepartment: string;
   productType: string;
+  vehicleType: string;
   category: string;
   brand: string;
   series: string;
@@ -29,7 +31,7 @@ type ProductFormData = {
 
 const EMPTY: ProductFormData = {
   productName: "", slug: "", description: "", code: "",
-  department: "", subDepartment: "", productType: "", category: "",
+  department: "", subDepartment: "", productType: "", vehicleType: "", category: "",
   brand: "", series: "", motors: "", oemCode: "",
   price: "", wholesalePrice: "", stock: "",
   active: true, isFeatured: false, freeShipping: false,
@@ -128,6 +130,7 @@ export default function ProductForm({
       department: form.department,
       subDepartment: form.subDepartment,
       productType: form.productType,
+      vehicleType: form.vehicleType,
       brand: form.brand,
       series: form.series,
       motors: form.motors || null,
@@ -212,6 +215,19 @@ export default function ProductForm({
           </Field>
           <Field label="Tipo de Producto" required>
             <input type="text" value={form.productType} onChange={set("productType")} required className={inputCls} />
+          </Field>
+          <Field label="Tipo de Vehículo" required={!documentId}>
+            <select
+              value={form.vehicleType}
+              onChange={set("vehicleType")}
+              required={!documentId}
+              className={inputCls}
+            >
+              <option value="">{documentId ? "Sin clasificar" : "Selecciona uno..."}</option>
+              {VEHICLE_TYPES.map((v) => (
+                <option key={v} value={v}>{v}</option>
+              ))}
+            </select>
           </Field>
           <div className="grid grid-cols-2 gap-5 md:col-span-2">
             <Field label="Marca" required>

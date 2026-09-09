@@ -6,12 +6,11 @@ import { Separator } from "@/components/ui/separator";
 import SkeletonSchema from "@/components/skeletonSchema";
 import { ProductType } from "@/types/product";
 import { CategoryType } from "@/types/category";
-import { ResponeType } from "@/types/response";
 import { useEffect, useState } from "react";
 import ProductCard from "./[categorySlug]/components/product-card";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { SlidersHorizontal, X, ChevronLeft, ChevronRight, LayoutGrid, List, ShoppingCart, Heart } from "lucide-react";
-import { useGetCategories } from "@/api/getProducts";
+import { VEHICLE_TYPES } from "@/constants/vehicle-types";
 import { formatPrice } from "@/lib/formatPrice";
 import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
@@ -117,19 +116,54 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
   const [totalCount, setTotalCount]   = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode]       = useState<"grid" | "list">("grid");
-  const [priceMinInput, setPriceMinInput] = useState("");
-  const [priceMaxInput, setPriceMaxInput] = useState("");
+  const [productTypeOptions, setProductTypeOptions] = useState<string[]>([]);
+  const [loadingProductTypes, setLoadingProductTypes] = useState(false);
 
   const page         = parseInt(searchParams.get("page") || "1", 10) || 1;
   const currentSort  = searchParams.get("sort")        || "createdAt:desc";
   const category     = searchParams.get("category");
   const brand        = searchParams.get("brand");
+  const vehicleType  = searchParams.get("vehicleType");
+  const productType  = searchParams.get("productType");
   const series       = searchParams.get("series");
   const productName  = searchParams.get("productName");
-  const priceMin     = searchParams.get("priceMin");
-  const priceMax     = searchParams.get("priceMax");
 
-  const { result: categories }: ResponeType = useGetCategories();
+  // Todas las categorias reales (no solo las destacadas del home), para que
+  // el filtro sea exacto y no oculte categorias validas como FRENOS o ELECTRICO.
+  const [categories, setCategories] = useState<CategoryType[]>([]);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories?sort=categoryName:asc`)
+      .then(r => r.json())
+      .then(json => setCategories(json.data ?? []))
+      .catch(() => setCategories([]));
+  }, []);
+
+  // El filtro de Tipo de Producto depende de la categoria elegida: cada vez
+  // que cambia, se traen los tipoProducto reales que existen dentro de esa
+  // categoria (mismo patron que technical-filter-modal.tsx).
+  useEffect(() => {
+    if (!category) {
+      setProductTypeOptions([]);
+      return;
+    }
+    let cancelled = false;
+    setLoadingProductTypes(true);
+    const params = new URLSearchParams();
+    params.set("filters[category][categoryName][$eq]", category);
+    params.set("filters[productType][$notNull]", "true");
+    params.set("fields[0]", "productType");
+    params.set("pagination[pageSize]", "100");
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products?${params.toString()}`)
+      .then(r => r.json())
+      .then(json => {
+        if (cancelled) return;
+        const values = (json.data ?? []).map((p: any) => p.productType).filter(Boolean);
+        setProductTypeOptions(Array.from(new Set(values)).sort() as string[]);
+      })
+      .catch(() => { if (!cancelled) setProductTypeOptions([]); })
+      .finally(() => { if (!cancelled) setLoadingProductTypes(false); });
+    return () => { cancelled = true; };
+  }, [category]);
 
   // Cambiar un filtro siempre reinicia la paginacion a la pagina 1.
   const setParam = (key: string, value: string | null) => {
@@ -142,12 +176,22 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
 
   const clearAll = () => router.push(pathname, { scroll: false });
 
+  // Cambiar de categoria invalida el tipo de producto elegido (depende de ella).
+  const setCategory = (value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set("category", value);
+    else params.delete("category");
+    params.delete("productType");
+    params.delete("page");
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   const activeFilters = [
-    brand       && { key: "brand",    label: `Marca: ${brand}` },
-    category    && { key: "category", label: `Tipo: ${category}` },
-    series      && { key: "series",   label: `Serie: ${series}` },
-    priceMin    && { key: "priceMin", label: `Desde: $${priceMin}` },
-    priceMax    && { key: "priceMax", label: `Hasta: $${priceMax}` },
+    brand       && { key: "brand",       label: `Marca: ${brand}` },
+    vehicleType && { key: "vehicleType", label: `Vehículo: ${vehicleType}` },
+    category    && { key: "category",    label: `Categoría: ${category}` },
+    productType && { key: "productType", label: `Tipo: ${productType}` },
+    series      && { key: "series",      label: `Serie: ${series}` },
   ].filter(Boolean) as { key: string; label: string }[];
 
   const currentSortLabel = SORT_OPTIONS.find(o => o.value === currentSort)?.label || "Ordenar";
@@ -162,12 +206,12 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
       params.set("pagination[page]", String(pageNumber));
       params.set("pagination[pageSize]", String(pageSize));
       params.set("sort[0]", currentSort);
-      if (category)    params.set("filters[productType][$containsi]", category);
+      if (category)    params.set("filters[category][categoryName][$eq]", category);
+      if (productType) params.set("filters[productType][$eq]", productType);
+      if (vehicleType) params.set("filters[vehicleType][$eq]", vehicleType);
       if (brand)       params.set("filters[brand][$containsi]", brand);
       if (series)      params.set("filters[series][$containsi]", series);
       if (productName) params.set("filters[productName][$containsi]", productName);
-      if (priceMin)    params.set("filters[price][$gte]", priceMin);
-      if (priceMax)    params.set("filters[price][$lte]", priceMax);
 
       const res  = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products?${params.toString()}`
@@ -194,7 +238,7 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
 
   useEffect(() => {
     fetchProducts(page);
-  }, [page, currentSort, category, brand, series, productName, priceMin, priceMax]);
+  }, [page, currentSort, category, productType, vehicleType, brand, series, productName]);
 
   const goToPage = (p: number) => {
     if (p < 1 || p > totalPages || p === page) return;
@@ -209,22 +253,6 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
     const end = Math.min(total, start + window - 1);
     start = Math.max(1, end - window + 1);
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  };
-
-  useEffect(() => {
-    setPriceMinInput(priceMin || "");
-    setPriceMaxInput(priceMax || "");
-  }, [priceMin, priceMax]);
-
-  const applyPriceFilter = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (priceMinInput) params.set("priceMin", priceMinInput);
-    else params.delete("priceMin");
-    if (priceMaxInput) params.set("priceMax", priceMaxInput);
-    else params.delete("priceMax");
-    params.delete("page");
-    router.push(`?${params.toString()}`, { scroll: false });
-    setShowFilters(false);
   };
 
   if (error)
@@ -305,7 +333,7 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
           {activeFilters.map(f => (
             <button
               key={f.key}
-              onClick={() => setParam(f.key, null)}
+              onClick={() => f.key === "category" ? setCategory(null) : setParam(f.key, null)}
               className="flex items-center gap-1.5 h-7 px-3 rounded-full bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 text-[11px] font-bold hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-200 dark:hover:border-red-800 hover:text-red-500 transition-colors"
             >
               {f.label}
@@ -323,7 +351,7 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
 
       {/* ── Filter panel ─────────────────────────────────────────────────── */}
       {showFilters && (
-        <div className="mb-4 p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl">
+        <div className="mb-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl">
           <div className="flex flex-wrap items-end gap-3">
 
             {/* Sort */}
@@ -357,12 +385,27 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
               </select>
             </div>
 
+            {/* Vehicle type (segment) */}
+            <div className="flex flex-col gap-1 min-w-[160px]">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Tipo de Vehículo</label>
+              <select
+                value={vehicleType || ""}
+                onChange={e => setParam("vehicleType", e.target.value || null)}
+                className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:border-sky-400 cursor-pointer"
+              >
+                <option value="">Todos los vehículos</option>
+                {VEHICLE_TYPES.map(v => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </select>
+            </div>
+
             {/* Category */}
             <div className="flex flex-col gap-1 min-w-[180px]">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Categoría</label>
               <select
                 value={category || ""}
-                onChange={e => setParam("category", e.target.value || null)}
+                onChange={e => setCategory(e.target.value || null)}
                 className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:border-sky-400 cursor-pointer"
               >
                 <option value="">Todas las categorías</option>
@@ -372,32 +415,26 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
               </select>
             </div>
 
-            {/* Price range */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Precio</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  placeholder="Mín"
-                  value={priceMinInput}
-                  onChange={e => setPriceMinInput(e.target.value)}
-                  className="w-24 h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-400"
-                />
-                <span className="text-slate-300 dark:text-slate-600 font-bold">—</span>
-                <input
-                  type="number"
-                  placeholder="Máx"
-                  value={priceMaxInput}
-                  onChange={e => setPriceMaxInput(e.target.value)}
-                  className="w-24 h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-400"
-                />
-                <button
-                  onClick={applyPriceFilter}
-                  className="h-9 px-4 rounded-lg bg-sky-600 text-white text-xs font-bold hover:bg-sky-700 transition-colors"
-                >
-                  Aplicar
-                </button>
-              </div>
+            {/* Product type (detail, depends on Category) */}
+            <div className="flex flex-col gap-1 min-w-[180px]">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Tipo de Producto</label>
+              <select
+                value={productType || ""}
+                onChange={e => setParam("productType", e.target.value || null)}
+                disabled={!category || loadingProductTypes}
+                className="h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-600 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:border-sky-400 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">
+                  {!category
+                    ? "Elige una categoría"
+                    : loadingProductTypes
+                      ? "Cargando..."
+                      : "Todos los tipos"}
+                </option>
+                {productTypeOptions.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
             </div>
 
             {/* Clear */}

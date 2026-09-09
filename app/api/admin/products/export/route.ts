@@ -13,6 +13,7 @@ const COLUMNS = [
   { key: "department",     label: "departamento",     width: 20 },
   { key: "subDepartment",  label: "subDepartamento",  width: 20 },
   { key: "productType",    label: "tipoProducto",     width: 20 },
+  { key: "vehicleType",    label: "tipoVehiculo",     width: 20 },
   { key: "brand",          label: "marca",            width: 16 },
   { key: "series",         label: "series",           width: 20 },
   { key: "motors",         label: "motores",          width: 20 },
