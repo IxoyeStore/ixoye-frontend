@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // Sin optimizacion de Vercel (limite de 5K transformaciones/mes en Hobby).
+    // Cloudinary optimiza via lib/image-loader.ts.
+    loader: "custom",
+    loaderFile: "./lib/image-loader.ts",
     remotePatterns: [
       {
         protocol: "https",
