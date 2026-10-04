@@ -33,6 +33,8 @@ import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useAdminAutoRedirect } from "@/hooks/use-admin-auto-redirect";
 import SupportMenu from "./support-menu";
 import TechnicalFilterModal from "./technical-filter-modal";
+import { cloudinaryUrl } from "@/lib/image-loader";
+import { FREE_SHIPPING_MIN_TOTAL } from "@/lib/shipping";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -111,7 +113,7 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
               className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:border-sky-200 dark:hover:border-sky-800 border border-transparent transition-all group/brand"
             >
               <div className="w-14 h-9 shrink-0 flex items-center justify-center rounded-lg p-1 bg-white border border-slate-100 dark:border-slate-600">
-                <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
+                <img src={cloudinaryUrl(logo, 112)} alt={name} loading="lazy" className="max-w-full max-h-full object-contain" />
               </div>
               <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover/brand:text-sky-700 dark:group-hover/brand:text-sky-400 leading-tight">
                 {name}
@@ -124,33 +126,44 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
   );
 };
 
-const SHIPPING_BANNER_TEXT = "Envío gratis en todo Nayarit en compras mínimas de $499";
+const WHATSAPP_NUMBERS = ["311 237 7582", "311 847 7877"];
+const SHIPPING_BANNER_TEXT = `Envío gratis en todo Nayarit en compras mínimas de $${FREE_SHIPPING_MIN_TOTAL}`;
 
-// Tira de texto en loop continuo (marquee). El truco de duplicar el
-// mismo bloque de items dos veces y animar translateX de 0 a -50% hace
-// que el loop se vea perfectamente continuo sin importar el ancho real
-// del texto, siempre y cuando ambas mitades sean identicas.
+// Barra de avisos sobre el navbar. En movil solo cabe el de envio gratis;
+// los demas aparecen conforme hay ancho (lg y xl).
 function FreeShippingBanner() {
-  const items = Array.from({ length: 6 });
-  const track = (keyPrefix: string) => (
-    <div className="flex shrink-0" aria-hidden={keyPrefix === "b"}>
-      {items.map((_, i) => (
-        <span
-          key={`${keyPrefix}-${i}`}
-          className="mx-6 flex items-center gap-2 text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-white whitespace-nowrap"
-        >
-          <Truck size={13} className="shrink-0" />
-          {SHIPPING_BANNER_TEXT}
-        </span>
-      ))}
-    </div>
-  );
-
+  const item =
+    "flex items-center gap-2 text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-white";
   return (
-    <div className="w-full bg-emerald-600 dark:bg-emerald-700 overflow-hidden py-1.5 select-none">
-      <div className="flex w-max animate-marquee">
-        {track("a")}
-        {track("b")}
+    <div className="w-full bg-emerald-600 dark:bg-emerald-700 select-none">
+      <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-center lg:justify-between gap-6">
+        <p className={`${item} min-w-0 justify-center text-center lg:whitespace-nowrap`}>
+          <span className="min-w-0">
+            <Truck size={13} className="inline-block align-[-2px] mr-2" />
+            {SHIPPING_BANNER_TEXT}
+          </span>
+        </p>
+        <p className={`${item} hidden lg:flex whitespace-nowrap`}>
+          <ShieldCheck size={13} className="shrink-0" />
+          Pago seguro con Openpay de BBVA
+        </p>
+        <p className={`${item} hidden xl:flex whitespace-nowrap`}>
+          <MessageCircle size={13} className="shrink-0" />
+          Cotiza por WhatsApp:
+          {WHATSAPP_NUMBERS.map((n, i) => (
+            <span key={n} className="flex items-center gap-2">
+              {i > 0 && <span aria-hidden>·</span>}
+              <a
+                href={`https://wa.me/52${n.replace(/\s/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline-offset-2 hover:underline"
+              >
+                {n}
+              </a>
+            </span>
+          ))}
+        </p>
       </div>
     </div>
   );
@@ -392,7 +405,9 @@ export default function Header({
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 md:h-24 gap-8">
           <Link href="/" className="flex items-center gap-0 group shrink-0">
             <img
-              src="/logo-ixoye.png"
+              src="/logo-ixoye.webp"
+              width={397}
+              height={192}
               className="h-10 md:h-14 w-auto object-contain brightness-0 invert"
               alt="logo"
             />
@@ -833,7 +848,7 @@ export default function Header({
                         className="flex items-center gap-3 px-3 py-3 rounded-xl border border-transparent hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:border-sky-200 dark:hover:border-sky-800 transition-all"
                       >
                         <div className="w-12 h-8 shrink-0 flex items-center justify-center rounded-lg p-1 bg-white border border-slate-100 dark:border-slate-600">
-                          <img src={logo} alt={name} className="max-w-full max-h-full object-contain" />
+                          <img src={cloudinaryUrl(logo, 112)} alt={name} loading="lazy" className="max-w-full max-h-full object-contain" />
                         </div>
                         <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-tight">{name}</span>
                       </button>

@@ -3,6 +3,7 @@
 
 import { useGetCategories } from "@/api/getProducts";
 import Link from "next/link";
+import { cloudinaryUrl, cloudinarySrcSet } from "@/lib/image-loader";
 import { ResponeType } from "@/types/response";
 import { CategoryType } from "@/types/category";
 import { LayoutGrid } from "lucide-react";
@@ -77,9 +78,15 @@ const ChooseCategory = () => {
                     <img
                       src={
                         category.mainImage?.url
-                          ? `${category.mainImage.url}`
+                          ? cloudinaryUrl(category.mainImage.url, 600)
                           : "/placeholder-category.jpg"
                       }
+                      srcSet={
+                        category.mainImage?.url
+                          ? cloudinarySrcSet(category.mainImage.url, [300, 600])
+                          : undefined
+                      }
+                      sizes="(max-width: 768px) 50vw, 25vw"
                       alt={category.categoryName}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"

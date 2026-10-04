@@ -10,6 +10,7 @@ import { useLovedProducts } from "@/hooks/use-loved-products";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
+import { FREE_SHIPPING_MIN_TOTAL } from "@/lib/shipping";
 
 export type InfoProductProps = {
   product: ProductType;
@@ -177,7 +178,7 @@ const InfoProduct = ({ product }: InfoProductProps) => {
             <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 px-2 py-0.5 rounded-md border border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950/40 w-fit">
               <Truck size={14} strokeWidth={3} />
               <span className="text-[11px] font-black uppercase tracking-wide">
-                Envío gratis Nayarit
+                Envío gratis Nayarit en compras desde ${FREE_SHIPPING_MIN_TOTAL}
               </span>
             </div>
           )}

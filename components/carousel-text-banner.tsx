@@ -8,7 +8,10 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 
-const images = ["/carousel-banner/banner-ixoye-parts.jpeg"];
+// Cada banner se publica en public/carousel-banner como WebP en 768, 1280,
+// 1920 y 2560 px de ancho (<base>-<ancho>.webp) para servir el tamano justo.
+const BANNER_WIDTHS = [768, 1280, 1920, 2560];
+const images = ["/carousel-banner/banner-ixoye-parts"];
 
 const CarouselTextBanner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -55,7 +58,13 @@ const CarouselTextBanner = () => {
                   onTouchEnd={() => isMultiple && setIsPaused(false)}
                 >
                   <img
-                    src={src}
+                    src={`${src}-1920.webp`}
+                    srcSet={BANNER_WIDTHS.map((w) => `${src}-${w}.webp ${w}w`).join(", ")}
+                    sizes="100vw"
+                    width={1920}
+                    height={652}
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                    loading={index === 0 ? "eager" : "lazy"}
                     alt={
                       isMultiple ? `Banner ${index + 1}` : "Banner Principal"
                     }

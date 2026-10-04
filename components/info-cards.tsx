@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { Truck, BadgePercent, Store, Search, X, MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
-import cpMexico from "@/lib/cp-mexico.json";
+import { lookupCP } from "@/lib/cp-lookup";
+import { FREE_SHIPPING_MIN_TOTAL } from "@/lib/shipping";
 
 const MUNICIPIOS_CON_ENVIO = new Set([
   "Tepic",
@@ -24,18 +25,30 @@ const MUNICIPIOS_CON_ENVIO = new Set([
 ]);
 
 const WHATSAPP_NUMBER = "3112377582";
-const PHONE_DISPLAY = "+52 311 237 7582";
-const PHONE_HREF = "tel:+523112377582";
+const PHONE_DISPLAY = "+52 311 847 7877";
+// El 311 237 7582 es solo WhatsApp; las llamadas van al 847.
+const PHONE_HREF = "tel:+523118477877";
 
 const InfoCards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cp, setCp] = useState("");
   const [resultado, setResultado] = useState<string | null>(null);
   const [disponible, setDisponible] = useState<boolean | null>(null);
+  const [consultando, setConsultando] = useState(false);
 
-  const consultarEnvio = () => {
-    if (cp.length < 5) return;
-    const entry = (cpMexico as Record<string, { e: string; m: string }>)[cp];
+  const consultarEnvio = async () => {
+    if (cp.length < 5 || consultando) return;
+    setConsultando(true);
+    let entry;
+    try {
+      entry = await lookupCP(cp);
+    } catch {
+      setResultado("No pudimos consultar el código postal. Intenta de nuevo.");
+      setDisponible(false);
+      return;
+    } finally {
+      setConsultando(false);
+    }
     if (!entry) {
       setResultado("Código postal no encontrado.");
       setDisponible(false);
@@ -43,7 +56,7 @@ const InfoCards = () => {
     }
     if (entry.e === "Nayarit") {
       if (MUNICIPIOS_CON_ENVIO.has(entry.m)) {
-        setResultado(`¡Envío GRATIS a ${entry.m}, Nayarit!`);
+        setResultado(`¡Envío GRATIS a ${entry.m}, Nayarit, en compras desde $${FREE_SHIPPING_MIN_TOTAL}!`);
         setDisponible(true);
       } else {
         setResultado(`Lo sentimos, no contamos con servicio de envío a ${entry.m}. Contáctanos para más información.`);
@@ -64,7 +77,7 @@ const InfoCards = () => {
           <div>
             <h3 className="text-lg font-bold text-sky-900 dark:text-sky-300">Envíos en Nayarit</h3>
             <p className="text-sm text-sky-600 dark:text-sky-400">
-              A partir de $499 de compra, el envío es gratis en todo Nayarit. Consulta la disponibilidad de envíos{" "}
+              A partir de ${FREE_SHIPPING_MIN_TOTAL} de compra, el envío es gratis en todo Nayarit. Consulta la disponibilidad de envíos{" "}
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="font-bold underline text-sky-800 dark:text-sky-300 hover:text-sky-500 dark:hover:text-sky-200 transition-colors"
@@ -140,12 +153,12 @@ const InfoCards = () => {
               />
 
               <button
-                disabled={cp.length < 5}
+                disabled={cp.length < 5 || consultando}
                 className="w-full bg-sky-700 hover:bg-sky-800 disabled:bg-gray-300 dark:disabled:bg-slate-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-sky-100 dark:shadow-none flex items-center justify-center gap-2"
                 onClick={consultarEnvio}
               >
                 <Search size={18} />
-                Consultar
+                {consultando ? "Consultando..." : "Consultar"}
               </button>
 
               {resultado && (

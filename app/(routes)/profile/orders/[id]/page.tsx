@@ -180,8 +180,10 @@ export default function OrderDetailPage() {
         <div className="flex justify-between items-start border-b-2 border-slate-900 dark:border-slate-100 pb-8">
           <div className="flex items-center gap-4">
             <img
-              src="/logo.png"
+              src="/logo.webp"
               alt="Logo Ixoye"
+              width={64}
+              height={64}
               className="w-16 h-16 object-contain print:grayscale dark:brightness-0 dark:invert"
             />
             <div className="space-y-1">

@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/context/auth-context";
 import MobileBackButtonHandler from "@/components/mobile-back-button-handler";
 import "./globals.css";
 import { Toaster } from "sonner";
-import Script from "next/script";
 import { SITE_URL } from "@/lib/site";
 
 const organizationJsonLd = {
@@ -13,7 +11,7 @@ const organizationJsonLd = {
   name: "Refacciones Diésel y Agrícola Ixoye",
   url: SITE_URL,
   email: "soporte@refaccionesixoye.mx",
-  telephone: ["+52 311 237 7582", "+52 311 847 7877"],
+  telephone: "+52 311 847 7877",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Vicente Guerrero #298",
@@ -42,16 +40,6 @@ const organizationJsonLd = {
   ],
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   title: "Ixoye",
   description: "Refacciones Diesel y Agricola Ixoye",
@@ -64,22 +52,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-        />
-        <Script
-          src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"
-          strategy="beforeInteractive"
-        />
-        <Script
-          src="https://openpay.s3.amazonaws.com/openpay.v1.min.js"
-          strategy="beforeInteractive"
-        />
-        <Script
-          src="https://openpay.s3.amazonaws.com/openpay-data.v1.min.js"
-          strategy="beforeInteractive"
         />
         <MobileBackButtonHandler />
         <AuthProvider>{children}</AuthProvider>

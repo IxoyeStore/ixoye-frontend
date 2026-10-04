@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, MapPin, Pencil, Plus, X } from "lucide-react";
 import { ubicaciones } from "@/constants/cities-and-states";
-import cpMexico from "@/lib/cp-mexico.json";
+import { lookupCP, type CPEntry } from "@/lib/cp-lookup";
 import { toast } from "sonner";
 
 const MEXICO_STATES = Object.keys(ubicaciones) as (keyof typeof ubicaciones)[];
@@ -150,8 +150,19 @@ export default function AddressSection({
       return;
     }
 
-    const entry = (cpMexico as Record<string, { e: string; m: string; c: string[] }>)[form.postalCode];
+    let cancelled = false;
+    lookupCP(form.postalCode)
+      .then((entry) => {
+        if (!cancelled) applyCPEntry(entry);
+      })
+      .catch((e) => console.error("Error consultando CP:", e));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.postalCode]);
 
+  const applyCPEntry = (entry: CPEntry | null) => {
     if (!entry) {
       setCpError(true);
       setColoniasSugeridas([]);
@@ -190,8 +201,7 @@ export default function AddressSection({
             ? prev.neighborhood
             : "",
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.postalCode]);
+  };
 
   const hasChanges = useMemo(
     () => JSON.stringify(form) !== JSON.stringify(original) || isNewAddress,

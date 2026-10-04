@@ -13,20 +13,16 @@ import { toast } from "sonner";
 import { ShoppingBasket, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import router from "next/router";
-import cpMexico from "@/lib/cp-mexico.json";
+import { lookupCP } from "@/lib/cp-lookup";
+// Solo para mostrarle el costo al cliente antes de pagar; el backend
+// recalcula y cobra el envio con los mismos valores.
+import { FREE_SHIPPING_MIN_TOTAL, SHIPPING_FLAT_COST } from "@/lib/shipping";
 
-// Envio gratis solo a partir de este monto; por debajo siempre se cobra
-// la tarifa fija. Ambos valores deben coincidir siempre con
-// calculateShippingServerSide() en ixoye-backend/src/api/order/controllers/order.ts,
-// que es quien realmente cobra - esto aqui es solo para mostrarle el
-// costo al cliente antes de pagar.
-const FREE_SHIPPING_MIN_TOTAL = 499;
-const SHIPPING_FLAT_COST = 150;
 
 type ShippingZone = { available: boolean; label: string };
 
-function resolveShippingZone(cp: string): ShippingZone {
-  const entry = (cpMexico as Record<string, { e: string; m: string }>)[cp];
+async function resolveShippingZone(cp: string): Promise<ShippingZone> {
+  const entry = await lookupCP(cp);
   // Solo hacemos envios dentro de Nayarit; fuera de esa zona (o un CP que
   // ni siquiera existe en el catalogo) el cliente debe comunicarse con
   // nosotros - no existe una tarifa nacional generica.
@@ -155,7 +151,7 @@ export default function Page() {
           if (json.data?.[0]) {
             const cp = json.data[0].postalCode;
             setUserCP(cp);
-            calculateShipping(cp);
+            await calculateShipping(cp);
           }
         } catch (e) {
           console.error("Error cargando CP:", e);
@@ -165,7 +161,7 @@ export default function Page() {
     fetchDefaultAddress();
   }, [user]);
 
-  const calculateShipping = (cp: string) => {
+  const calculateShipping = async (cp: string) => {
     if (cp.length !== 5) return;
 
     const cacheKey = "shipping_zone_cache";
@@ -179,7 +175,7 @@ export default function Page() {
       }
     }
 
-    const zone = resolveShippingZone(cp);
+    const zone = await resolveShippingZone(cp);
     setShippingZone(zone);
     localStorage.setItem(cacheKey, JSON.stringify({ cp, ...zone }));
   };
@@ -336,7 +332,10 @@ export default function Page() {
               <Separator className="bg-slate-200 dark:bg-slate-700 mt-4" />
 
               <img
-                src="/pagos-tiendas.jpg"
+                src="/pagos-tiendas.webp"
+                width={800}
+                height={190}
+                loading="lazy"
                 alt="Tiendas donde puedes pagar tu pedido en efectivo: Soriana, Walmart, Sam's Club, Bodega Aurrera, 7-Eleven, Farmacias del Ahorro, Waldo's, SyS Tienda, Kiosko y Circle K"
                 className="mt-4 w-full rounded-2xl border border-slate-100 dark:border-slate-700"
               />

@@ -3,9 +3,13 @@
 import { useState, useRef } from "react";
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
+import { cloudinaryUrl, cloudinarySrcSet } from "@/lib/image-loader";
 
 const THUMBS_VISIBLE = 5;
 const ZOOM_FACTOR = 3;
+const MAIN_WIDTHS = [400, 800, 1200];
+const MAIN_SIZES = "(min-width: 640px) 45vw, 100vw";
+const ZOOM_WIDTH = 1600;
 
 type Props = {
   images: string[];
@@ -54,7 +58,7 @@ export default function ProductGallery({ images, productName }: Props) {
       }`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={images[idx]} alt={`${productName} - vista ${idx + 1}`} draggable={false} className="w-full h-full object-contain" />
+      <img src={cloudinaryUrl(images[idx], 136)} alt={`${productName} - vista ${idx + 1}`} draggable={false} className="w-full h-full object-contain" />
     </button>
   );
 
@@ -100,7 +104,10 @@ export default function ProductGallery({ images, productName }: Props) {
             {images.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={images[safeIdx]}
+                src={cloudinaryUrl(images[safeIdx], 800)}
+                srcSet={cloudinarySrcSet(images[safeIdx], MAIN_WIDTHS)}
+                sizes={MAIN_SIZES}
+                fetchPriority={safeIdx === 0 ? "high" : "auto"}
                 alt={productName}
                 draggable={false}
                 className="w-full h-full object-contain"
@@ -131,7 +138,7 @@ export default function ProductGallery({ images, productName }: Props) {
           <div
             className="absolute top-0 left-[calc(100%+1.5rem)] w-[130%] aspect-square rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl z-20 overflow-hidden pointer-events-none"
             style={{
-              backgroundImage: `url(${images[safeIdx]})`,
+              backgroundImage: `url(${cloudinaryUrl(images[safeIdx], ZOOM_WIDTH)})`,
               backgroundSize: `${ZOOM_FACTOR * 100}%`,
               backgroundPosition: `${bgX}% ${bgY}%`,
               backgroundRepeat: "no-repeat",
@@ -149,7 +156,15 @@ export default function ProductGallery({ images, productName }: Props) {
         >
           {images.length > 0 ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={images[safeIdx]} alt={productName} draggable={false} className="w-full h-full object-contain" />
+            <img
+              src={cloudinaryUrl(images[safeIdx], 800)}
+              srcSet={cloudinarySrcSet(images[safeIdx], MAIN_WIDTHS)}
+              sizes={MAIN_SIZES}
+              fetchPriority={safeIdx === 0 ? "high" : "auto"}
+              alt={productName}
+              draggable={false}
+              className="w-full h-full object-contain"
+            />
           ) : (
             <ProductImage className="w-full h-full" />
           )}
@@ -187,7 +202,7 @@ export default function ProductGallery({ images, productName }: Props) {
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={images[i]} alt={`${productName} - vista ${i + 1}`} className="w-full h-full object-contain" />
+                <img src={cloudinaryUrl(images[i], 128)} alt={`${productName} - vista ${i + 1}`} className="w-full h-full object-contain" />
               </button>
             ))}
           </div>
@@ -232,7 +247,7 @@ export default function ProductGallery({ images, productName }: Props) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={images[safeIdx]}
+              src={cloudinaryUrl(images[safeIdx], ZOOM_WIDTH)}
               alt={productName}
               className="max-w-full max-h-[90vh] object-contain rounded-2xl"
             />

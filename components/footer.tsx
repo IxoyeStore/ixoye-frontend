@@ -8,7 +8,7 @@ import {
   Instagram,
   Youtube,
   Mail,
-  Phone,
+  MessageCircle,
   MapPin,
   Headset,
   Info,
@@ -79,8 +79,11 @@ export default function Footer() {
           {/* Logo + descripción */}
           <div className="space-y-4 md:col-span-1">
             <img
-              src="/logo.png"
+              src="/logo.webp"
               alt="logo"
+              width={192}
+              height={192}
+              loading="lazy"
               className="h-16 w-auto brightness-0 invert object-contain"
             />
             <p className="text-sm text-blue-50/80 leading-relaxed">
@@ -134,15 +137,25 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <Phone size={16} className="text-sky-300 mt-0.5" />
-                <a
-                  href="tel:+520000000000"
-                  className="hover:text-sky-200 transition-colors"
-                >
-                  +52 (311) 237 7582 <br/>
-                  +52 (311) 847 7877
-
-                </a>
+                <MessageCircle size={16} className="text-sky-300 mt-0.5 shrink-0" />
+                <div className="leading-tight space-y-2">
+                  <a
+                    href="https://wa.me/523112377582"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block hover:text-sky-200 transition-colors"
+                  >
+                    +52 (311) 237 7582
+                    <span className="block text-xs text-blue-50/60">Solo WhatsApp</span>
+                  </a>
+                  <a
+                    href="tel:+523118477877"
+                    className="block hover:text-sky-200 transition-colors"
+                  >
+                    +52 (311) 847 7877
+                    <span className="block text-xs text-blue-50/60">Llamadas y WhatsApp</span>
+                  </a>
+                </div>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin size={16} className="text-sky-300 mt-0.5 shrink-0" />
@@ -243,7 +256,7 @@ export default function Footer() {
               ¿Necesitas Factura?
             </strong>
             Envía tu Constancia de Situación Fiscal y número de pedido a nuestro
-            correo o WhatsApp dentro del mes de tu compra para.
+            correo o WhatsApp dentro del mes de tu compra para emitirla.
           </p>
         </div>
 

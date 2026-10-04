@@ -176,7 +176,7 @@ const SuccessContent = () => {
         </div>
 
         <div className="hidden md:flex justify-center md:min-w-[400px]">
-          <Image src="/success-v2.png" alt="Success" width={300} height={600} />
+          <Image src="/success-v2.webp" alt="Success" width={300} height={450} />
         </div>
       </div>
     </div>
