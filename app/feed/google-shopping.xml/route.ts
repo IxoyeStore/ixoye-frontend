@@ -77,7 +77,9 @@ export async function GET() {
   return new Response(xml, {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
-      "Cache-Control": "public, max-age=3600",
+      // s-maxage para que el CDN de Vercel lo cachee; con solo max-age cada
+      // request ejecutaba la función y re-descargaba el catálogo completo.
+      "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
     },
   });
 }
