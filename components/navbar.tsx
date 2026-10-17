@@ -185,6 +185,16 @@ export default function Header({
   const desktopRef  = useRef<HTMLDivElement>(null);
   const mobileRef   = useRef<HTMLDivElement>(null);
 
+  // Al bajar, solo la franja del logo/buscador/accesos queda fija y se compacta.
+  // Umbrales distintos para entrar y salir, asi no parpadea cerca del limite.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled((s) => (s ? window.scrollY > 20 : window.scrollY > 80));
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   // Close preview on navigation
   useEffect(() => {
     setShowPreview(false);
@@ -345,10 +355,10 @@ export default function Header({
       </div>
     ) : null;
 
-  const iconClass =
-    "flex flex-col items-center justify-center gap-1 px-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/10 text-white/90 h-14 min-w-[64px]";
-  const navTextClass =
-    "text-[9px] font-black uppercase italic tracking-wider text-center";
+  const iconClass = `flex flex-col items-center justify-center gap-1 px-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/10 text-white/90 min-w-[64px] ${
+    scrolled ? "h-11" : "h-14"
+  }`;
+  const navTextClass = `text-[9px] font-black uppercase italic tracking-wider text-center ${scrolled ? "hidden" : ""}`;
 
   return (
     <>
@@ -361,16 +371,22 @@ export default function Header({
     <header className="w-full sticky top-0 z-50 shadow-lg">
       {/* FRANJA SUPERIOR */}
       <div className="w-full bg-[#003366] bg-gradient-to-t from-[#0055a4] to-[#003366] text-white">
-        <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 md:h-24 gap-8">
+        <div
+          className={`max-w-7xl mx-auto px-4 flex justify-between items-center h-20 gap-8 transition-[height] duration-200 ${
+            scrolled ? "md:h-16" : "md:h-24"
+          }`}
+        >
           <Link href="/" className="flex items-center gap-0 group shrink-0">
             <img
               src="/logo-ixoye.webp"
               width={397}
               height={192}
-              className="h-10 md:h-14 w-auto object-contain brightness-0 invert"
+              className={`h-10 w-auto object-contain brightness-0 invert transition-[height] duration-200 ${
+                scrolled ? "md:h-10" : "md:h-14"
+              }`}
               alt="logo"
             />
-            <div className="hidden lg:flex flex-col justify-center pl-2">
+            <div className={`hidden flex-col justify-center pl-2 ${scrolled ? "" : "lg:flex"}`}>
               <h1 className="text-white font-black text-[21px] uppercase italic">
                 Refacciones
               </h1>
@@ -532,7 +548,11 @@ export default function Header({
           </button>
         </div>
       </div>
+    </header>
 
+    {/* Lo que sigue ya no es sticky: se va con el scroll. z-40 para que los
+        menus de "Busqueda por:" queden encima del contenido de la pagina. */}
+    <div className="w-full relative z-40">
       {/* FRANJA INFERIOR */}
       <div className="hidden md:flex w-full bg-[#004a99] border-b border-white/10 py-3 items-center shadow-md relative">
         <div className="flex-1 flex justify-center items-center gap-8">
@@ -840,7 +860,7 @@ export default function Header({
           </div>
         </div>
       )}
-    </header>
+    </div>
     </>
   );
 }

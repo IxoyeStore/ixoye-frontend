@@ -131,15 +131,13 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
   // La barra de filtros se pega justo debajo del navbar (que tambien es
   // sticky) en vez de tapar contenido debajo de el. Se mide en vivo en vez
   // de hardcodear un alto de navbar, porque el navbar cambia de tamano
-  // entre mobile/desktop y ademas puede llevar el banner de envio gratis.
+  // entre mobile/desktop y se compacta al hacer scroll.
   useEffect(() => {
-    const updateStickyTop = () => {
-      const header = document.querySelector("header");
-      setStickyTop(header?.getBoundingClientRect().height ?? 0);
-    };
-    updateStickyTop();
-    window.addEventListener("resize", updateStickyTop);
-    return () => window.removeEventListener("resize", updateStickyTop);
+    const header = document.querySelector("header");
+    if (!header) return;
+    const observer = new ResizeObserver(() => setStickyTop(header.getBoundingClientRect().height));
+    observer.observe(header);
+    return () => observer.disconnect();
   }, []);
 
   const page         = parseInt(searchParams.get("page") || "1", 10) || 1;
