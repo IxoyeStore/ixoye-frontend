@@ -73,7 +73,7 @@ function TractorPanel({ tree, onNavigate }: { tree: FitmentTree; onNavigate: () 
   );
   const currentMake = tree.makes.find((m) => m.name === make);
   const currentSeries = currentMake?.series.find((s) => s.name === series);
-  const width = currentSeries ? "w-[880px]" : currentMake ? "w-[540px]" : "w-[300px]";
+  const width = currentSeries ? "w-[800px]" : currentMake ? "w-[540px]" : "w-[300px]";
 
   return (
     <div className={`flex divide-x divide-slate-100 dark:divide-slate-700 max-w-[90vw] ${width}`}>
@@ -120,7 +120,7 @@ function TractorPanel({ tree, onNavigate }: { tree: FitmentTree; onNavigate: () 
         <div className="flex-1 flex flex-col">
           <p className={columnTitleClass}>Modelo</p>
           <div className="px-2 pb-2 max-h-[420px] overflow-y-auto">
-            <div className="grid grid-cols-3 gap-x-1 gap-y-0.5">
+            <div className="flex flex-col gap-y-0.5">
               <AllItem
                 count={currentSeries.count}
                 onClick={() => go({ kind: "tractor", make: currentMake.name, series: currentSeries.name })}
@@ -151,7 +151,7 @@ function EnginePanel({ tree, onNavigate }: { tree: FitmentTree; onNavigate: () =
   const current = tree.engines.find((g) => g.make === make);
 
   return (
-    <div className={`flex divide-x divide-slate-100 dark:divide-slate-700 max-w-[90vw] ${current ? "w-[640px]" : "w-[300px]"}`}>
+    <div className={`flex divide-x divide-slate-100 dark:divide-slate-700 max-w-[90vw] ${current ? "w-[560px]" : "w-[300px]"}`}>
       <div className={`flex flex-col ${current ? "w-[260px] shrink-0 bg-slate-50/60 dark:bg-slate-900/40" : "w-full"}`}>
         <div className="p-3 pb-2">
           <NavMenuSearch value={query} onChange={setQuery} placeholder="Buscar marca o motor..." autoFocus />
@@ -171,7 +171,7 @@ function EnginePanel({ tree, onNavigate }: { tree: FitmentTree; onNavigate: () =
         <div className="flex-1 flex flex-col">
           <p className={columnTitleClass}>Motor</p>
           <div className="px-2 pb-2 max-h-[420px] overflow-y-auto">
-            <div className="grid grid-cols-2 gap-x-1 gap-y-0.5">
+            <div className="flex flex-col gap-y-0.5">
               <AllItem count={current.count} onClick={() => go({ kind: "make", make: current.make })} />
               {current.engines.map((en) => (
                 <button
@@ -262,7 +262,7 @@ export function MobileTractorMenu({ onNavigate }: { onNavigate: () => void }) {
                         <span className={countClass}>{s.count}</span>
                         <ChevronDown size={14} className="group-open/series:rotate-180 transition-transform" />
                       </summary>
-                      <div className="grid grid-cols-3 gap-x-2 pl-3 pb-2">
+                      <div className="flex flex-col pl-3 pb-2">
                         <button onClick={() => go({ kind: "tractor", make: m.name, series: s.name })} className={mobileAllClass}>
                           Todos
                         </button>
@@ -319,7 +319,7 @@ export function MobileEngineMenu({ onNavigate }: { onNavigate: () => void }) {
                   <span className={countClass}>{g.count}</span>
                   <ChevronDown size={14} className="group-open/make:rotate-180 transition-transform" />
                 </summary>
-                <div className="grid grid-cols-2 gap-x-3 pl-3 pb-2">
+                <div className="flex flex-col pl-3 pb-2">
                   <button onClick={() => go({ kind: "make", make: g.make })} className={mobileAllClass}>
                     <span>Todos</span>
                     <span className={countClass}>{g.count}</span>

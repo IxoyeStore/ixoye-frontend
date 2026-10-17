@@ -82,7 +82,7 @@ function CategoryPanel({ tree, onNavigate }: { tree: CategoryTree; onNavigate: (
   const current = tree.find((c) => c.name === selected);
 
   return (
-    <div className={`flex divide-x divide-slate-100 dark:divide-slate-700 ${current ? "w-[760px]" : "w-[300px]"} max-w-[90vw]`}>
+    <div className={`flex divide-x divide-slate-100 dark:divide-slate-700 ${current ? "w-[600px]" : "w-[300px]"} max-w-[90vw]`}>
       <div className={`flex flex-col ${current ? "w-[260px] shrink-0 bg-slate-50/60 dark:bg-slate-900/40" : "w-full"}`}>
         <div className="p-3 pb-2">
           <NavMenuSearch value={query} onChange={setQuery} placeholder="Buscar categoría o tipo..." autoFocus />
@@ -131,7 +131,7 @@ function CategoryPanel({ tree, onNavigate }: { tree: CategoryTree; onNavigate: (
               Esta categoría todavía no tiene tipos de producto.
             </p>
           )}
-          <div className="grid grid-cols-3 gap-x-2 gap-y-0.5">
+          <div className="flex flex-col gap-y-0.5">
             {current.types.map((t) => (
               <button key={t.name} onClick={() => go(current.name, t.name)} className={typeItemClass}>
                 <span className="truncate">{typeLabel(t.name)}</span>
@@ -204,7 +204,7 @@ export function MobileCategoryMenu({ onNavigate }: { onNavigate: () => void }) {
                     <span className={countClass}>{c.count}</span>
                     <ChevronDown size={14} className="group-open/cat:rotate-180 transition-transform" />
                   </summary>
-                  <div className="grid grid-cols-2 gap-x-3 pl-7 pb-2">
+                  <div className="flex flex-col pl-7 pb-2">
                     {c.types.map((t) => (
                       <button
                         key={t.name}
