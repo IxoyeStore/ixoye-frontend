@@ -358,7 +358,7 @@ export default function Header({
   const iconClass = `flex flex-col items-center justify-center gap-1 px-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover:bg-white/10 text-white/90 min-w-[64px] ${
     scrolled ? "h-11" : "h-14"
   }`;
-  const navTextClass = `text-[9px] font-black uppercase italic tracking-wider text-center ${scrolled ? "hidden" : ""}`;
+  const navTextClass = "text-[9px] font-black uppercase italic tracking-wider text-center";
 
   return (
     <>
@@ -371,8 +371,12 @@ export default function Header({
     <header className="w-full sticky top-0 z-50 shadow-lg">
       {/* FRANJA SUPERIOR */}
       <div className="w-full bg-[#003366] bg-gradient-to-t from-[#0055a4] to-[#003366] text-white">
+        {/* Ancho completo: logo pegado a la izquierda, accesos a la derecha y el
+            buscador ocupa todo lo de en medio. Al hacer scroll solo cambia el
+            alto de la franja; logo, texto y accesos conservan su ancho para que
+            el buscador mida siempre lo mismo. */}
         <div
-          className={`max-w-7xl mx-auto px-4 flex justify-between items-center h-20 gap-8 transition-[height] duration-200 ${
+          className={`w-full px-4 md:px-6 flex justify-between items-center h-20 gap-6 transition-[height] duration-200 ${
             scrolled ? "md:h-16" : "md:h-24"
           }`}
         >
@@ -381,12 +385,10 @@ export default function Header({
               src="/logo-ixoye.webp"
               width={397}
               height={192}
-              className={`h-10 w-auto object-contain brightness-0 invert transition-[height] duration-200 ${
-                scrolled ? "md:h-10" : "md:h-14"
-              }`}
+              className="h-10 md:h-14 w-auto object-contain brightness-0 invert"
               alt="logo"
             />
-            <div className={`hidden flex-col justify-center pl-2 ${scrolled ? "" : "lg:flex"}`}>
+            <div className="hidden lg:flex flex-col justify-center pl-2">
               <h1 className="text-white font-black text-[21px] uppercase italic">
                 Refacciones
               </h1>
@@ -397,7 +399,7 @@ export default function Header({
           </Link>
 
           {/* Desktop search */}
-          <div ref={desktopRef} className="hidden md:flex flex-1 max-w-2xl relative">
+          <div ref={desktopRef} className="hidden md:flex flex-1 min-w-0 relative">
             <form onSubmit={handleSearch} className="w-full relative group">
               <input
                 type="text"
@@ -417,7 +419,7 @@ export default function Header({
             <PreviewDropdown />
           </div>
 
-          <nav className="hidden md:flex gap-1 items-center">
+          <nav className="hidden md:flex gap-1 items-center shrink-0">
             <Link href="/category" className={iconClass} title="Tienda">
               <Store className="w-6 h-6" />
               <span className={navTextClass}>Tienda</span>
