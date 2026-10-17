@@ -377,7 +377,7 @@ export default function Header({
             el buscador mida siempre lo mismo. */}
         <div
           className={`w-full px-4 md:px-6 flex justify-between items-center h-20 gap-6 transition-[height] duration-200 ${
-            scrolled ? "md:h-16" : "md:h-24"
+            scrolled ? "md:h-[76px]" : "md:h-24"
           }`}
         >
           <Link href="/" className="flex items-center gap-0 group shrink-0">
