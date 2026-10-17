@@ -12,6 +12,7 @@ const COLUMNS = [
   { key: "slug",           label: "slug",             width: 30 },
   { key: "department",     label: "departamento",     width: 20 },
   { key: "subDepartment",  label: "subDepartamento",  width: 20 },
+  { key: "categoryName",   label: "categoria",        width: 20 },
   { key: "productType",    label: "tipoProducto",     width: 20 },
   { key: "vehicleType",    label: "tipoVehiculo",     width: 20 },
   { key: "brand",          label: "marca",            width: 16 },
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
   let hasMore = true;
 
   while (hasMore) {
-    let url = `${API}/api/products?sort=productName:asc&pagination[page]=${page}&pagination[pageSize]=100`;
+    let url = `${API}/api/products?sort=productName:asc&populate[category][fields][0]=categoryName&pagination[page]=${page}&pagination[pageSize]=100`;
     if (search)   url += `&filters[$or][0][productName][$containsi]=${encodeURIComponent(search)}&filters[$or][1][code][$containsi]=${encodeURIComponent(search)}`;
     if (category) url += `&filters[category][slug][$eq]=${encodeURIComponent(category)}`;
     if (active)   url += `&filters[active][$eq]=${active}`;
@@ -65,6 +66,7 @@ export async function GET(request: NextRequest) {
 
   all.forEach((p) => {
     p.hasImages = Array.isArray(p.images) && p.images.length > 0;
+    p.categoryName = p.category?.categoryName ?? "";
   });
 
   // ── Build Excel ──────────────────────────────────────────────────────────

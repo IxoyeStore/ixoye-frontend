@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifySignedSession } from "@/lib/session";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token   = request.cookies.get("jwt")?.value;
   const session = request.cookies.get("session")?.value;
   const { pathname } = request.nextUrl;

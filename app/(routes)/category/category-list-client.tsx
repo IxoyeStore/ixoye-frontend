@@ -16,6 +16,8 @@ import { useCart } from "@/hooks/use-cart";
 import { useLovedProducts } from "@/hooks/use-loved-products";
 import Link from "next/link";
 import Image from "next/image";
+import { vehicleStrapiFilters } from "@/lib/vehicle";
+import { useCategoryTree, typeLabel } from "@/lib/category-tree";
 
 const BRANDS = [
   "EMMARK","WEGA","BALDWIN","SAKURA","PFI","FERSA","DAI","EDTPART","GABRIEL",
@@ -116,8 +118,6 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
   const [totalCount, setTotalCount]   = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode]       = useState<"grid" | "list">("grid");
-  const [productTypeOptions, setProductTypeOptions] = useState<string[]>([]);
-  const [loadingProductTypes, setLoadingProductTypes] = useState(false);
   const [stickyTop, setStickyTop]     = useState(0);
 
   // En escritorio el panel de filtros arranca abierto (hay espacio de
@@ -150,6 +150,11 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
   const productType  = searchParams.get("productType");
   const series       = searchParams.get("series");
   const productName  = searchParams.get("productName");
+  // Equipo del cliente (buscador de vehiculo): tractor o motor compatible.
+  const make          = searchParams.get("make");
+  const tractorSeries = searchParams.get("tractorSeries");
+  const model         = searchParams.get("model");
+  const engine        = searchParams.get("engine");
 
   // Todas las categorias reales (no solo las destacadas del home), para que
   // el filtro sea exacto y no oculte categorias validas como FRENOS o ELECTRICO.
@@ -161,32 +166,14 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
       .catch(() => setCategories([]));
   }, []);
 
-  // El filtro de Tipo de Producto depende de la categoria elegida: cada vez
-  // que cambia, se traen los tipoProducto reales que existen dentro de esa
-  // categoria (mismo patron que technical-filter-modal.tsx).
-  useEffect(() => {
-    if (!category) {
-      setProductTypeOptions([]);
-      return;
-    }
-    let cancelled = false;
-    setLoadingProductTypes(true);
-    const params = new URLSearchParams();
-    params.set("filters[category][categoryName][$eq]", category);
-    params.set("filters[productType][$notNull]", "true");
-    params.set("fields[0]", "productType");
-    params.set("pagination[pageSize]", "100");
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products?${params.toString()}`)
-      .then(r => r.json())
-      .then(json => {
-        if (cancelled) return;
-        const values = (json.data ?? []).map((p: any) => p.productType).filter(Boolean);
-        setProductTypeOptions(Array.from(new Set(values)).sort() as string[]);
-      })
-      .catch(() => { if (!cancelled) setProductTypeOptions([]); })
-      .finally(() => { if (!cancelled) setLoadingProductTypes(false); });
-    return () => { cancelled = true; };
-  }, [category]);
+  // El filtro de Tipo de Producto depende de la categoria elegida. Los tipos
+  // salen del arbol de categorias del backend, que cuenta todos los productos
+  // (antes se muestreaban solo los primeros 100 de la categoria).
+  const { tree: categoryTree, error: categoryTreeError } = useCategoryTree();
+  const loadingProductTypes = !!category && !categoryTree && !categoryTreeError;
+  const productTypeOptions = category
+    ? (categoryTree?.find(c => c.name === category)?.types ?? []).map(t => t.name)
+    : [];
 
   // Cambiar un filtro siempre reinicia la paginacion a la pagina 1.
   const setParam = (key: string, value: string | null) => {
@@ -209,11 +196,25 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
+  const clearVehicle = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    ["make", "tractorSeries", "model", "engine", "page"].forEach(k => params.delete(k));
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  const vehicleChip = make && {
+    key: "vehicle",
+    label: engine
+      ? `Motor: ${make} ${engine}`
+      : `Equipo: ${[make, model || tractorSeries].filter(Boolean).join(" ")}`,
+  };
+
   const activeFilters = [
+    vehicleChip,
     brand       && { key: "brand",       label: `Marca: ${brand}` },
     vehicleType && { key: "vehicleType", label: `Vehículo: ${vehicleType}` },
     category    && { key: "category",    label: `Categoría: ${category}` },
-    productType && { key: "productType", label: `Tipo: ${productType}` },
+    productType && { key: "productType", label: `Tipo: ${typeLabel(productType)}` },
     series      && { key: "series",      label: `Serie: ${series}` },
   ].filter(Boolean) as { key: string; label: string }[];
 
@@ -230,11 +231,13 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
       params.set("pagination[pageSize]", String(pageSize));
       params.set("sort[0]", currentSort);
       if (category)    params.set("filters[category][categoryName][$eq]", category);
-      if (productType) params.set("filters[productType][$eq]", productType);
+      // $eqi: el mismo tipo esta capturado con distintas mayusculas ("Balero"/"BALERO").
+      if (productType) params.set("filters[productType][$eqi]", productType);
       if (vehicleType) params.set("filters[vehicleType][$eq]", vehicleType);
       if (brand)       params.set("filters[brand][$containsi]", brand);
       if (series)      params.set("filters[series][$containsi]", series);
       if (productName) params.set("filters[productName][$containsi]", productName);
+      vehicleStrapiFilters({ make, tractorSeries, model, engine }).forEach(([k, v]) => params.set(k, v));
 
       const res  = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products?${params.toString()}`
@@ -261,7 +264,7 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
 
   useEffect(() => {
     fetchProducts(page);
-  }, [page, currentSort, category, productType, vehicleType, brand, series, productName]);
+  }, [page, currentSort, category, productType, vehicleType, brand, series, productName, make, tractorSeries, model, engine]);
 
   const goToPage = (p: number) => {
     if (p < 1 || p > totalPages || p === page) return;
@@ -365,7 +368,11 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
           {activeFilters.map(f => (
             <button
               key={f.key}
-              onClick={() => f.key === "category" ? setCategory(null) : setParam(f.key, null)}
+              onClick={() =>
+                f.key === "category" ? setCategory(null)
+                : f.key === "vehicle" ? clearVehicle()
+                : setParam(f.key, null)
+              }
               className="flex items-center gap-1.5 h-7 px-3 rounded-full bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 text-[11px] font-bold hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-200 dark:hover:border-red-800 hover:text-red-500 transition-colors"
             >
               {f.label}
@@ -404,7 +411,7 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
 
             {/* Brand */}
             <div className="flex flex-col gap-1 min-w-[160px]">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Marca</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Marca de refacción</label>
               <select
                 value={brand || ""}
                 onChange={e => setParam("brand", e.target.value || null)}
@@ -464,7 +471,7 @@ function CategoryContent({ title = "Tienda Principal" }: { title?: string }) {
                       : "Todos los tipos"}
                 </option>
                 {productTypeOptions.map(t => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t} value={t}>{typeLabel(t)}</option>
                 ))}
               </select>
             </div>

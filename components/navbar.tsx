@@ -33,6 +33,9 @@ import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useAdminAutoRedirect } from "@/hooks/use-admin-auto-redirect";
 import SupportMenu from "./support-menu";
 import TechnicalFilterModal from "./technical-filter-modal";
+import { TractorDropdown, EngineDropdown, MobileTractorMenu, MobileEngineMenu } from "./vehicle-nav-menus";
+import NavMenu from "./nav-menu";
+import { CategoryDropdown, MobileCategoryMenu } from "./category-nav-menu";
 import { cloudinaryUrl } from "@/lib/image-loader";
 import { FREE_SHIPPING_MIN_TOTAL } from "@/lib/shipping";
 
@@ -65,46 +68,9 @@ const STATIC_BRANDS = [
   { name: "TOYOPOWER", logo: "https://res.cloudinary.com/ddiafp5c0/image/upload/v1779323340/TOYOPOWER.webp" },
 ];
 
-const NavDropdown = ({ label, items, icon: Icon, color, onSelect }: any) => {
+const BrandDropdown = ({ onSelect, open, onToggle }: { onSelect: (name: string) => void; open: boolean; onToggle: () => void }) => {
   return (
-    <div className="relative group">
-      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white hover:border-sky-400 hover:bg-white/10 transition-all active:scale-95">
-        <Icon size={14} className={color} />
-        <span className="text-[10px] font-black uppercase tracking-[0.15em]">{label}</span>
-        <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
-      </button>
-      <div className="absolute top-full left-0 mt-2 w-96 max-w-[90vw] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
-        <div className="p-2 max-h-[400px] overflow-y-auto">
-          {items.length === 0 ? (
-            <div className="p-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase italic">Cargando...</div>
-          ) : (
-            <div className="grid grid-cols-2 gap-0.5">
-              {items.map((item: string) => (
-                <button
-                  key={item}
-                  onClick={() => onSelect(item)}
-                  className="w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-700 dark:hover:text-sky-400 rounded-xl transition-colors"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
-  return (
-    <div className="relative group">
-      <button className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white hover:border-sky-400 hover:bg-white/10 transition-all active:scale-95">
-        <ShieldCheck size={14} className="text-sky-300" />
-        <span className="text-[10px] font-black uppercase tracking-[0.15em]">Marcas</span>
-        <ChevronDown size={12} className="opacity-40 group-hover:rotate-180 transition-transform" />
-      </button>
-      <div className="absolute top-full right-0 mt-2 w-96 max-w-[90vw] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden">
+    <NavMenu label="Marcas" icon={ShieldCheck} open={open} onToggle={onToggle} align="right">
         <div className="p-3 grid grid-cols-2 gap-1.5 max-h-[480px] overflow-y-auto">
           {STATIC_BRANDS.map(({ name, logo }) => (
             <button
@@ -121,8 +87,7 @@ const BrandDropdown = ({ onSelect }: { onSelect: (name: string) => void }) => {
             </button>
           ))}
         </div>
-      </div>
-    </div>
+    </NavMenu>
   );
 };
 
@@ -190,7 +155,6 @@ export default function Header({
   const [searchQuery, setSearchQuery] = useState("");
   const [preview, setPreview] = useState<PreviewProduct[]>([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [dynamicProductTypes, setDynamicProductTypes] = useState<string[]>([]);
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
     type: "tractor" | "motor" | null;
@@ -198,6 +162,13 @@ export default function Header({
 
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  // Menus de "Busqueda por:" (con clic, uno abierto a la vez).
+  const [openMenu, setOpenMenu] = useState<"tractor" | "motor" | "category" | "brand" | null>(null);
+  const searchByRef = useRef<HTMLDivElement>(null);
+  const toggleMenu = (menu: NonNullable<typeof openMenu>) =>
+    setOpenMenu((current) => (current === menu ? null : menu));
+  const closeMenu = () => setOpenMenu(null);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -219,7 +190,18 @@ export default function Header({
     setShowPreview(false);
     setSearchQuery("");
     setNotifOpen(false);
+    setOpenMenu(null);
   }, [pathname]);
+
+  // Click outside → close "Busqueda por:" menus
+  useEffect(() => {
+    if (!openMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (!searchByRef.current?.contains(e.target as Node)) setOpenMenu(null);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [openMenu]);
 
   // Click outside → close notifications dropdown
   useEffect(() => {
@@ -244,7 +226,7 @@ export default function Header({
   // Escape → close preview
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setShowPreview(false);
+      if (e.key === "Escape") { setShowPreview(false); setOpenMenu(null); }
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
@@ -323,29 +305,6 @@ export default function Header({
     setOpen(false);
     (document.activeElement as HTMLElement)?.blur();
   };
-
-  useEffect(() => {
-    const fetchProductTypes = async () => {
-      try {
-        const res = await fetch(
-          `${API}/api/products?fields[0]=productType&pagination[pageSize]=100`,
-        );
-        const json = await res.json();
-        if (json.data) {
-          const types = json.data.map(
-            (item: any) => (item.attributes || item).productType,
-          );
-          const uniqueTypes = Array.from(
-            new Set(types.filter(Boolean)),
-          ) as string[];
-          setDynamicProductTypes(uniqueTypes.sort());
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchProductTypes();
-  }, []);
 
   const handleStaticSelect = (val: string, param: string) => {
     router.push(`/category?${param}=${encodeURIComponent(val.toLowerCase())}`);
@@ -584,15 +543,15 @@ export default function Header({
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <NavDropdown
-              label="Categoría"
-              items={dynamicProductTypes}
-              icon={Package}
-              color="text-sky-300"
-              onSelect={(val: string) => handleStaticSelect(val, "category")}
+          <div ref={searchByRef} className="flex items-center gap-4">
+            <TractorDropdown open={openMenu === "tractor"} onToggle={() => toggleMenu("tractor")} onNavigate={closeMenu} />
+            <EngineDropdown open={openMenu === "motor"} onToggle={() => toggleMenu("motor")} onNavigate={closeMenu} />
+            <CategoryDropdown open={openMenu === "category"} onToggle={() => toggleMenu("category")} onNavigate={closeMenu} />
+            <BrandDropdown
+              open={openMenu === "brand"}
+              onToggle={() => toggleMenu("brand")}
+              onSelect={(val) => { handleStaticSelect(val, "brand"); closeMenu(); }}
             />
-            <BrandDropdown onSelect={(val) => handleStaticSelect(val, "brand")} />
           </div>
         </div>
 
@@ -801,31 +760,9 @@ export default function Header({
               </p>
 
               <div className="space-y-3">
-                <details className="group">
-                  <summary className="flex items-center justify-between p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 list-none cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <Package size={18} />
-                      <span className="text-[11px] font-black uppercase italic">
-                        Tipos de Producto
-                      </span>
-                    </div>
-                    <ChevronDown
-                      size={16}
-                      className="group-open:rotate-180 transition-transform"
-                    />
-                  </summary>
-                  <div className="grid grid-cols-1 gap-1 mt-2 pl-4 border-l-2 border-emerald-100 dark:border-emerald-800">
-                    {dynamicProductTypes.map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => handleStaticSelect(type, "category")}
-                        className="text-left py-3.5 text-sm font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 last:border-0"
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </details>
+                <MobileTractorMenu onNavigate={() => setOpen(false)} />
+                <MobileEngineMenu onNavigate={() => setOpen(false)} />
+                <MobileCategoryMenu onNavigate={() => setOpen(false)} />
 
                 <details className="group">
                   <summary className="flex items-center justify-between p-4 rounded-2xl bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 list-none cursor-pointer">

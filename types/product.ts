@@ -30,6 +30,7 @@ export type ProductType = {
   series: string;
   motors?: string;
   oemCode?: string;
+  oemNumbers?: string | null;
 
   // Valores y Estados
   price: number;

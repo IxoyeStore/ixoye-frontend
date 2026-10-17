@@ -18,6 +18,22 @@ import { lookupCP } from "@/lib/cp-lookup";
 // recalcula y cobra el envio con los mismos valores.
 import { FREE_SHIPPING_MIN_TOTAL, SHIPPING_FLAT_COST } from "@/lib/shipping";
 
+// Tiendas donde se puede pagar en efectivo con la referencia de Openpay (Paynet).
+// Ordenadas por tipo para que en escritorio (4 por fila) cada grupo quede en
+// su propia fila: autoservicio, conveniencia, farmacias y otros.
+const CASH_PAYMENT_STORES = [
+  { name: "Walmart", src: "/pagos/walmart.svg" },
+  { name: "Sam's Club", src: "/pagos/sams-club.svg" },
+  { name: "Bodega Aurrera", src: "/pagos/bodega-aurrera.png" },
+  { name: "Soriana", src: "/pagos/soriana.svg" },
+  { name: "7-Eleven", src: "/pagos/7-eleven.svg" },
+  { name: "Circle K", src: "/pagos/circle-k.svg" },
+  { name: "Kiosko", src: "/pagos/kiosko.png" },
+  { name: "SYS Tienda", src: "/pagos/sys-tienda.png" },
+  { name: "Farmacias del Ahorro", src: "/pagos/farmacias-del-ahorro.png" },
+  { name: "Farmacias Guadalajara", src: "/pagos/farmacias-guadalajara.png" },
+  { name: "Waldo's", src: "/pagos/waldos.png" },
+];
 
 type ShippingZone = { available: boolean; label: string };
 
@@ -191,7 +207,10 @@ export default function Page() {
       : SHIPPING_FLAT_COST
     : 0;
   const shippingQuote = shippingZone
-    ? { cost: shippingUnavailable ? -1 : shippingCost, label: shippingZone.label }
+    ? {
+        cost: shippingUnavailable ? -1 : shippingCost,
+        label: shippingZone.label,
+      }
     : null;
   const finalTotal = totalPrice + shippingCost;
 
@@ -204,7 +223,10 @@ export default function Page() {
       {!hasItems ? (
         <div className="flex flex-col items-center justify-center py-24 sm:py-32 text-center bg-slate-50 dark:bg-slate-800 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-700 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="bg-white dark:bg-slate-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100/50 dark:ring-slate-800">
-            <ShoppingBasket size={32} className="text-slate-300 dark:text-slate-600" />
+            <ShoppingBasket
+              size={32}
+              className="text-slate-300 dark:text-slate-600"
+            />
           </div>
           <p className="text-slate-500 dark:text-slate-400 font-black uppercase text-xs tracking-widest mb-2">
             Tu carrito está vacío
@@ -331,14 +353,32 @@ export default function Page() {
               </p>
               <Separator className="bg-slate-200 dark:bg-slate-700 mt-4" />
 
-              <img
-                src="/pagos-tiendas.webp"
-                width={800}
-                height={190}
-                loading="lazy"
-                alt="Tiendas donde puedes pagar tu pedido en efectivo: Soriana, Walmart, Sam's Club, Bodega Aurrera, 7-Eleven, Farmacias del Ahorro, Waldo's, SyS Tienda, Kiosko y Circle K"
-                className="mt-4 w-full rounded-2xl border border-slate-100 dark:border-slate-700"
-              />
+              <div className="mt-4">
+                <p className="text-center text-md font-bold text-slate-800 dark:text-slate-200">
+                  ¿En dónde puedo pagar?
+                </p>
+                <ul className="mt-3 flex flex-wrap justify-center gap-2">
+                  {CASH_PAYMENT_STORES.map(({ name, src }) => (
+                    <li
+                      key={name}
+                      className="flex items-center justify-center h-16 px-2 rounded-xl bg-white border border-slate-100 dark:border-slate-700 w-[calc((100%-1rem)/3)] sm:w-[calc((100%-1.5rem)/4)]"
+                    >
+                      <img
+                        src={src}
+                        alt={name}
+                        title={name}
+                        loading="lazy"
+                        className="max-h-12 max-w-full object-contain"
+                      />
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-4 text-center text-sm text-slate-800 dark:text-slate-200">
+                  ¿Tienes dudas? Comunícate con nosotros por WhatsApp a través
+                  del botón de Soporte, o envíanos un correo a
+                  soporte@refaccionesixoye.mx
+                </p>
+              </div>
             </div>
           </div>
         </div>

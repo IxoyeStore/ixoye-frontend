@@ -46,7 +46,7 @@ function SearchContent() {
 
         const params = new URLSearchParams();
         const searchableFields = [
-          "productName", "code", "brand", "productType", "series", "oemCode", "motors", "description",
+          "productName", "code", "brand", "productType", "series", "oemCode", "oemNumbers", "motors", "description",
         ];
 
         // Cada palabra debe aparecer en AL MENOS uno de los campos (AND entre
@@ -84,6 +84,7 @@ function SearchContent() {
             const scoreOf = (p: any) => {
               if (p.oemCode?.toLowerCase() === q) return 400;
               if (p.code?.toLowerCase() === q) return 300;
+              if (p.oemNumbers?.toLowerCase().includes(`|${q}|`)) return 280;
               if (p.oemCode?.toLowerCase().includes(q)) return 250;
               if (p.code?.toLowerCase().includes(q)) return 200;
               if (p.productName?.toLowerCase().includes(q)) return 100;

@@ -18,6 +18,7 @@ const COLUMNS = [
   { key: "slug",           label: "slug"             },
   { key: "department",     label: "departamento"     },
   { key: "subDepartment",  label: "subDepartamento"  },
+  { key: "categoryName",   label: "categoria"        },
   { key: "productType",    label: "tipoProducto"     },
   { key: "vehicleType",    label: "tipoVehiculo"     },
   { key: "brand",          label: "marca"            },
@@ -272,6 +273,17 @@ export default function BulkProductsPage() {
         if (fields.department     !== undefined) payload.department     = String(fields.department);
         if (fields.subDepartment  !== undefined) payload.subDepartment  = String(fields.subDepartment);
         if (fields.productType    !== undefined) payload.productType    = String(fields.productType);
+        // categoria: nombre de una categoria existente; vacia no cambia la que ya tiene
+        const categoryName = String(fields.categoryName ?? "").trim();
+        if (categoryName) {
+          const cat = categories.find((c: any) => c.categoryName.toLowerCase() === categoryName.toLowerCase());
+          if (!cat) {
+            throw new Error(
+              `categoria inválida: "${categoryName}". Debe ser una de: ${categories.map((c: any) => c.categoryName).join(", ")}.`
+            );
+          }
+          payload.category = cat.documentId;
+        }
         if (isCreate || fields.vehicleType !== undefined) {
           const vehicleType = fields.vehicleType !== undefined ? String(fields.vehicleType).trim() : "";
           if (isCreate && !vehicleType) {
